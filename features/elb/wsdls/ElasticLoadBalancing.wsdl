@@ -1,0 +1,3698 @@
+<?xml version="1.0"?>
+<wsdl:definitions
+  targetNamespace="http://elasticloadbalancing.amazonaws.com/doc/2012-06-01/"
+  xmlns:tns="http://elasticloadbalancing.amazonaws.com/doc/2012-06-01/"
+  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+  xmlns:wsa="http://www.w3.org/2005/08/addressing/"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <wsdl:types>
+
+    <xs:schema
+      targetNamespace="http://elasticloadbalancing.amazonaws.com/doc/2012-06-01/"
+      elementFormDefault="qualified">
+
+      <xs:element name="ResponseMetadata">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="RequestId" type="xs:string"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="Error">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Type">
+              <xs:simpleType>
+                <xs:restriction base="xs:string">
+                  <xs:enumeration value="Receiver"/>
+                  <xs:enumeration value="Sender"/>
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:element>
+            <xs:element name="Code" type="xs:string"/>
+            <xs:element name="Message" type="xs:string"/>
+            <xs:element name="Detail">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:any maxOccurs="unbounded" minOccurs="0" namespace="##any" processContents="lax"/>
+                </xs:sequence>
+                <xs:anyAttribute namespace="##other" processContents="lax"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="ErrorResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:Error" maxOccurs="unbounded"/>
+            <xs:element name="RequestId" type="xs:string"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DescribeLoadBalancerPolicyTypes">
+        <xs:complexType>
+
+          <xs:annotation>
+            <xs:documentation><![CDATA[
+             	]]></xs:documentation>
+          </xs:annotation>
+          
+          <xs:sequence>
+            <xs:element name="PolicyTypeNames" type="tns:PolicyTypeNames" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                 	<p>
+                 	Specifies the name of the policy types.  If no names are specified,
+                 	returns the description of all
+                 	the policy types defined by Elastic Load Balancing service.
+                 	</p>
+                 ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DescribeLoadBalancerPolicyTypesResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:DescribeLoadBalancerPolicyTypesResult"/>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DescribeLoadBalancerPolicyTypesResult">
+        <xs:complexType>
+
+            <xs:annotation>
+              <xs:documentation><![CDATA[
+               	<p>
+               	The output for the <a>DescribeLoadBalancerPolicyTypes</a> action.
+               	</p>
+               ]]></xs:documentation>
+            </xs:annotation>
+            
+          <xs:sequence>
+            <xs:element name="PolicyTypeDescriptions" type="tns:PolicyTypeDescriptions" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                 	<p>
+                 	List of policy type description structures of the specified policy type.
+                 	If no policy type names are specified,
+                 	returns the description of all the policy types defined by Elastic Load Balancing service.
+                 	</p>
+                 ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="ConfigureHealthCheck">
+        <xs:complexType>
+
+          <xs:annotation>
+            <xs:documentation><![CDATA[
+              	<p>
+              	Input for the <a>ConfigureHealthCheck</a> action.
+              	</p>
+              ]]></xs:documentation>
+          </xs:annotation>
+          
+          <xs:sequence>
+            <xs:element name="LoadBalancerName" type="xs:string">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                      The mnemonic name associated with the LoadBalancer.
+                      This name must be unique within the client AWS account.
+                      </p>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="HealthCheck" type="tns:HealthCheck">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                      A structure containing the configuration information
+                      for the new healthcheck.
+                      </p>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="ConfigureHealthCheckResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:ConfigureHealthCheckResult"/>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="ConfigureHealthCheckResult">
+        <xs:complexType>
+
+            <xs:annotation>
+              <xs:documentation><![CDATA[
+                	<p>
+                	The output for the <a>ConfigureHealthCheck</a> action.
+                	</p>
+                ]]></xs:documentation>
+            </xs:annotation>
+            
+          <xs:sequence>
+            <xs:element name="HealthCheck" type="tns:HealthCheck" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                      The updated healthcheck for the instances.
+                      </p>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DetachLoadBalancerFromSubnets">
+        <xs:complexType>
+
+          <xs:annotation>
+            <xs:documentation><![CDATA[
+                 <p>
+                     The input for the <a>DetachLoadBalancerFromSubnets</a> action. 
+                 </p> 
+              ]]></xs:documentation>
+          </xs:annotation>
+          
+          <xs:sequence>
+            <xs:element name="LoadBalancerName" type="xs:string">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                          The name associated with the LoadBalancer to be detached.
+                          The name must be unique within the client AWS account.
+                      </p>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="Subnets" type="tns:Subnets">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                          A list of subnet IDs to remove from the set of configured subnets for the LoadBalancer.
+                      </p>  
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DetachLoadBalancerFromSubnetsResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:DetachLoadBalancerFromSubnetsResult"/>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DetachLoadBalancerFromSubnetsResult">
+        <xs:complexType>
+
+            <xs:annotation>
+              <xs:documentation><![CDATA[
+                    <p>
+                        The output for the <a>DetachLoadBalancerFromSubnets</a> action.
+                    </p>
+                ]]></xs:documentation>
+            </xs:annotation>
+            
+          <xs:sequence>
+            <xs:element name="Subnets" type="tns:Subnets" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                          A list of subnet IDs removed from the configured set of subnets for the LoadBalancer.  
+                      </p>  
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DescribeLoadBalancerPolicies">
+        <xs:complexType>
+
+          <xs:annotation>
+            <xs:documentation><![CDATA[
+             ]]></xs:documentation>
+          </xs:annotation>
+          
+          <xs:sequence>
+            <xs:element name="LoadBalancerName" type="xs:string" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                 	<p>
+                 	The mnemonic name associated with the LoadBalancer.
+                 	If no name is specified, the operation returns the attributes of either all the sample policies pre-defined by Elastic Load Balancing or the specified sample polices.
+                 	</p>
+                 ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="PolicyNames" type="tns:PolicyNames" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                 	<p>
+                 	  The names of LoadBalancer policies you've created or Elastic Load Balancing sample policy names.
+                 	</p>
+                 ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DescribeLoadBalancerPoliciesResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:DescribeLoadBalancerPoliciesResult"/>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DescribeLoadBalancerPoliciesResult">
+        <xs:complexType>
+
+            <xs:annotation>
+              <xs:documentation><![CDATA[
+                 <p>The output for the <a>DescribeLoadBalancerPolicies</a> action.
+                 </p>
+               ]]></xs:documentation>
+            </xs:annotation>
+            
+          <xs:sequence>
+            <xs:element name="PolicyDescriptions" type="tns:PolicyDescriptions" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                 	<p>
+                 	A list of policy description structures.
+                 	</p>
+                 ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="SetLoadBalancerPoliciesOfListener">
+        <xs:complexType>
+
+          <xs:annotation>
+            <xs:documentation><![CDATA[
+          		<p>
+          		The input for the <a>SetLoadBalancerPoliciesOfListener</a> action.
+          		</p>
+              ]]></xs:documentation>
+          </xs:annotation>
+          
+          <xs:sequence>
+            <xs:element name="LoadBalancerName" type="xs:string">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                      The name associated with the LoadBalancer.
+                      The name must be unique within the client AWS account.
+                      </p>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="LoadBalancerPort" type="xs:integer">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                      The external port of the LoadBalancer with which this policy applies to. 
+                      </p>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="PolicyNames" type="tns:PolicyNames">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                      List of policies to be associated with the listener. Currently this list can have at most
+                      one policy. If the list is empty, the current policy is removed from the listener.
+                      </p>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="SetLoadBalancerPoliciesOfListenerResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:SetLoadBalancerPoliciesOfListenerResult"/>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="SetLoadBalancerPoliciesOfListenerResult">
+        <xs:complexType>
+
+            <xs:annotation>
+              <xs:documentation><![CDATA[
+            		<p>
+            		The output for the <a>SetLoadBalancerPoliciesOfListener</a> action.
+            		</p>
+                ]]></xs:documentation>
+            </xs:annotation>
+            
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DisableAvailabilityZonesForLoadBalancer">
+        <xs:complexType>
+
+          <xs:annotation>
+            <xs:documentation><![CDATA[
+          		<p>
+          		The input for the <a>DisableAvailabilityZonesForLoadBalancer</a> action.
+          		</p>
+              ]]></xs:documentation>
+          </xs:annotation>
+          
+          <xs:sequence>
+            <xs:element name="LoadBalancerName" type="xs:string">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                      The name associated with the LoadBalancer.
+                      The name must be unique within the client AWS account.
+                      </p>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="AvailabilityZones" type="tns:AvailabilityZones">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                      A list of Availability Zones to be removed from the LoadBalancer.
+                      </p>
+                      <note>
+                      There must be at least one Availability Zone
+                      registered with a LoadBalancer at all times.
+                      The client cannot remove all the Availability Zones from a LoadBalancer.
+                      Specified Availability Zones must be in the same Region.
+                      </note>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DisableAvailabilityZonesForLoadBalancerResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:DisableAvailabilityZonesForLoadBalancerResult"/>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DisableAvailabilityZonesForLoadBalancerResult">
+        <xs:complexType>
+
+            <xs:annotation>
+              <xs:documentation><![CDATA[
+            		<p>
+            		The output for the <a>DisableAvailabilityZonesForLoadBalancer</a> action.
+            		</p>
+                ]]></xs:documentation>
+            </xs:annotation>
+            
+          <xs:sequence>
+            <xs:element name="AvailabilityZones" type="tns:AvailabilityZones" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                      A list of updated Availability Zones for the LoadBalancer.
+                      </p>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DescribeInstanceHealth">
+        <xs:complexType>
+
+          <xs:annotation>
+            <xs:documentation><![CDATA[
+                  <p>
+                  Returns the current state of the instances of the
+                  specified LoadBalancer. If no instances are specified,
+                  the state of all the instances for the LoadBalancer is returned.
+                  </p>
+              ]]></xs:documentation>
+          </xs:annotation>
+          
+          <xs:sequence>
+            <xs:element name="LoadBalancerName" type="xs:string">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                      The name associated with the LoadBalancer.
+                      The name must be unique within the client AWS account.
+                      </p>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="Instances" type="tns:Instances" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                      A list of instance IDs whose states are being queried.
+                      </p>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DescribeInstanceHealthResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:DescribeInstanceHealthResult"/>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DescribeInstanceHealthResult">
+        <xs:complexType>
+
+            <xs:annotation>
+              <xs:documentation><![CDATA[
+            		<p>
+            		The output for the <a>DescribeInstanceHealth</a> action.
+            		</p>
+                ]]></xs:documentation>
+            </xs:annotation>
+            
+          <xs:sequence>
+            <xs:element name="InstanceStates" type="tns:InstanceStates" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                      A list containing health information
+                      for the specified instances.
+                      </p>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DeleteLoadBalancerPolicy">
+        <xs:complexType>
+
+          <xs:annotation>
+            <xs:documentation><![CDATA[
+          		<p>
+          		The input for the <a>DeleteLoadBalancerPolicy</a> action.
+          		</p>
+              ]]></xs:documentation>
+          </xs:annotation>
+          
+          <xs:sequence>
+            <xs:element name="LoadBalancerName" type="xs:string">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                 	<p>
+                 	The mnemonic name associated with the LoadBalancer. 
+                 	The name must be unique within your AWS account.
+                 	</p>
+                 ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="PolicyName" type="xs:string">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                 	<p>
+                 	The mnemonic name for the policy being deleted. 
+                 	</p>
+                 ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DeleteLoadBalancerPolicyResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:DeleteLoadBalancerPolicyResult"/>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DeleteLoadBalancerPolicyResult">
+        <xs:complexType>
+
+            <xs:annotation>
+              <xs:documentation><![CDATA[
+            		<p>
+            		The output for the <a>DeleteLoadBalancerPolicy</a> action.
+            		</p>
+                ]]></xs:documentation>
+            </xs:annotation>
+            
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="CreateLoadBalancerPolicy">
+        <xs:complexType>
+
+          <xs:annotation>
+            <xs:documentation><![CDATA[
+             ]]></xs:documentation>
+          </xs:annotation>
+          
+          <xs:sequence>
+            <xs:element name="LoadBalancerName" type="xs:string">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                 	<p>
+                 	The name associated with the LoadBalancer for which the policy is being created.
+                 	This name must be unique within the client AWS account.
+                 	</p>
+                 ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="PolicyName" type="xs:string">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                 	<p>
+                 	The name of the LoadBalancer policy being created.
+                 	The name must be unique within the set of policies for this LoadBalancer.
+                 	</p>
+                 ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="PolicyTypeName" type="xs:string">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                 	<p>
+                 	The name of the base policy type being used to create this policy.
+                 	To get the list of policy types, use the <a>DescribeLoadBalancerPolicyTypes</a> action.
+                 	</p>
+                 ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="PolicyAttributes" type="tns:PolicyAttributes" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                 	<p>
+                 	A list of attributes associated with the policy being created.
+                 	</p>
+                 ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="CreateLoadBalancerPolicyResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:CreateLoadBalancerPolicyResult"/>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="CreateLoadBalancerPolicyResult">
+        <xs:complexType>
+
+            <xs:annotation>
+              <xs:documentation><![CDATA[
+                <p>The output for the <a>CreateLoadBalancerPolicy</a> action.
+                </p>
+               ]]></xs:documentation>
+            </xs:annotation>
+            
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="EnableAvailabilityZonesForLoadBalancer">
+        <xs:complexType>
+
+          <xs:annotation>
+            <xs:documentation><![CDATA[
+          		<p>
+          		The input for the <a>EnableAvailabilityZonesForLoadBalancer</a> action.
+          		</p>
+              ]]></xs:documentation>
+          </xs:annotation>
+          
+          <xs:sequence>
+            <xs:element name="LoadBalancerName" type="xs:string">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                      The name associated with the LoadBalancer.
+                      The name must be unique within the client AWS account.
+                      </p>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="AvailabilityZones" type="tns:AvailabilityZones">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                      A list of new Availability Zones for the LoadBalancer.
+                      Each Availability Zone must be in the same Region as the LoadBalancer.
+                      </p>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="EnableAvailabilityZonesForLoadBalancerResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:EnableAvailabilityZonesForLoadBalancerResult"/>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="EnableAvailabilityZonesForLoadBalancerResult">
+        <xs:complexType>
+
+            <xs:annotation>
+              <xs:documentation><![CDATA[
+            		<p>
+            		The output for the <a>EnableAvailabilityZonesForLoadBalancer</a> action.
+            		</p>
+                ]]></xs:documentation>
+            </xs:annotation>
+            
+          <xs:sequence>
+            <xs:element name="AvailabilityZones" type="tns:AvailabilityZones" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                      An updated list of Availability Zones for the LoadBalancer.
+                      </p>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="CreateLoadBalancerListeners">
+        <xs:complexType>
+
+          <xs:annotation>
+            <xs:documentation><![CDATA[
+          		<p>
+          		The input for the <a>CreateLoadBalancerListeners</a> action.
+          		</p>
+              ]]></xs:documentation>
+          </xs:annotation>
+          
+          <xs:sequence>
+            <xs:element name="LoadBalancerName" type="xs:string">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                 	<p>
+                 	The name of the new LoadBalancer. The name must be unique within your AWS account. 
+                 	</p>
+                 ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="Listeners" type="tns:Listeners">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                 	<p>
+                 	A list of <code>LoadBalancerPort</code>, 
+                 	<code>InstancePort</code>, 
+                 	<code>Protocol</code>, and 
+                 	<code>SSLCertificateId</code> items.   	
+                 	</p>
+                 ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="CreateLoadBalancerListenersResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:CreateLoadBalancerListenersResult"/>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="CreateLoadBalancerListenersResult">
+        <xs:complexType>
+
+            <xs:annotation>
+              <xs:documentation><![CDATA[
+            		<p>
+            		The output for the <a>CreateLoadBalancerListeners</a> action.
+            		</p>
+                ]]></xs:documentation>
+            </xs:annotation>
+            
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="CreateLoadBalancer">
+        <xs:complexType>
+
+          <xs:annotation>
+            <xs:documentation><![CDATA[
+              	<p>
+              	The input for the <a>CreateLoadBalancer</a> action.
+              	</p>
+              ]]></xs:documentation>
+          </xs:annotation>
+          
+          <xs:sequence>
+            <xs:element name="LoadBalancerName" type="xs:string">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                      The name associated with the LoadBalancer.
+                      The name must be unique within your set of LoadBalancers.
+                      </p>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="Listeners" type="tns:Listeners">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                      A list of the following tuples:
+                      LoadBalancerPort, InstancePort, and Protocol.
+                      </p>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="AvailabilityZones" type="tns:AvailabilityZones" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                      A list of Availability Zones.
+                      </p>
+                      <p>
+                      At least one Availability Zone must be specified.
+                      Specified Availability Zones must be in the same EC2 Region
+                      as the LoadBalancer.
+                      Traffic will be equally distributed across all zones.
+                      </p>
+                      <p>
+                      This list can be modified
+                      after the creation of the LoadBalancer.
+                      </p>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="Subnets" type="tns:Subnets" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                     <p>
+                         A list of subnet IDs in your VPC to attach to your LoadBalancer.
+                     </p> 
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="SecurityGroups" type="tns:SecurityGroups" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                    <p>
+                        The security groups assigned to your LoadBalancer within your VPC.
+                    </p>  
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="Scheme" type="xs:string" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                    <p>The type of a LoadBalancer. </p>          
+                    
+                    <p>By default, Elastic Load Balancing creates an Internet-facing LoadBalancer
+                        with a publicly resolvable DNS name, which resolves to public IP addresses. </p>
+                        
+                        <p>Specify the value <code>internal</code> for this option to create an internal LoadBalancer
+                            with a DNS name that resolves to private IP addresses.</p>
+                        
+                       <p>This option is only available for LoadBalancers attached to an Amazon VPC.</p>
+                       
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="CreateLoadBalancerResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:CreateLoadBalancerResult"/>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="CreateLoadBalancerResult">
+        <xs:complexType>
+
+            <xs:annotation>
+              <xs:documentation><![CDATA[
+            		<p>
+            		The output for the <a>CreateLoadBalancer</a> action.
+            		</p>
+                ]]></xs:documentation>
+            </xs:annotation>
+            
+          <xs:sequence>
+            <xs:element name="DNSName" type="xs:string" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                      The DNS name for the LoadBalancer.
+                      </p>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DeleteLoadBalancer">
+        <xs:complexType>
+
+          <xs:annotation>
+            <xs:documentation><![CDATA[
+          		<p>
+          		The input for the <a>DeleteLoadBalancer</a> action.
+          		</p>
+              ]]></xs:documentation>
+          </xs:annotation>
+          
+          <xs:sequence>
+            <xs:element name="LoadBalancerName" type="xs:string">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                      The name associated with the LoadBalancer.
+                      The name must be unique within the client AWS account.
+                      </p>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DeleteLoadBalancerResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:DeleteLoadBalancerResult"/>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DeleteLoadBalancerResult">
+        <xs:complexType>
+
+            <xs:annotation>
+              <xs:documentation><![CDATA[
+            		<p>
+            		The output for the <a>DeleteLoadBalander</a> action.
+            		</p>
+                ]]></xs:documentation>
+            </xs:annotation>
+            
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="SetLoadBalancerPoliciesForBackendServer">
+        <xs:complexType>
+
+          <xs:annotation>
+            <xs:documentation><![CDATA[
+             ]]></xs:documentation>
+          </xs:annotation>
+          
+          <xs:sequence>
+            <xs:element name="LoadBalancerName" type="xs:string">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                 	<p>
+                 	The mnemonic name associated with the LoadBalancer.
+                 	This name must be unique within the client AWS account.
+                 	</p>
+                 ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="InstancePort" type="xs:integer">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                 	<p>
+                 	The port number associated with the back-end server.
+                 	</p>
+                 ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="PolicyNames" type="tns:PolicyNames">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                 	<p>
+                 	List of policy names to be set.  If the list is empty, then all current polices are
+                 	removed from the back-end server.
+                 	</p>
+                 ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="SetLoadBalancerPoliciesForBackendServerResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:SetLoadBalancerPoliciesForBackendServerResult"/>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="SetLoadBalancerPoliciesForBackendServerResult">
+        <xs:complexType>
+
+            <xs:annotation>
+              <xs:documentation><![CDATA[
+               	<p>
+               		The output for the <a>SetLoadBalancerPoliciesForBackendServer</a> action.
+               	</p>
+               ]]></xs:documentation>
+            </xs:annotation>
+            
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DeleteLoadBalancerListeners">
+        <xs:complexType>
+
+          <xs:annotation>
+            <xs:documentation><![CDATA[
+          		<p>
+          		The input for the <a>DeleteLoadBalancerListeners</a> action.
+          		</p>
+              ]]></xs:documentation>
+          </xs:annotation>
+          
+          <xs:sequence>
+            <xs:element name="LoadBalancerName" type="xs:string">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                 	<p>
+                 	The mnemonic name associated with the LoadBalancer. 
+                 	</p>
+                 ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="LoadBalancerPorts" type="tns:Ports">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                 	<p>
+                  The client port number(s) of the LoadBalancerListener(s) to be removed. 
+                 	</p>
+                 ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DeleteLoadBalancerListenersResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:DeleteLoadBalancerListenersResult"/>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DeleteLoadBalancerListenersResult">
+        <xs:complexType>
+
+            <xs:annotation>
+              <xs:documentation><![CDATA[
+            		<p>
+            		The output for the <a>DeleteLoadBalancerListeners</a> action.
+            		</p>
+                ]]></xs:documentation>
+            </xs:annotation>
+            
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DeregisterInstancesFromLoadBalancer">
+        <xs:complexType>
+
+          <xs:annotation>
+            <xs:documentation><![CDATA[
+          		<p>
+          		The input for the <a>DeregisterInstancesFromLoadBalancer</a> action.
+          		</p>
+              ]]></xs:documentation>
+          </xs:annotation>
+          
+          <xs:sequence>
+            <xs:element name="LoadBalancerName" type="xs:string">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                      The name associated with the LoadBalancer.
+                      The name must be unique within the client AWS account.
+                      </p>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="Instances" type="tns:Instances">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                      A list of EC2 instance IDs consisting of all
+                      instances to be deregistered.
+                      </p>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DeregisterInstancesFromLoadBalancerResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:DeregisterInstancesFromLoadBalancerResult"/>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DeregisterInstancesFromLoadBalancerResult">
+        <xs:complexType>
+
+            <xs:annotation>
+              <xs:documentation><![CDATA[
+            		<p>
+            		The output for the <a>DeregisterInstancesFromLoadBalancer</a> action.
+            		</p>
+                ]]></xs:documentation>
+            </xs:annotation>
+            
+          <xs:sequence>
+            <xs:element name="Instances" type="tns:Instances" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                      An updated list of remaining instances
+                      registered with the LoadBalancer.
+                      </p>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="SetLoadBalancerListenerSSLCertificate">
+        <xs:complexType>
+
+          <xs:annotation>
+            <xs:documentation><![CDATA[
+          		<p>
+          		The input for the <a>SetLoadBalancerListenerSSLCertificate</a> action.
+          		</p>
+              ]]></xs:documentation>
+          </xs:annotation>
+          
+          <xs:sequence>
+            <xs:element name="LoadBalancerName" type="xs:string">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                 	<p>
+                 	The name of the the LoadBalancer. 
+                 	</p>
+                 ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="LoadBalancerPort" type="xs:integer">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                 	<p>
+                 	The port that uses the specified SSL certificate. 
+                 	</p>
+                 ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="SSLCertificateId" type="xs:string">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                 	<p>
+                 	The ID of the SSL certificate chain to use. 
+                 	For more information on SSL certificates, see 
+                 	<a href="http://docs.amazonwebservices.com/IAM/latest/UserGuide/ManagingServerCerts.html">
+                 	Managing Server Certificates
+                 	</a>
+                 	in the AWS Identity and Access Management documentation. 
+                 	</p>
+                 ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="SetLoadBalancerListenerSSLCertificateResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:SetLoadBalancerListenerSSLCertificateResult"/>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="SetLoadBalancerListenerSSLCertificateResult">
+        <xs:complexType>
+
+            <xs:annotation>
+              <xs:documentation><![CDATA[
+            		<p>
+            		The output for the <a>SetLoadBalancerListenerSSLCertificate</a> action.
+            		</p>
+                ]]></xs:documentation>
+            </xs:annotation>
+            
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="CreateLBCookieStickinessPolicy">
+        <xs:complexType>
+
+          <xs:annotation>
+            <xs:documentation><![CDATA[
+          		<p>
+          		The input for the <a>CreateLBCookieStickinessPolicy</a> action.
+          		</p>
+              ]]></xs:documentation>
+          </xs:annotation>
+          
+          <xs:sequence>
+            <xs:element name="LoadBalancerName" type="xs:string">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                      The name associated with the LoadBalancer.
+                      The name must be unique within the client AWS account.
+                      </p>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="PolicyName" type="xs:string">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                      The name of the policy being created. 
+                      The name must be unique within the set of policies for this LoadBalancer.    
+                      </p>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="CookieExpirationPeriod" type="xs:long" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                      The time period in seconds after which the cookie should be considered stale. 
+                      Not specifying this parameter indicates that the sticky session will last for the duration 
+                      of the browser session. 
+                      </p>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="CreateLBCookieStickinessPolicyResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:CreateLBCookieStickinessPolicyResult"/>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="CreateLBCookieStickinessPolicyResult">
+        <xs:complexType>
+
+            <xs:annotation>
+              <xs:documentation><![CDATA[
+            		<p>
+            		The output for the <a>CreateLBCookieStickinessPolicy</a> action.
+            		</p>
+                ]]></xs:documentation>
+            </xs:annotation>
+            
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="AttachLoadBalancerToSubnets">
+        <xs:complexType>
+
+          <xs:annotation>
+            <xs:documentation><![CDATA[
+                 <p>
+                     The input for the <a>AttachLoadBalancerToSubnets</a> action.  
+                 </p> 
+              ]]></xs:documentation>
+          </xs:annotation>
+          
+          <xs:sequence>
+            <xs:element name="LoadBalancerName" type="xs:string">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                     <p>
+                         The name associated with the LoadBalancer.
+                         The name must be unique within the client AWS account.
+                     </p>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="Subnets" type="tns:Subnets">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                    <p>
+                      A list of subnet IDs to add for the LoadBalancer.
+                    </p>  
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="AttachLoadBalancerToSubnetsResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:AttachLoadBalancerToSubnetsResult"/>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="AttachLoadBalancerToSubnetsResult">
+        <xs:complexType>
+
+            <xs:annotation>
+              <xs:documentation><![CDATA[
+                <p>
+                    The output for the <a>AttachLoadBalancerToSubnets</a> action.
+                </p>
+                ]]></xs:documentation>
+            </xs:annotation>
+            
+          <xs:sequence>
+            <xs:element name="Subnets" type="tns:Subnets" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                    <p>
+                      A list of subnet IDs added for the LoadBalancer.  
+                    </p>  
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="CreateAppCookieStickinessPolicy">
+        <xs:complexType>
+
+          <xs:annotation>
+            <xs:documentation><![CDATA[
+          		<p>
+          		The input for the <a>CreateAppCookieStickinessPolicy</a> action.
+          		</p>
+              ]]></xs:documentation>
+          </xs:annotation>
+          
+          <xs:sequence>
+            <xs:element name="LoadBalancerName" type="xs:string">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                      The name associated with the LoadBalancer.
+                      The name must be unique within the client AWS account.
+                      </p>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="PolicyName" type="xs:string">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                      The name of the policy being created. 
+                      The name must be unique within the set of policies for this LoadBalancer.    
+                      </p>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="CookieName" type="xs:string">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                      Name of the application cookie used for stickiness. 
+                      </p>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="CreateAppCookieStickinessPolicyResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:CreateAppCookieStickinessPolicyResult"/>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="CreateAppCookieStickinessPolicyResult">
+        <xs:complexType>
+
+            <xs:annotation>
+              <xs:documentation><![CDATA[
+            		<p>
+            		The output for the <a>CreateAppCookieStickinessPolicy</a> action.
+            		</p>
+                ]]></xs:documentation>
+            </xs:annotation>
+            
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="RegisterInstancesWithLoadBalancer">
+        <xs:complexType>
+
+          <xs:annotation>
+            <xs:documentation><![CDATA[
+          		<p>
+          		The input for the <a>RegisterInstancesWithLoadBalancer</a> action.
+          		</p>
+              ]]></xs:documentation>
+          </xs:annotation>
+          
+          <xs:sequence>
+            <xs:element name="LoadBalancerName" type="xs:string">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                      The name associated with the LoadBalancer.
+                      The name must be unique within the client AWS account.
+                      </p>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="Instances" type="tns:Instances">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                      A list of instance IDs that should be registered with the LoadBalancer.</p>
+                      <note>When the instance is stopped and then restarted, the IP addresses associated 
+                          with your instance changes. Elastic Load Balancing cannot recognize the new IP address,
+                          which prevents it from routing traffic to your instances. We recommend that you 
+                          de-register your Amazon EC2 instances from your load balancer after you stop your 
+                          instance, and then register the load balancer with your instance after you've restarted. 
+                          To de-register your instances from load balancer, use <a>DeregisterInstancesFromLoadBalancer</a> action.</note>
+                      
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="RegisterInstancesWithLoadBalancerResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:RegisterInstancesWithLoadBalancerResult"/>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="RegisterInstancesWithLoadBalancerResult">
+        <xs:complexType>
+
+            <xs:annotation>
+              <xs:documentation><![CDATA[
+            		<p>
+            		The output for the <a>RegisterInstancesWithLoadBalancer</a> action.
+            		</p>
+                ]]></xs:documentation>
+            </xs:annotation>
+            
+          <xs:sequence>
+            <xs:element name="Instances" type="tns:Instances" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                      An updated list of instances for the LoadBalancer.
+                      </p>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="ApplySecurityGroupsToLoadBalancer">
+        <xs:complexType>
+
+          <xs:annotation>
+            <xs:documentation><![CDATA[
+                <p>
+                    The input for the <a>ApplySecurityGroupsToLoadBalancer</a> action.
+                </p>  
+              ]]></xs:documentation>
+          </xs:annotation>
+          
+          <xs:sequence>
+            <xs:element name="LoadBalancerName" type="xs:string">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                     <p>
+                         The name associated with the LoadBalancer.
+                         The name must be unique within the client AWS account.  
+                     </p> 
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="SecurityGroups" type="tns:SecurityGroups">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                    <p>
+                        A list of security group IDs to associate with your LoadBalancer in VPC. The security
+                        group IDs must be provided as the ID and not the security group name (For example, sg-1234).
+                    </p>  
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="ApplySecurityGroupsToLoadBalancerResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:ApplySecurityGroupsToLoadBalancerResult"/>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="ApplySecurityGroupsToLoadBalancerResult">
+        <xs:complexType>
+
+            <xs:annotation>
+              <xs:documentation><![CDATA[
+                   <p>
+                       The out for the <a>ApplySecurityGroupsToLoadBalancer</a> action.
+                   </p> 
+                ]]></xs:documentation>
+            </xs:annotation>
+            
+          <xs:sequence>
+            <xs:element name="SecurityGroups" type="tns:SecurityGroups" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                     <p>
+                         A list of security group IDs associated with your LoadBalancer.
+                     </p> 
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DescribeLoadBalancers">
+        <xs:complexType>
+
+          <xs:annotation>
+            <xs:documentation><![CDATA[
+          		<p>
+          		The input for the <a>DescribeLoadBalancers</a> action.
+          		</p>
+              ]]></xs:documentation>
+          </xs:annotation>
+          
+          <xs:sequence>
+            <xs:element name="LoadBalancerNames" type="tns:LoadBalancerNames" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                          A list of names associated with the LoadBalancers at creation time.
+                      </p>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="Marker" type="xs:string" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                          An optional parameter reserved for future use.
+                      </p>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DescribeLoadBalancersResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:DescribeLoadBalancersResult"/>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DescribeLoadBalancersResult">
+        <xs:complexType>
+
+            <xs:annotation>
+              <xs:documentation><![CDATA[
+            		<p>
+            		The output for the <a>DescribeLoadBalancers</a> action.
+            		</p>
+                ]]></xs:documentation>
+            </xs:annotation>
+            
+          <xs:sequence>
+            <xs:element name="LoadBalancerDescriptions" type="tns:LoadBalancerDescriptions" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                      A list of LoadBalancer description structures.
+                      </p>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="NextMarker" type="xs:string" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                          An optional parameter reserved for future use.
+                      </p>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:complexType name="InstanceState">
+
+        <xs:annotation>
+          <xs:documentation><![CDATA[
+                <p>
+                The InstanceState data type.
+                </p>
+            ]]></xs:documentation>
+        </xs:annotation>
+        
+        <xs:sequence>
+            <xs:element name="InstanceId" type="xs:string" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                      Provides an EC2 instance ID.
+                      </p>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="State" type="xs:string" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                      Specifies the current status of the instance.
+                      </p>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="ReasonCode" type="xs:string" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                      Provides information about the cause of <i>OutOfService</i> instances.
+                      Specifically, it indicates whether the cause is Elastic Load Balancing
+                      or the instance behind the LoadBalancer.
+                      </p>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="Description" type="xs:string" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                          Provides a description of the instance.
+                      </p>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="PolicyTypeDescription">
+
+        <xs:annotation>
+          <xs:documentation><![CDATA[
+           	<p>
+           	The <a>PolicyTypeDescription</a> data type.
+           	</p>
+           ]]></xs:documentation>
+        </xs:annotation>
+        
+        <xs:sequence>
+            <xs:element name="PolicyTypeName" type="xs:string" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                 	<p>
+                 	The name of the policy type.
+                 	</p>
+                 ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="Description" type="xs:string" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                 	<p>
+                 	A human-readable description of the policy type.
+                 	</p>
+                 ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="PolicyAttributeTypeDescriptions" type="tns:PolicyAttributeTypeDescriptions" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                 	<p>
+                 	The description of the policy attributes associated with the LoadBalancer policies defined by the Elastic Load Balancing service.
+                 	</p>
+                 ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:simpleType name="HealthCheckInterval">
+        <xs:restriction base="xs:integer">
+        </xs:restriction>
+      </xs:simpleType>
+
+      <xs:complexType name="SourceSecurityGroup">
+
+        <xs:annotation>
+          <xs:documentation><![CDATA[
+                <p>
+                    This data type is used as a response element in the <a>DescribeLoadBalancers</a> action.
+                    For information about Elastic Load Balancing security groups, go to <a href="http://docs.amazonwebservices.com/ElasticLoadBalancing/latest/DeveloperGuide/elb-security-features.html#using-elb-security-groups">Using Security Groups With Elastic Load Balancing</a>
+                    in the <i>Elastic Load Balancing Developer Guide</i>. 
+                </p>
+            ]]></xs:documentation>
+        </xs:annotation>
+        
+        <xs:sequence>
+            <xs:element name="OwnerAlias" type="xs:string" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                          Owner of the source security group. Use this value for the 
+                          <code>--source-group-user</code> parameter of the <code>ec2-authorize</code>
+                          command in the Amazon EC2 command line tool.
+                      </p>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="GroupName" type="xs:string" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                          Name of the source security group. Use this value for the 
+                          <code>--source-group</code> parameter of the <code>ec2-authorize</code>
+                          command in the Amazon EC2 command line tool.
+                      </p>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="PolicyTypeNames">
+        <xs:sequence>
+          <xs:element name="member" type="xs:string" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="Instance">
+
+        <xs:annotation>
+          <xs:documentation><![CDATA[
+                <p>
+                The Instance data type.
+                </p>
+            ]]></xs:documentation>
+        </xs:annotation>
+        
+        <xs:sequence>
+            <xs:element name="InstanceId" type="xs:string" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                      Provides an EC2 instance ID.
+                      </p>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="AppCookieStickinessPolicies">
+        <xs:sequence>
+          <xs:element name="member" type="tns:AppCookieStickinessPolicy" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="PolicyAttributeTypeDescriptions">
+        <xs:sequence>
+          <xs:element name="member" type="tns:PolicyAttributeTypeDescription" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="PolicyAttributeDescriptions">
+        <xs:sequence>
+          <xs:element name="member" type="tns:PolicyAttributeDescription" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="LoadBalancerDescription">
+
+        <xs:annotation>
+          <xs:documentation><![CDATA[
+                <p>
+               Contains the result of a successful invocation of <a>DescribeLoadBalancers</a>.
+                </p>
+            ]]></xs:documentation>
+        </xs:annotation>
+        
+        <xs:sequence>
+            <xs:element name="LoadBalancerName" type="xs:string" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                      Specifies the name associated with the LoadBalancer.
+                      </p>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="DNSName" type="xs:string" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                      Specifies the external DNS name associated with the LoadBalancer.
+                      </p>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="CanonicalHostedZoneName" type="xs:string" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                      Provides the name of the Amazon Route 53 hosted zone that is associated
+                      with the LoadBalancer. For information on how to associate your load
+                      balancer with a hosted zone, go to <a href="http://docs.amazonwebservices.com/ElasticLoadBalancing/latest/DeveloperGuide/using-domain-names-with-elb.html">Using Domain Names With Elastic Load Balancing</a>
+                      in the <i>Elastic Load Balancing Developer Guide</i>.
+                      </p>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="CanonicalHostedZoneNameID" type="xs:string" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                      Provides the ID of the Amazon Route 53 hosted zone name that is associated
+                      with the LoadBalancer. For information on how to associate or disassociate your load
+                      balancer with a hosted zone, go to <a href="http://docs.amazonwebservices.com/ElasticLoadBalancing/latest/DeveloperGuide/using-domain-names-with-elb.html">Using Domain Names With Elastic Load Balancing</a>
+                          in the <i>Elastic Load Balancing Developer Guide</i>. 
+                      </p>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="ListenerDescriptions" type="tns:ListenerDescriptions" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                      LoadBalancerPort, InstancePort, Protocol, InstanceProtocol, and PolicyNames are returned
+                      in a list of tuples in the ListenerDescriptions element.
+                      </p>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="Policies" type="tns:Policies" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                 		<p>
+                 		Provides a list of policies defined for the LoadBalancer.
+                 		</p>
+                 	]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="BackendServerDescriptions" type="tns:BackendServerDescriptions" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                 	<p>
+                 	Contains a list of back-end server descriptions.
+                 	</p>
+                 ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="AvailabilityZones" type="tns:AvailabilityZones" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                      Specifies a list of Availability Zones.
+                      </p>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="Subnets" type="tns:Subnets" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                    <p>
+                        Provides a list of VPC subnet IDs for the LoadBalancer.
+                    </p>  
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="VPCId" type="xs:string" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                    <p>
+                        Provides the ID of the VPC attached to the LoadBalancer.
+                    </p>  
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="Instances" type="tns:Instances" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                      Provides a list of EC2 instance IDs for the LoadBalancer.
+                      </p>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="HealthCheck" type="tns:HealthCheck" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                      Specifies information regarding the
+                      various health probes conducted on the LoadBalancer.
+                      </p>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="SourceSecurityGroup" type="tns:SourceSecurityGroup" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                          The security group that you can use as part of your inbound rules for 
+                          your LoadBalancer's back-end Amazon EC2 application instances.  
+                          To only allow traffic from LoadBalancers, add a security group rule to your back end instance that specifies this
+                          source security group as the inbound source. 
+                      </p>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="SecurityGroups" type="tns:SecurityGroups" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                     <p>
+                        The security groups the LoadBalancer is a member of (VPC only).
+                     </p> 
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="CreatedTime" type="xs:dateTime" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                      Provides the date and time the LoadBalancer was created.
+                      </p>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="Scheme" type="xs:string" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                     <p>Specifies the type of LoadBalancer.</p>
+              
+                      <p>If the <code>Scheme</code>  is <code>internet-facing</code>, the LoadBalancer
+                      has a publicly resolvable DNS name that resolves to public IP addresses.</p>
+                      
+                      <p>If the <code>Scheme</code>  is <code>internal</code>, the LoadBalancer has a publicly resolvable
+                         DNS name that resolves to private IP addresses.</p>
+                        
+                       <p> This option is only available for LoadBalancers attached to an Amazon VPC. </p> 
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="PolicyDescriptions">
+        <xs:sequence>
+          <xs:element name="member" type="tns:PolicyDescription" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="PolicyAttributeDescription">
+
+        <xs:annotation>
+          <xs:documentation><![CDATA[
+           	<p>
+           	The <code>PolicyAttributeDescription</code> data type.
+           	This data type is used to describe the attributes and values
+           	associated with a policy.
+           	</p>
+           ]]></xs:documentation>
+        </xs:annotation>
+        
+        <xs:sequence>
+            <xs:element name="AttributeName" type="xs:string" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                 	<p>
+                 	The name of the attribute associated with the policy.
+                 	</p>
+                 ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="AttributeValue" type="xs:string" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                 	<p>
+                 	The value of the attribute associated with the policy.
+                 	</p>
+                 ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="Listeners">
+        <xs:sequence>
+          <xs:element name="member" type="tns:Listener" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="Listener">
+
+        <xs:annotation>
+          <xs:documentation><![CDATA[
+                <p>
+                The Listener data type.
+                </p>
+            ]]></xs:documentation>
+        </xs:annotation>
+        
+        <xs:sequence>
+            <xs:element name="Protocol" type="xs:string">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                      Specifies the LoadBalancer transport protocol to use for routing
+                      - HTTP, HTTPS, TCP or SSL.
+                      This property cannot be modified for the life of the LoadBalancer.
+                      </p>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="LoadBalancerPort" type="xs:integer">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                      Specifies the external LoadBalancer port number.
+                      This property cannot be modified for the life of the LoadBalancer.
+                      </p>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="InstanceProtocol" type="xs:string" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                 	<p>
+                 	Specifies the protocol to use for routing traffic to back-end instances - HTTP, HTTPS, TCP, or SSL.
+                 	This property cannot be modified for the life of the LoadBalancer.
+                 	</p>
+                 	<note>
+                 	If the front-end protocol is HTTP or HTTPS, <code>InstanceProtocol</code> has to be at the same protocol layer,
+                 	    i.e., HTTP or HTTPS. Likewise, if the front-end protocol is TCP or SSL, InstanceProtocol has to be TCP or SSL.
+                 	</note>
+                 	<note>
+                 	If there is another listener with the same <code>InstancePort</code> whose <code>InstanceProtocol</code> is secure,
+                 	i.e., HTTPS or SSL, the listener's <code>InstanceProtocol</code> has to be secure, i.e., HTTPS or SSL. 
+                  If there is another listener with the same <code>InstancePort</code> whose <code>InstanceProtocol</code> is HTTP or TCP,
+                  the listener's <code>InstanceProtocol</code> must be either HTTP or TCP. 
+                 	</note>
+                 ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="InstancePort" type="tns:InstancePort">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                      Specifies the TCP port on which the instance server is listening.
+                      This property cannot be modified for the life of the LoadBalancer.
+                      </p>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="SSLCertificateId" type="xs:string" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                 	<p>
+                 	The ARN string of the server certificate. 
+                 	To get the ARN of the server certificate, call the AWS Identity and Access Management  
+                 	    <a href="http://docs.amazonwebservices.com/IAM/latest/APIReference/index.html?API_UploadServerCertificate.html">UploadServerCertificate   	
+                 	</a> API. </p>
+                 ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="PolicyTypeDescriptions">
+        <xs:sequence>
+          <xs:element name="member" type="tns:PolicyTypeDescription" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="LoadBalancerDescriptions">
+        <xs:sequence>
+          <xs:element name="member" type="tns:LoadBalancerDescription" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="PolicyNames">
+        <xs:sequence>
+          <xs:element name="member" type="xs:string" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="Subnets">
+        <xs:sequence>
+          <xs:element name="member" type="xs:string" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="Instances">
+        <xs:sequence>
+          <xs:element name="member" type="tns:Instance" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="LoadBalancerNames">
+        <xs:sequence>
+          <xs:element name="member" type="xs:string" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="PolicyAttribute">
+
+        <xs:annotation>
+          <xs:documentation><![CDATA[
+           	<p>
+           	The <a>PolicyAttribute</a> data type.  This data type contains a key/value pair that defines properties of
+           	a specific policy.
+           	</p>
+           ]]></xs:documentation>
+        </xs:annotation>
+        
+        <xs:sequence>
+            <xs:element name="AttributeName" type="xs:string" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                 	<p>
+                 	The name of the attribute associated with the policy.
+                 	</p>
+                 ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="AttributeValue" type="xs:string" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                 	<p>
+                 	The value of the attribute associated with the policy.
+                 	</p>
+                 ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="AppCookieStickinessPolicy">
+
+        <xs:annotation>
+          <xs:documentation><![CDATA[
+           <p>The AppCookieStickinessPolicy data type.
+           </p>
+           ]]></xs:documentation>
+        </xs:annotation>
+        
+        <xs:sequence>
+            <xs:element name="PolicyName" type="xs:string" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                 <p>The mnemonic name for the policy being created. The name must be unique within a set of policies for this LoadBalancer.
+                 </p>
+                 ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="CookieName" type="xs:string" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                 <p>The name of the application cookie used for stickiness.
+                 </p>
+                 
+                 ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="InstanceStates">
+        <xs:sequence>
+          <xs:element name="member" type="tns:InstanceState" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="PolicyAttributes">
+        <xs:sequence>
+          <xs:element name="member" type="tns:PolicyAttribute" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:simpleType name="HealthCheckTimeout">
+        <xs:restriction base="xs:integer">
+        </xs:restriction>
+      </xs:simpleType>
+
+      <xs:complexType name="PolicyDescription">
+
+        <xs:annotation>
+          <xs:documentation><![CDATA[
+           	<p>
+           	The <code>PolicyDescription</code> data type.
+           	</p>
+           ]]></xs:documentation>
+        </xs:annotation>
+        
+        <xs:sequence>
+            <xs:element name="PolicyName" type="xs:string" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                 	<p>
+                 	The name mof the policy associated with the LoadBalancer.
+                 	</p>
+                 ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="PolicyTypeName" type="xs:string" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                 	<p>
+                 	The name of the policy type associated with the LoadBalancer.
+                 	</p>
+                 ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="PolicyAttributeDescriptions" type="tns:PolicyAttributeDescriptions" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                 	<p>
+                 	A list of policy attribute description structures.
+                 	</p>
+                 ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="PolicyAttributeTypeDescription">
+
+        <xs:annotation>
+          <xs:documentation><![CDATA[
+           	<p>
+           	The <code>PolicyAttributeTypeDescription</code> data type. This data type is used to describe values
+           	that are acceptable for the policy attribute.
+           	</p>
+           ]]></xs:documentation>
+        </xs:annotation>
+        
+        <xs:sequence>
+            <xs:element name="AttributeName" type="xs:string" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                 	<p>
+                 	The name of the attribute associated with the policy type.
+                 	</p>
+                 ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="AttributeType" type="xs:string" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                 	<p>
+                 	The type of attribute.  For example, Boolean, Integer, etc.
+                 	</p>
+                 ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="Description" type="xs:string" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                 	<p>
+                 	A human-readable description of the attribute.
+                 	</p>
+                 ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="DefaultValue" type="xs:string" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                 	<p>
+                 	The default value of the attribute, if applicable.
+                 	</p>
+                 ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="Cardinality" type="xs:string" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                 	<p>
+                 	The cardinality of the attribute.  Valid Values:
+                 		<ul>
+                 			<li>ONE(1) : Single value required</li>
+                 			<li>ZERO_OR_ONE(0..1) : Up to one value can be supplied</li>
+                 			<li>ZERO_OR_MORE(0..*) : Optional. Multiple values are allowed</li>
+                 			<li>ONE_OR_MORE(1..*0) : Required.  Multiple values are allowed</li>
+                 		</ul>
+                 	</p>
+                 ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="AvailabilityZones">
+        <xs:sequence>
+          <xs:element name="member" type="xs:string" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="BackendServerDescriptions">
+        <xs:sequence>
+          <xs:element name="member" type="tns:BackendServerDescription" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="LBCookieStickinessPolicies">
+        <xs:sequence>
+          <xs:element name="member" type="tns:LBCookieStickinessPolicy" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="Ports">
+        <xs:sequence>
+          <xs:element name="member" type="xs:integer" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="HealthCheck">
+
+        <xs:annotation>
+          <xs:documentation><![CDATA[
+                <p>
+                The HealthCheck data type.
+                </p>
+            ]]></xs:documentation>
+        </xs:annotation>
+        
+        <xs:sequence>
+            <xs:element name="Target" type="xs:string">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                      Specifies the instance being checked. The protocol is either TCP, HTTP, HTTPS, or SSL.
+                      The range of valid ports is one (1) through 65535.
+                      </p>
+                      <note>
+                          <p>
+                          TCP is the default, specified as a TCP: port pair,
+                          for example "TCP:5000". In this case a healthcheck simply
+                          attempts to open a TCP connection to the instance on the
+                          specified port. Failure to connect within the configured
+                          timeout is considered unhealthy.
+                          </p>
+                          <p>SSL is also specified as SSL: port pair, for example, SSL:5000.</p>
+                          <p>
+                          For HTTP or HTTPS protocol, the situation is different. You have to include a ping path in the string. HTTP is specified
+                          as a HTTP:port;/;PathToPing; grouping, for example
+                          "HTTP:80/weather/us/wa/seattle". In this case, a HTTP GET
+                          request is issued to the instance on the given port and path.
+                          Any answer other than "200 OK" within the timeout period is
+                          considered unhealthy.
+                          </p>
+                          <p>
+                          The total length of the HTTP ping target needs to
+                          be 1024 16-bit Unicode characters or less.
+                          </p>
+                      </note>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="Interval" type="tns:HealthCheckInterval">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                      Specifies the approximate interval, in seconds,
+                      between health checks of an individual instance.
+                      </p>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="Timeout" type="tns:HealthCheckTimeout">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                      Specifies the amount of time, in seconds, during which no response
+                      means a failed health probe.
+                      </p>
+                      <note>
+                      This value must be less than the <i>Interval</i> value.
+                      </note>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="UnhealthyThreshold" type="tns:UnhealthyThreshold">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                      Specifies the number of consecutive health probe failures required
+                      before moving the instance to the <i>Unhealthy</i> state.
+                      </p>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="HealthyThreshold" type="tns:HealthyThreshold">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                      <p>
+                      Specifies the number of consecutive health probe successes required before
+                      moving the instance to the <i>Healthy</i> state.
+                      </p>
+                  ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="BackendServerDescription">
+
+        <xs:annotation>
+          <xs:documentation><![CDATA[
+           	<p>
+           	This data type is used as a response element in the <a>DescribeLoadBalancers</a> action to describe the configuration of the back-end server.
+           	</p>
+           ]]></xs:documentation>
+        </xs:annotation>
+        
+        <xs:sequence>
+            <xs:element name="InstancePort" type="tns:InstancePort" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                 	<p>
+                 	Provides the port on which the back-end server is listening.
+                 	</p>
+                 ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="PolicyNames" type="tns:PolicyNames" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                 	<p>
+                 	Provides a list of policy names enabled for the back-end server.
+                 	</p>
+                 ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:simpleType name="InstancePort">
+        <xs:restriction base="xs:integer">
+        </xs:restriction>
+      </xs:simpleType>
+
+      <xs:complexType name="ListenerDescriptions">
+        <xs:sequence>
+          <xs:element name="member" type="tns:ListenerDescription" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="SecurityGroups">
+        <xs:sequence>
+          <xs:element name="member" type="xs:string" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:simpleType name="HealthyThreshold">
+        <xs:restriction base="xs:integer">
+        </xs:restriction>
+      </xs:simpleType>
+
+      <xs:simpleType name="UnhealthyThreshold">
+        <xs:restriction base="xs:integer">
+        </xs:restriction>
+      </xs:simpleType>
+
+      <xs:complexType name="ListenerDescription">
+
+        <xs:annotation>
+          <xs:documentation><![CDATA[
+           	<p>
+           	The ListenerDescription data type. 
+           	</p>
+           ]]></xs:documentation>
+        </xs:annotation>
+        
+        <xs:sequence>
+            <xs:element name="Listener" type="tns:Listener" minOccurs="0"/>
+            <xs:element name="PolicyNames" type="tns:PolicyNames" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                 	<p>
+                 	A list of policies enabled for this listener. 
+                 	An empty list indicates that no policies are enabled.
+                 	</p>
+                 ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="LBCookieStickinessPolicy">
+
+        <xs:annotation>
+          <xs:documentation><![CDATA[
+           <p>The LBCookieStickinessPolicy data type.
+           </p>
+           ]]></xs:documentation>
+        </xs:annotation>
+        
+        <xs:sequence>
+            <xs:element name="PolicyName" type="xs:string" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                 <p>The name for the policy being created. The name must be unique within the set of policies for this LoadBalancer.
+                 </p>
+                 ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="CookieExpirationPeriod" type="xs:long" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                 <p>The time period in seconds after which the cookie should be considered stale. Not specifying this parameter indicates that the stickiness session will last for the duration of the browser session.
+                 </p>
+                 ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="Policies">
+
+        <xs:annotation>
+          <xs:documentation><![CDATA[
+           	<p>
+           	The policies data type.
+           	</p>
+           ]]></xs:documentation>
+        </xs:annotation>
+        
+        <xs:sequence>
+            <xs:element name="AppCookieStickinessPolicies" type="tns:AppCookieStickinessPolicies" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                 	<p>
+                 	A list of the <a>AppCookieStickinessPolicy</a> objects created with <a>CreateAppCookieStickinessPolicy</a>.
+                 	</p>
+                 ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="LBCookieStickinessPolicies" type="tns:LBCookieStickinessPolicies" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                 	<p>
+                 	A list of <a>LBCookieStickinessPolicy</a> objects created with <a>CreateAppCookieStickinessPolicy</a>.
+                 	</p>
+                 ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="OtherPolicies" type="tns:PolicyNames" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                 	<p>
+                 	A list of policy names other than the stickiness policies.
+                 	</p>
+                 ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+
+    </xs:schema>
+
+  </wsdl:types>
+
+  <wsdl:message name="DescribeLoadBalancerPolicyTypesRequestMsg">
+    <wsdl:part element="tns:DescribeLoadBalancerPolicyTypes" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DescribeLoadBalancerPolicyTypesResponseMsg">
+    <wsdl:part element="tns:DescribeLoadBalancerPolicyTypesResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="ConfigureHealthCheckRequestMsg">
+    <wsdl:part element="tns:ConfigureHealthCheck" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="ConfigureHealthCheckResponseMsg">
+    <wsdl:part element="tns:ConfigureHealthCheckResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DetachLoadBalancerFromSubnetsRequestMsg">
+    <wsdl:part element="tns:DetachLoadBalancerFromSubnets" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DetachLoadBalancerFromSubnetsResponseMsg">
+    <wsdl:part element="tns:DetachLoadBalancerFromSubnetsResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DescribeLoadBalancerPoliciesRequestMsg">
+    <wsdl:part element="tns:DescribeLoadBalancerPolicies" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DescribeLoadBalancerPoliciesResponseMsg">
+    <wsdl:part element="tns:DescribeLoadBalancerPoliciesResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="SetLoadBalancerPoliciesOfListenerRequestMsg">
+    <wsdl:part element="tns:SetLoadBalancerPoliciesOfListener" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="SetLoadBalancerPoliciesOfListenerResponseMsg">
+    <wsdl:part element="tns:SetLoadBalancerPoliciesOfListenerResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DisableAvailabilityZonesForLoadBalancerRequestMsg">
+    <wsdl:part element="tns:DisableAvailabilityZonesForLoadBalancer" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DisableAvailabilityZonesForLoadBalancerResponseMsg">
+    <wsdl:part element="tns:DisableAvailabilityZonesForLoadBalancerResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DescribeInstanceHealthRequestMsg">
+    <wsdl:part element="tns:DescribeInstanceHealth" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DescribeInstanceHealthResponseMsg">
+    <wsdl:part element="tns:DescribeInstanceHealthResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DeleteLoadBalancerPolicyRequestMsg">
+    <wsdl:part element="tns:DeleteLoadBalancerPolicy" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DeleteLoadBalancerPolicyResponseMsg">
+    <wsdl:part element="tns:DeleteLoadBalancerPolicyResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="CreateLoadBalancerPolicyRequestMsg">
+    <wsdl:part element="tns:CreateLoadBalancerPolicy" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="CreateLoadBalancerPolicyResponseMsg">
+    <wsdl:part element="tns:CreateLoadBalancerPolicyResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="EnableAvailabilityZonesForLoadBalancerRequestMsg">
+    <wsdl:part element="tns:EnableAvailabilityZonesForLoadBalancer" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="EnableAvailabilityZonesForLoadBalancerResponseMsg">
+    <wsdl:part element="tns:EnableAvailabilityZonesForLoadBalancerResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="CreateLoadBalancerListenersRequestMsg">
+    <wsdl:part element="tns:CreateLoadBalancerListeners" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="CreateLoadBalancerListenersResponseMsg">
+    <wsdl:part element="tns:CreateLoadBalancerListenersResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="CreateLoadBalancerRequestMsg">
+    <wsdl:part element="tns:CreateLoadBalancer" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="CreateLoadBalancerResponseMsg">
+    <wsdl:part element="tns:CreateLoadBalancerResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DeleteLoadBalancerRequestMsg">
+    <wsdl:part element="tns:DeleteLoadBalancer" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DeleteLoadBalancerResponseMsg">
+    <wsdl:part element="tns:DeleteLoadBalancerResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="SetLoadBalancerPoliciesForBackendServerRequestMsg">
+    <wsdl:part element="tns:SetLoadBalancerPoliciesForBackendServer" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="SetLoadBalancerPoliciesForBackendServerResponseMsg">
+    <wsdl:part element="tns:SetLoadBalancerPoliciesForBackendServerResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DeleteLoadBalancerListenersRequestMsg">
+    <wsdl:part element="tns:DeleteLoadBalancerListeners" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DeleteLoadBalancerListenersResponseMsg">
+    <wsdl:part element="tns:DeleteLoadBalancerListenersResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DeregisterInstancesFromLoadBalancerRequestMsg">
+    <wsdl:part element="tns:DeregisterInstancesFromLoadBalancer" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DeregisterInstancesFromLoadBalancerResponseMsg">
+    <wsdl:part element="tns:DeregisterInstancesFromLoadBalancerResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="SetLoadBalancerListenerSSLCertificateRequestMsg">
+    <wsdl:part element="tns:SetLoadBalancerListenerSSLCertificate" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="SetLoadBalancerListenerSSLCertificateResponseMsg">
+    <wsdl:part element="tns:SetLoadBalancerListenerSSLCertificateResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="CreateLBCookieStickinessPolicyRequestMsg">
+    <wsdl:part element="tns:CreateLBCookieStickinessPolicy" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="CreateLBCookieStickinessPolicyResponseMsg">
+    <wsdl:part element="tns:CreateLBCookieStickinessPolicyResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="AttachLoadBalancerToSubnetsRequestMsg">
+    <wsdl:part element="tns:AttachLoadBalancerToSubnets" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="AttachLoadBalancerToSubnetsResponseMsg">
+    <wsdl:part element="tns:AttachLoadBalancerToSubnetsResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="CreateAppCookieStickinessPolicyRequestMsg">
+    <wsdl:part element="tns:CreateAppCookieStickinessPolicy" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="CreateAppCookieStickinessPolicyResponseMsg">
+    <wsdl:part element="tns:CreateAppCookieStickinessPolicyResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="RegisterInstancesWithLoadBalancerRequestMsg">
+    <wsdl:part element="tns:RegisterInstancesWithLoadBalancer" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="RegisterInstancesWithLoadBalancerResponseMsg">
+    <wsdl:part element="tns:RegisterInstancesWithLoadBalancerResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="ApplySecurityGroupsToLoadBalancerRequestMsg">
+    <wsdl:part element="tns:ApplySecurityGroupsToLoadBalancer" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="ApplySecurityGroupsToLoadBalancerResponseMsg">
+    <wsdl:part element="tns:ApplySecurityGroupsToLoadBalancerResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DescribeLoadBalancersRequestMsg">
+    <wsdl:part element="tns:DescribeLoadBalancers" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DescribeLoadBalancersResponseMsg">
+    <wsdl:part element="tns:DescribeLoadBalancersResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:portType name="ElasticLoadBalancingPortType">
+
+    <wsdl:operation name="DescribeLoadBalancerPolicyTypes">
+      <wsdl:documentation><![CDATA[
+   	<p>
+   	Returns meta-information on the specified LoadBalancer policies defined by the
+   	Elastic Load Balancing service.  The policy types that are
+   	returned from this action can be used in a <a>CreateLoadBalancerPolicy</a> action to
+   	instantiate specific policy configurations that will be applied to an Elastic LoadBalancer.
+   	</p>
+   ]]></wsdl:documentation>
+      <wsdl:input message="tns:DescribeLoadBalancerPolicyTypesRequestMsg" wsa:Action="urn:DescribeLoadBalancerPolicyTypes"/>
+      <wsdl:output message="tns:DescribeLoadBalancerPolicyTypesResponseMsg" wsa:Action="urn:DescribeLoadBalancerPolicyTypes:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="ConfigureHealthCheck">
+      <wsdl:documentation><![CDATA[
+        <p>
+        Enables the client to define an application
+        healthcheck for the instances.
+        </p>
+    ]]></wsdl:documentation>
+      <wsdl:input message="tns:ConfigureHealthCheckRequestMsg" wsa:Action="urn:ConfigureHealthCheck"/>
+      <wsdl:output message="tns:ConfigureHealthCheckResponseMsg" wsa:Action="urn:ConfigureHealthCheck:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="DetachLoadBalancerFromSubnets">
+      <wsdl:documentation><![CDATA[
+       <p>
+           Removes subnets from the set of configured subnets in the VPC for the LoadBalancer.  
+       </p> 
+        <p>
+            After a subnet is removed all of the EndPoints registered with the LoadBalancer that are 
+            in the removed subnet will go into the <i>OutOfService</i> state. When a subnet is removed, the LoadBalancer
+            will balance the traffic among the remaining routable subnets for the LoadBalancer.    
+        </p>
+    ]]></wsdl:documentation>
+      <wsdl:input message="tns:DetachLoadBalancerFromSubnetsRequestMsg" wsa:Action="urn:DetachLoadBalancerFromSubnets"/>
+      <wsdl:output message="tns:DetachLoadBalancerFromSubnetsResponseMsg" wsa:Action="urn:DetachLoadBalancerFromSubnets:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="DescribeLoadBalancerPolicies">
+      <wsdl:documentation><![CDATA[
+   <p>Returns detailed descriptions of the policies.
+   If you specify a LoadBalancer name, the operation returns either the descriptions of the specified policies, or descriptions of all the policies created for the LoadBalancer.
+   If you don't specify a LoadBalancer name, the operation returns descriptions of the specified sample policies, or descriptions of all the sample policies.
+   The names of the sample policies have the <code>ELBSample-</code> prefix.
+   </p>
+   ]]></wsdl:documentation>
+      <wsdl:input message="tns:DescribeLoadBalancerPoliciesRequestMsg" wsa:Action="urn:DescribeLoadBalancerPolicies"/>
+      <wsdl:output message="tns:DescribeLoadBalancerPoliciesResponseMsg" wsa:Action="urn:DescribeLoadBalancerPolicies:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="SetLoadBalancerPoliciesOfListener">
+      <wsdl:documentation><![CDATA[
+        <p>
+        Associates, updates, or disables a policy with a listener on the LoadBalancer. 
+        You can associate multiple policies with a listener. 
+        </p>
+    ]]></wsdl:documentation>
+      <wsdl:input message="tns:SetLoadBalancerPoliciesOfListenerRequestMsg" wsa:Action="urn:SetLoadBalancerPoliciesOfListener"/>
+      <wsdl:output message="tns:SetLoadBalancerPoliciesOfListenerResponseMsg" wsa:Action="urn:SetLoadBalancerPoliciesOfListener:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="DisableAvailabilityZonesForLoadBalancer">
+      <wsdl:documentation><![CDATA[
+        <p>
+        Removes the specified EC2 Availability Zones from
+        the set of configured Availability Zones for the LoadBalancer.
+        </p>
+        <p>
+        There must be at least one Availability Zone registered
+        with a LoadBalancer at all times. A client cannot remove all
+        the Availability Zones from a LoadBalancer.
+        Once an Availability Zone is removed, all the instances
+        registered with the LoadBalancer that are in the removed
+        Availability Zone go into the OutOfService state. Upon Availability
+        Zone removal, the LoadBalancer attempts to equally balance
+        the traffic among its remaining usable Availability Zones.
+        Trying to remove an Availability Zone that was not associated with
+        the LoadBalancer does nothing.
+        </p>
+        <note>
+        In order for this call to be successful, the client
+        must have created the LoadBalancer.
+        The client must provide the same account credentials
+        as those that were used to create the LoadBalancer.
+        </note>
+    ]]></wsdl:documentation>
+      <wsdl:input message="tns:DisableAvailabilityZonesForLoadBalancerRequestMsg" wsa:Action="urn:DisableAvailabilityZonesForLoadBalancer"/>
+      <wsdl:output message="tns:DisableAvailabilityZonesForLoadBalancerResponseMsg" wsa:Action="urn:DisableAvailabilityZonesForLoadBalancer:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="DescribeInstanceHealth">
+      <wsdl:documentation><![CDATA[
+        <p>
+        Returns the current state of the instances of the specified LoadBalancer.
+        If no instances are specified, the state of all the instances for the
+        LoadBalancer is returned.
+        </p>
+        <note>
+        The client must have created the specified input
+        LoadBalancer in order to retrieve this information;
+        the client must provide the same account credentials
+        as those that were used to create the LoadBalancer.
+        </note>
+    ]]></wsdl:documentation>
+      <wsdl:input message="tns:DescribeInstanceHealthRequestMsg" wsa:Action="urn:DescribeInstanceHealth"/>
+      <wsdl:output message="tns:DescribeInstanceHealthResponseMsg" wsa:Action="urn:DescribeInstanceHealth:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="DeleteLoadBalancerPolicy">
+      <wsdl:documentation><![CDATA[
+   	<p>
+   	Deletes a policy from the LoadBalancer. 
+   	The specified policy must not be enabled for any listeners.
+   	</p>
+   ]]></wsdl:documentation>
+      <wsdl:input message="tns:DeleteLoadBalancerPolicyRequestMsg" wsa:Action="urn:DeleteLoadBalancerPolicy"/>
+      <wsdl:output message="tns:DeleteLoadBalancerPolicyResponseMsg" wsa:Action="urn:DeleteLoadBalancerPolicy:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="CreateLoadBalancerPolicy">
+      <wsdl:documentation><![CDATA[
+   	<p>
+   	Creates a new policy that contains the necessary attributes depending on the policy type.
+   	Policies are settings that are saved for your Elastic LoadBalancer and that can be applied to the
+   	front-end listener, or the back-end application server, depending on your policy type.
+   	</p>
+   ]]></wsdl:documentation>
+      <wsdl:input message="tns:CreateLoadBalancerPolicyRequestMsg" wsa:Action="urn:CreateLoadBalancerPolicy"/>
+      <wsdl:output message="tns:CreateLoadBalancerPolicyResponseMsg" wsa:Action="urn:CreateLoadBalancerPolicy:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="EnableAvailabilityZonesForLoadBalancer">
+      <wsdl:documentation><![CDATA[
+        <p>
+        Adds one or more EC2 Availability Zones to the LoadBalancer.
+        </p>
+        <p>
+        The LoadBalancer evenly distributes requests across all
+        its registered Availability Zones that contain instances.
+        As a result, the client must ensure that its LoadBalancer is
+        appropriately scaled for each registered Availability Zone.
+        </p>
+        <note>
+        The new EC2 Availability Zones to be added must be in the same
+        EC2 Region as the Availability Zones for which the
+        LoadBalancer was created.
+        </note>
+    ]]></wsdl:documentation>
+      <wsdl:input message="tns:EnableAvailabilityZonesForLoadBalancerRequestMsg" wsa:Action="urn:EnableAvailabilityZonesForLoadBalancer"/>
+      <wsdl:output message="tns:EnableAvailabilityZonesForLoadBalancerResponseMsg" wsa:Action="urn:EnableAvailabilityZonesForLoadBalancer:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="CreateLoadBalancerListeners">
+      <wsdl:documentation><![CDATA[
+   	<p>
+   	Creates one or more listeners on a LoadBalancer for the specified port. 
+   	If a listener with the given port does not already exist, it will be created; 
+   	otherwise, the properties of the new listener must match the properties 
+   	of the existing listener. 
+   	</p>
+   ]]></wsdl:documentation>
+      <wsdl:input message="tns:CreateLoadBalancerListenersRequestMsg" wsa:Action="urn:CreateLoadBalancerListeners"/>
+      <wsdl:output message="tns:CreateLoadBalancerListenersResponseMsg" wsa:Action="urn:CreateLoadBalancerListeners:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="CreateLoadBalancer">
+      <wsdl:documentation><![CDATA[
+        <p>
+        Creates a new LoadBalancer.
+        </p>
+        <p>
+        After the call has completed successfully, a new LoadBalancer
+        is created; however, it will not be usable until at least
+        one instance has been registered.
+        When the LoadBalancer creation is completed,
+        the client can check whether or not it is usable by
+        using the DescribeInstanceHealth API.
+        The LoadBalancer is usable as soon as any registered instance
+        is <i>InService</i>.
+        </p>
+        <note>
+        Currently, the client's quota of LoadBalancers is
+        limited to ten per Region.
+        </note>
+        <note>
+            <p>
+            LoadBalancer DNS names vary depending on the Region
+            they're created in. For LoadBalancers created in the United States,
+            the DNS name ends with:
+            </p>
+            <ul>
+                <li>
+                <i>us-east-1.elb.amazonaws.com</i> (for the US Standard Region)
+                </li>
+                <li>
+                <i>us-west-1.elb.amazonaws.com</i> (for the Northern California Region)
+                </li>
+            </ul>
+            <p>
+            For LoadBalancers created in the EU (Ireland) Region,
+            the DNS name ends with:
+            </p>
+            <ul>
+                <li>
+                <i>eu-west-1.elb.amazonaws.com</i>
+                </li>
+            </ul>
+        </note>
+    ]]></wsdl:documentation>
+      <wsdl:input message="tns:CreateLoadBalancerRequestMsg" wsa:Action="urn:CreateLoadBalancer"/>
+      <wsdl:output message="tns:CreateLoadBalancerResponseMsg" wsa:Action="urn:CreateLoadBalancer:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="DeleteLoadBalancer">
+      <wsdl:documentation><![CDATA[
+        <p>
+        Deletes the specified LoadBalancer.
+        </p>
+        <p>
+        If attempting to recreate the LoadBalancer,
+        the client must reconfigure all the settings.
+        The DNS name associated with a deleted LoadBalancer
+        will no longer be usable.
+        Once deleted, the name and associated DNS record of the
+        LoadBalancer no longer exist and traffic sent to any of its
+        IP addresses will no longer be delivered to client instances.
+        The client will not receive the same DNS name even if a
+        new LoadBalancer with same LoadBalancerName is created.
+        </p>
+        <p>
+        To successfully call this API, the client must provide the same
+        account credentials as were used to create the LoadBalancer.
+        </p>
+        <note>
+        By design, if the LoadBalancer does not exist or has already been deleted,
+        DeleteLoadBalancer still succeeds.
+        </note>
+    ]]></wsdl:documentation>
+      <wsdl:input message="tns:DeleteLoadBalancerRequestMsg" wsa:Action="urn:DeleteLoadBalancer"/>
+      <wsdl:output message="tns:DeleteLoadBalancerResponseMsg" wsa:Action="urn:DeleteLoadBalancer:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="SetLoadBalancerPoliciesForBackendServer">
+      <wsdl:documentation><![CDATA[
+    <p>
+    Replaces the current set of policies associated with a port on which the back-end server is listening with a new set of policies. After the policies have been created using <a>CreateLoadBalancerPolicy</a>, 
+    they can be applied here as a list. At this time, only the back-end server authentication policy type can be applied to the back-end ports; this policy type is composed of multiple public key policies.
+    </p>
+   ]]></wsdl:documentation>
+      <wsdl:input message="tns:SetLoadBalancerPoliciesForBackendServerRequestMsg" wsa:Action="urn:SetLoadBalancerPoliciesForBackendServer"/>
+      <wsdl:output message="tns:SetLoadBalancerPoliciesForBackendServerResponseMsg" wsa:Action="urn:SetLoadBalancerPoliciesForBackendServer:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="DeleteLoadBalancerListeners">
+      <wsdl:documentation><![CDATA[
+   	<p>
+   	Deletes listeners from the LoadBalancer for the specified port.
+   	</p>
+   ]]></wsdl:documentation>
+      <wsdl:input message="tns:DeleteLoadBalancerListenersRequestMsg" wsa:Action="urn:DeleteLoadBalancerListeners"/>
+      <wsdl:output message="tns:DeleteLoadBalancerListenersResponseMsg" wsa:Action="urn:DeleteLoadBalancerListeners:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="DeregisterInstancesFromLoadBalancer">
+      <wsdl:documentation><![CDATA[
+        <p>
+        Deregisters instances from the LoadBalancer.
+        Once the instance is deregistered,
+        it will stop receiving traffic from the LoadBalancer.
+        </p>
+        <p>
+        In order to successfully call this API,
+        the same account credentials as those
+        used to create the LoadBalancer must be provided.
+        </p>
+    ]]></wsdl:documentation>
+      <wsdl:input message="tns:DeregisterInstancesFromLoadBalancerRequestMsg" wsa:Action="urn:DeregisterInstancesFromLoadBalancer"/>
+      <wsdl:output message="tns:DeregisterInstancesFromLoadBalancerResponseMsg" wsa:Action="urn:DeregisterInstancesFromLoadBalancer:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="SetLoadBalancerListenerSSLCertificate">
+      <wsdl:documentation><![CDATA[
+   	<p>
+   	Sets the certificate that terminates the specified listener's SSL connections. 
+   	The specified certificate replaces any prior certificate that was used on the same LoadBalancer and port. 
+   	</p>
+   ]]></wsdl:documentation>
+      <wsdl:input message="tns:SetLoadBalancerListenerSSLCertificateRequestMsg" wsa:Action="urn:SetLoadBalancerListenerSSLCertificate"/>
+      <wsdl:output message="tns:SetLoadBalancerListenerSSLCertificateResponseMsg" wsa:Action="urn:SetLoadBalancerListenerSSLCertificate:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="CreateLBCookieStickinessPolicy">
+      <wsdl:documentation><![CDATA[
+        <p>
+        Generates a stickiness policy with sticky session lifetimes controlled by the 
+        lifetime of the browser (user-agent) or a specified expiration period. This 
+        policy can be associated only with HTTP/HTTPS listeners.
+        </p>
+        <p>
+        When a LoadBalancer implements this policy, the LoadBalancer uses a special
+        cookie to track the backend server instance for each request. When the LoadBalancer
+        receives a request, it first checks to see if this cookie is present in the request. 
+        If so, the LoadBalancer sends the request to the application server specified in the
+        cookie. If not, the LoadBalancer sends the request to a server that is chosen based on
+        the existing load balancing algorithm.
+        </p>
+        <p>
+        A cookie is inserted into the response for binding subsequent requests from the same user to
+        that server. The validity of the cookie is based on the cookie expiration time, which is 
+        specified in the policy configuration. 
+        </p>
+    ]]></wsdl:documentation>
+      <wsdl:input message="tns:CreateLBCookieStickinessPolicyRequestMsg" wsa:Action="urn:CreateLBCookieStickinessPolicy"/>
+      <wsdl:output message="tns:CreateLBCookieStickinessPolicyResponseMsg" wsa:Action="urn:CreateLBCookieStickinessPolicy:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="AttachLoadBalancerToSubnets">
+      <wsdl:documentation><![CDATA[
+     <p>
+         Adds one or more subnets to the set of configured subnets in the VPC for the LoadBalancer.
+     </p>  
+       <p>
+           The Loadbalancers evenly distribute requests across all of the registered subnets. 
+       </p>
+    ]]></wsdl:documentation>
+      <wsdl:input message="tns:AttachLoadBalancerToSubnetsRequestMsg" wsa:Action="urn:AttachLoadBalancerToSubnets"/>
+      <wsdl:output message="tns:AttachLoadBalancerToSubnetsResponseMsg" wsa:Action="urn:AttachLoadBalancerToSubnets:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="CreateAppCookieStickinessPolicy">
+      <wsdl:documentation><![CDATA[
+        <p>
+        Generates a stickiness policy with sticky session lifetimes that follow 
+        that of an application-generated cookie. This policy can be associated
+        only with HTTP/HTTPS listeners.
+        </p>
+        <p>
+        This policy is similar to the policy created by CreateLBCookieStickinessPolicy, 
+        except that the lifetime of the special Elastic Load Balancing cookie follows the
+        lifetime of the application-generated cookie specified in the policy configuration. 
+        The LoadBalancer only inserts a new stickiness cookie when the application response
+        includes a new application cookie. 
+        </p>
+        <p>
+        If the application cookie is explicitly removed or expires, the session stops being
+        sticky until a new application cookie is issued. 
+        </p>
+        <note>
+            An application client must receive and send two cookies: the application-generated 
+            cookie and the special Elastic Load Balancing cookie named <code>AWSELB</code>. 
+            This is the default behavior for many common web browsers.
+        </note>
+    ]]></wsdl:documentation>
+      <wsdl:input message="tns:CreateAppCookieStickinessPolicyRequestMsg" wsa:Action="urn:CreateAppCookieStickinessPolicy"/>
+      <wsdl:output message="tns:CreateAppCookieStickinessPolicyResponseMsg" wsa:Action="urn:CreateAppCookieStickinessPolicy:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="RegisterInstancesWithLoadBalancer">
+      <wsdl:documentation><![CDATA[
+        <p>
+        Adds new instances to the LoadBalancer.
+        </p>
+        <p>
+        Once the instance is registered, it starts receiving traffic
+        and requests from the LoadBalancer. Any instance that is not
+        in any of the Availability Zones registered for the LoadBalancer
+        will be moved to the <i>OutOfService</i> state. It will move to the
+        <i>InService</i> state when the Availability Zone is added to the LoadBalancer.
+        </p>
+        <note>
+        In order for this call to be successful, the client
+        must have created the LoadBalancer.
+        The client must provide the same account credentials
+        as those that were used to create the LoadBalancer.
+        </note>
+        <note>
+        Completion of this API does not guarantee that operation has completed.
+        Rather, it means that the request has been registered and the
+        changes will happen shortly.
+        </note>
+        
+    ]]></wsdl:documentation>
+      <wsdl:input message="tns:RegisterInstancesWithLoadBalancerRequestMsg" wsa:Action="urn:RegisterInstancesWithLoadBalancer"/>
+      <wsdl:output message="tns:RegisterInstancesWithLoadBalancerResponseMsg" wsa:Action="urn:RegisterInstancesWithLoadBalancer:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="ApplySecurityGroupsToLoadBalancer">
+      <wsdl:documentation><![CDATA[
+       <p>
+         Associates one or more security groups with your LoadBalancer in VPC. 
+         The provided security group IDs will override any currently applied security groups.
+       </p> 
+    ]]></wsdl:documentation>
+      <wsdl:input message="tns:ApplySecurityGroupsToLoadBalancerRequestMsg" wsa:Action="urn:ApplySecurityGroupsToLoadBalancer"/>
+      <wsdl:output message="tns:ApplySecurityGroupsToLoadBalancerResponseMsg" wsa:Action="urn:ApplySecurityGroupsToLoadBalancer:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="DescribeLoadBalancers">
+      <wsdl:documentation><![CDATA[
+        <p>
+        Returns detailed configuration information
+        for the specified LoadBalancers. If no LoadBalancers are specified,
+        the operation returns configuration information
+        for all LoadBalancers created by the caller.
+        </p>
+        <note>
+        The client must have created the specified input
+        LoadBalancers in order to retrieve this information;
+        the client must provide the same account credentials
+        as those that were used to create the LoadBalancer.
+        </note>
+    ]]></wsdl:documentation>
+      <wsdl:input message="tns:DescribeLoadBalancersRequestMsg" wsa:Action="urn:DescribeLoadBalancers"/>
+      <wsdl:output message="tns:DescribeLoadBalancersResponseMsg" wsa:Action="urn:DescribeLoadBalancers:Response"/>
+    </wsdl:operation>
+
+  </wsdl:portType>
+
+  <wsdl:binding name="ElasticLoadBalancingBinding" type="tns:ElasticLoadBalancingPortType">
+
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+
+    <wsdl:operation name="DescribeLoadBalancerPolicyTypes">
+      <soap:operation soapAction="DescribeLoadBalancerPolicyTypes"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="ConfigureHealthCheck">
+      <soap:operation soapAction="ConfigureHealthCheck"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="DetachLoadBalancerFromSubnets">
+      <soap:operation soapAction="DetachLoadBalancerFromSubnets"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="DescribeLoadBalancerPolicies">
+      <soap:operation soapAction="DescribeLoadBalancerPolicies"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="SetLoadBalancerPoliciesOfListener">
+      <soap:operation soapAction="SetLoadBalancerPoliciesOfListener"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="DisableAvailabilityZonesForLoadBalancer">
+      <soap:operation soapAction="DisableAvailabilityZonesForLoadBalancer"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="DescribeInstanceHealth">
+      <soap:operation soapAction="DescribeInstanceHealth"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="DeleteLoadBalancerPolicy">
+      <soap:operation soapAction="DeleteLoadBalancerPolicy"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="CreateLoadBalancerPolicy">
+      <soap:operation soapAction="CreateLoadBalancerPolicy"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="EnableAvailabilityZonesForLoadBalancer">
+      <soap:operation soapAction="EnableAvailabilityZonesForLoadBalancer"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="CreateLoadBalancerListeners">
+      <soap:operation soapAction="CreateLoadBalancerListeners"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="CreateLoadBalancer">
+      <soap:operation soapAction="CreateLoadBalancer"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="DeleteLoadBalancer">
+      <soap:operation soapAction="DeleteLoadBalancer"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="SetLoadBalancerPoliciesForBackendServer">
+      <soap:operation soapAction="SetLoadBalancerPoliciesForBackendServer"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="DeleteLoadBalancerListeners">
+      <soap:operation soapAction="DeleteLoadBalancerListeners"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="DeregisterInstancesFromLoadBalancer">
+      <soap:operation soapAction="DeregisterInstancesFromLoadBalancer"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="SetLoadBalancerListenerSSLCertificate">
+      <soap:operation soapAction="SetLoadBalancerListenerSSLCertificate"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="CreateLBCookieStickinessPolicy">
+      <soap:operation soapAction="CreateLBCookieStickinessPolicy"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="AttachLoadBalancerToSubnets">
+      <soap:operation soapAction="AttachLoadBalancerToSubnets"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="CreateAppCookieStickinessPolicy">
+      <soap:operation soapAction="CreateAppCookieStickinessPolicy"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="RegisterInstancesWithLoadBalancer">
+      <soap:operation soapAction="RegisterInstancesWithLoadBalancer"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="ApplySecurityGroupsToLoadBalancer">
+      <soap:operation soapAction="ApplySecurityGroupsToLoadBalancer"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="DescribeLoadBalancers">
+      <soap:operation soapAction="DescribeLoadBalancers"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+  </wsdl:binding>
+
+  <wsdl:service name="ElasticLoadBalancing">
+    <wsdl:documentation><![CDATA[
+    	<fullname>Elastic Load Balancing</fullname>
+        
+        <p>
+        Elastic Load Balancing is a cost-effective and easy
+        to use web service to help you improve the availability and
+        scalability of your application running on Amazon Elastic Cloud Compute (Amazon EC2). It makes it easy for
+        you to distribute application loads between two or more
+        EC2 instances. Elastic Load Balancing supports the growth in traffic of your application by enabling availability through redundancy.
+        </p>
+        
+        <p>This guide provides detailed information about Elastic Load Balancing 
+            actions, data types, and parameters that can be used for sending a 
+            query request. Query requests are HTTP or HTTPS requests that use the 
+            HTTP verb GET or POST and a query parameter named Action or Operation. 
+            Action is used throughout this documentation, although Operation is 
+            supported for backward compatibility with other AWS Query APIs.</p>
+                
+        <p>For detailed information on constructing a query request using the actions, data types, and parameters mentioned in this guide,
+            go to <a href="http://docs.amazonwebservices.com/ElasticLoadBalancing/latest/DeveloperGuide/using-query-api.html">Using the Query API</a>
+            in the <i>Elastic Load Balancing Developer Guide</i>.</p>
+                   
+        <p>For detailed information about Elastic Load Balancing features and their associated actions, go to 
+            <a href="http://docs.amazonwebservices.com/ElasticLoadBalancing/latest/DeveloperGuide/UserScenarios.html">Using Elastic Load Balancing</a>
+            in the <i>Elastic Load Balancing Developer Guide</i>.</p>
+        
+        <p>This reference guide is based on the current WSDL, which is available at:
+            <a href="elasticloadbalancing.amazonaws.com/doc/2012-06-01/ElasticLoadBalancing.wsdl"></a>   
+        </p>
+            
+    ]]></wsdl:documentation>
+    <wsdl:port name="ElasticLoadBalancingPort" binding="tns:ElasticLoadBalancingBinding">
+      <soap:address location="https://elasticloadbalancing.amazonaws.com/"/>
+    </wsdl:port>
+  </wsdl:service>
+
+</wsdl:definitions>

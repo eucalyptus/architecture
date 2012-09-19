@@ -1,0 +1,2019 @@
+<?xml version="1.0"?>
+<wsdl:definitions
+  targetNamespace="http://autoscaling.amazonaws.com/doc/2011-01-01/"
+  xmlns:tns="http://autoscaling.amazonaws.com/doc/2011-01-01/"
+  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+  xmlns:wsa="http://www.w3.org/2005/08/addressing/"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <wsdl:types>
+
+    <xs:schema
+      targetNamespace="http://autoscaling.amazonaws.com/doc/2011-01-01/"
+      elementFormDefault="qualified">
+
+      <xs:element name="ResponseMetadata">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="RequestId" type="xs:string"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="Error">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Type">
+              <xs:simpleType>
+                <xs:restriction base="xs:string">
+                  <xs:enumeration value="Receiver"/>
+                  <xs:enumeration value="Sender"/>
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:element>
+            <xs:element name="Code" type="xs:string"/>
+            <xs:element name="Message" type="xs:string"/>
+            <xs:element name="Detail">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:any maxOccurs="unbounded" minOccurs="0" namespace="##any" processContents="lax"/>
+                </xs:sequence>
+                <xs:anyAttribute namespace="##other" processContents="lax"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="ErrorResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:Error" maxOccurs="unbounded"/>
+            <xs:element name="RequestId" type="xs:string"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DescribeAutoScalingGroups">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="AutoScalingGroupNames" type="tns:AutoScalingGroupNames" minOccurs="0"/>
+            <xs:element name="NextToken" type="tns:XmlString" minOccurs="0"/>
+            <xs:element name="MaxRecords" type="tns:MaxRecords" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DescribeAutoScalingGroupsResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:DescribeAutoScalingGroupsResult"/>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DescribeAutoScalingGroupsResult">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="AutoScalingGroups" type="tns:AutoScalingGroups"/>
+            <xs:element name="NextToken" type="tns:XmlString" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="EnableMetricsCollection">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="AutoScalingGroupName" type="tns:ResourceName"/>
+            <xs:element name="Metrics" type="tns:Metrics" minOccurs="0"/>
+            <xs:element name="Granularity" type="tns:XmlStringMaxLen255"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="EnableMetricsCollectionResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="ResumeProcesses">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="AutoScalingGroupName" type="tns:ResourceName"/>
+            <xs:element name="ScalingProcesses" type="tns:ProcessNames" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="ResumeProcessesResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DeleteLaunchConfiguration">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="LaunchConfigurationName" type="tns:ResourceName"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DeleteLaunchConfigurationResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DescribePolicies">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="AutoScalingGroupName" type="tns:ResourceName" minOccurs="0"/>
+            <xs:element name="PolicyNames" type="tns:PolicyNames" minOccurs="0"/>
+            <xs:element name="NextToken" type="tns:XmlString" minOccurs="0"/>
+            <xs:element name="MaxRecords" type="tns:MaxRecords" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DescribePoliciesResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:DescribePoliciesResult"/>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DescribePoliciesResult">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="ScalingPolicies" type="tns:ScalingPolicies" minOccurs="0"/>
+            <xs:element name="NextToken" type="tns:XmlString" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DescribeScalingProcessTypes">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DescribeScalingProcessTypesResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:DescribeScalingProcessTypesResult"/>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DescribeScalingProcessTypesResult">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Processes" type="tns:Processes" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="CreateAutoScalingGroup">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="AutoScalingGroupName" type="tns:XmlStringMaxLen255"/>
+            <xs:element name="LaunchConfigurationName" type="tns:ResourceName"/>
+            <xs:element name="MinSize" type="xs:integer"/>
+            <xs:element name="MaxSize" type="xs:integer"/>
+            <xs:element name="DesiredCapacity" type="xs:integer" minOccurs="0"/>
+            <xs:element name="DefaultCooldown" type="xs:integer" minOccurs="0"/>
+            <xs:element name="AvailabilityZones" type="tns:AvailabilityZones"/>
+            <xs:element name="LoadBalancerNames" type="tns:LoadBalancerNames" minOccurs="0"/>
+            <xs:element name="HealthCheckType" type="tns:XmlStringMaxLen32" minOccurs="0"/>
+            <xs:element name="HealthCheckGracePeriod" type="xs:integer" minOccurs="0"/>
+            <xs:element name="PlacementGroup" type="tns:XmlStringMaxLen255" minOccurs="0"/>
+            <xs:element name="VPCZoneIdentifier" type="tns:XmlStringMaxLen255" minOccurs="0"/>
+            <xs:element name="TerminationPolicies" type="tns:TerminationPolicies" minOccurs="0"/>
+            <xs:element name="Tags" type="tns:Tags" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="CreateAutoScalingGroupResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DescribeScalingActivities">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="ActivityIds" type="tns:ActivityIds" minOccurs="0"/>
+            <xs:element name="AutoScalingGroupName" type="tns:ResourceName" minOccurs="0"/>
+            <xs:element name="MaxRecords" type="tns:MaxRecords" minOccurs="0"/>
+            <xs:element name="NextToken" type="tns:XmlString" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DescribeScalingActivitiesResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:DescribeScalingActivitiesResult"/>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DescribeScalingActivitiesResult">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Activities" type="tns:Activities"/>
+            <xs:element name="NextToken" type="tns:XmlString" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DescribeNotificationConfigurations">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="AutoScalingGroupNames" type="tns:AutoScalingGroupNames" minOccurs="0"/>
+            <xs:element name="NextToken" type="tns:XmlString" minOccurs="0"/>
+            <xs:element name="MaxRecords" type="tns:MaxRecords" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DescribeNotificationConfigurationsResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:DescribeNotificationConfigurationsResult"/>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DescribeNotificationConfigurationsResult">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="NotificationConfigurations" type="tns:NotificationConfigurations"/>
+            <xs:element name="NextToken" type="tns:XmlString" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DescribeTerminationPolicyTypes">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DescribeTerminationPolicyTypesResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:DescribeTerminationPolicyTypesResult"/>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DescribeTerminationPolicyTypesResult">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="TerminationPolicyTypes" type="tns:TerminationPolicies" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DescribeTags">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Filters" type="tns:Filters" minOccurs="0"/>
+            <xs:element name="NextToken" type="tns:XmlString" minOccurs="0"/>
+            <xs:element name="MaxRecords" type="tns:MaxRecords" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DescribeTagsResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:DescribeTagsResult"/>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DescribeTagsResult">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Tags" type="tns:TagDescriptionList" minOccurs="0"/>
+            <xs:element name="NextToken" type="tns:XmlString" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="ExecutePolicy">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="AutoScalingGroupName" type="tns:ResourceName" minOccurs="0"/>
+            <xs:element name="PolicyName" type="tns:ResourceName"/>
+            <xs:element name="HonorCooldown" type="xs:boolean" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="ExecutePolicyResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DeleteTags">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Tags" type="tns:Tags"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DeleteTagsResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="PutScalingPolicy">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="AutoScalingGroupName" type="tns:ResourceName"/>
+            <xs:element name="PolicyName" type="tns:XmlStringMaxLen255"/>
+            <xs:element name="ScalingAdjustment" type="xs:integer"/>
+            <xs:element name="AdjustmentType" type="tns:XmlStringMaxLen255"/>
+            <xs:element name="Cooldown" type="xs:integer" minOccurs="0"/>
+            <xs:element name="MinAdjustmentStep" type="xs:integer" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="PutScalingPolicyResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:PutScalingPolicyResult"/>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="PutScalingPolicyResult">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="PolicyARN" type="tns:ResourceName" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="PutNotificationConfiguration">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="AutoScalingGroupName" type="tns:ResourceName"/>
+            <xs:element name="TopicARN" type="tns:ResourceName"/>
+            <xs:element name="NotificationTypes" type="tns:AutoScalingNotificationTypes"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="PutNotificationConfigurationResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DeletePolicy">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="AutoScalingGroupName" type="tns:ResourceName" minOccurs="0"/>
+            <xs:element name="PolicyName" type="tns:ResourceName"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DeletePolicyResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DeleteNotificationConfiguration">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="AutoScalingGroupName" type="tns:ResourceName"/>
+            <xs:element name="TopicARN" type="tns:ResourceName"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DeleteNotificationConfigurationResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DeleteScheduledAction">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="AutoScalingGroupName" type="tns:ResourceName" minOccurs="0"/>
+            <xs:element name="ScheduledActionName" type="tns:ResourceName"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DeleteScheduledActionResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="SetInstanceHealth">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="InstanceId" type="tns:XmlStringMaxLen16"/>
+            <xs:element name="HealthStatus" type="tns:XmlStringMaxLen32"/>
+            <xs:element name="ShouldRespectGracePeriod" type="xs:boolean" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="SetInstanceHealthResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DescribeAutoScalingNotificationTypes">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DescribeAutoScalingNotificationTypesResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:DescribeAutoScalingNotificationTypesResult"/>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DescribeAutoScalingNotificationTypesResult">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="AutoScalingNotificationTypes" type="tns:AutoScalingNotificationTypes" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="CreateOrUpdateTags">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Tags" type="tns:Tags"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="CreateOrUpdateTagsResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="SuspendProcesses">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="AutoScalingGroupName" type="tns:ResourceName"/>
+            <xs:element name="ScalingProcesses" type="tns:ProcessNames" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="SuspendProcessesResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DescribeAutoScalingInstances">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="InstanceIds" type="tns:InstanceIds" minOccurs="0"/>
+            <xs:element name="MaxRecords" type="tns:MaxRecords" minOccurs="0"/>
+            <xs:element name="NextToken" type="tns:XmlString" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DescribeAutoScalingInstancesResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:DescribeAutoScalingInstancesResult"/>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DescribeAutoScalingInstancesResult">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="AutoScalingInstances" type="tns:AutoScalingInstances" minOccurs="0"/>
+            <xs:element name="NextToken" type="tns:XmlString" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="CreateLaunchConfiguration">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="LaunchConfigurationName" type="tns:XmlStringMaxLen255"/>
+            <xs:element name="ImageId" type="tns:XmlStringMaxLen255"/>
+            <xs:element name="KeyName" type="tns:XmlStringMaxLen255" minOccurs="0"/>
+            <xs:element name="SecurityGroups" type="tns:SecurityGroups" minOccurs="0"/>
+            <xs:element name="UserData" type="tns:XmlStringUserData" minOccurs="0"/>
+            <xs:element name="InstanceType" type="tns:XmlStringMaxLen255"/>
+            <xs:element name="KernelId" type="tns:XmlStringMaxLen255" minOccurs="0"/>
+            <xs:element name="RamdiskId" type="tns:XmlStringMaxLen255" minOccurs="0"/>
+            <xs:element name="BlockDeviceMappings" type="tns:BlockDeviceMappings" minOccurs="0"/>
+            <xs:element name="InstanceMonitoring" type="tns:InstanceMonitoring" minOccurs="0"/>
+            <xs:element name="SpotPrice" type="tns:SpotPrice" minOccurs="0"/>
+            <xs:element name="IamInstanceProfile" type="tns:XmlStringMaxLen1600" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="CreateLaunchConfigurationResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DeleteAutoScalingGroup">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="AutoScalingGroupName" type="tns:ResourceName"/>
+            <xs:element name="ForceDelete" type="xs:boolean" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DeleteAutoScalingGroupResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DisableMetricsCollection">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="AutoScalingGroupName" type="tns:ResourceName"/>
+            <xs:element name="Metrics" type="tns:Metrics" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DisableMetricsCollectionResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="UpdateAutoScalingGroup">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="AutoScalingGroupName" type="tns:ResourceName"/>
+            <xs:element name="LaunchConfigurationName" type="tns:ResourceName" minOccurs="0"/>
+            <xs:element name="MinSize" type="xs:integer" minOccurs="0"/>
+            <xs:element name="MaxSize" type="xs:integer" minOccurs="0"/>
+            <xs:element name="DesiredCapacity" type="xs:integer" minOccurs="0"/>
+            <xs:element name="DefaultCooldown" type="xs:integer" minOccurs="0"/>
+            <xs:element name="AvailabilityZones" type="tns:AvailabilityZones" minOccurs="0"/>
+            <xs:element name="HealthCheckType" type="tns:XmlStringMaxLen32" minOccurs="0"/>
+            <xs:element name="HealthCheckGracePeriod" type="xs:integer" minOccurs="0"/>
+            <xs:element name="PlacementGroup" type="tns:XmlStringMaxLen255" minOccurs="0"/>
+            <xs:element name="VPCZoneIdentifier" type="tns:XmlStringMaxLen255" minOccurs="0"/>
+            <xs:element name="TerminationPolicies" type="tns:TerminationPolicies" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="UpdateAutoScalingGroupResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DescribeLaunchConfigurations">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="LaunchConfigurationNames" type="tns:LaunchConfigurationNames" minOccurs="0"/>
+            <xs:element name="NextToken" type="tns:XmlString" minOccurs="0"/>
+            <xs:element name="MaxRecords" type="tns:MaxRecords" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DescribeLaunchConfigurationsResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:DescribeLaunchConfigurationsResult"/>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DescribeLaunchConfigurationsResult">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="LaunchConfigurations" type="tns:LaunchConfigurations"/>
+            <xs:element name="NextToken" type="tns:XmlString" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DescribeAdjustmentTypes">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DescribeAdjustmentTypesResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:DescribeAdjustmentTypesResult"/>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DescribeAdjustmentTypesResult">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="AdjustmentTypes" type="tns:AdjustmentTypes" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DescribeScheduledActions">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="AutoScalingGroupName" type="tns:ResourceName" minOccurs="0"/>
+            <xs:element name="ScheduledActionNames" type="tns:ScheduledActionNames" minOccurs="0"/>
+            <xs:element name="StartTime" type="xs:dateTime" minOccurs="0"/>
+            <xs:element name="EndTime" type="xs:dateTime" minOccurs="0"/>
+            <xs:element name="NextToken" type="tns:XmlString" minOccurs="0"/>
+            <xs:element name="MaxRecords" type="tns:MaxRecords" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DescribeScheduledActionsResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:DescribeScheduledActionsResult"/>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DescribeScheduledActionsResult">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="ScheduledUpdateGroupActions" type="tns:ScheduledUpdateGroupActions" minOccurs="0"/>
+            <xs:element name="NextToken" type="tns:XmlString" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="PutScheduledUpdateGroupAction">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="AutoScalingGroupName" type="tns:ResourceName"/>
+            <xs:element name="ScheduledActionName" type="tns:XmlStringMaxLen255"/>
+            <xs:element name="Time" type="xs:dateTime" minOccurs="0"/>
+            <xs:element name="StartTime" type="xs:dateTime" minOccurs="0"/>
+            <xs:element name="EndTime" type="xs:dateTime" minOccurs="0"/>
+            <xs:element name="Recurrence" type="tns:XmlStringMaxLen255" minOccurs="0"/>
+            <xs:element name="MinSize" type="xs:integer" minOccurs="0"/>
+            <xs:element name="MaxSize" type="xs:integer" minOccurs="0"/>
+            <xs:element name="DesiredCapacity" type="xs:integer" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="PutScheduledUpdateGroupActionResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DescribeMetricCollectionTypes">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DescribeMetricCollectionTypesResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:DescribeMetricCollectionTypesResult"/>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DescribeMetricCollectionTypesResult">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Metrics" type="tns:MetricCollectionTypes" minOccurs="0"/>
+            <xs:element name="Granularities" type="tns:MetricGranularityTypes" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="SetDesiredCapacity">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="AutoScalingGroupName" type="tns:ResourceName"/>
+            <xs:element name="DesiredCapacity" type="xs:integer"/>
+            <xs:element name="HonorCooldown" type="xs:boolean" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="SetDesiredCapacityResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="TerminateInstanceInAutoScalingGroup">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="InstanceId" type="tns:XmlStringMaxLen16"/>
+            <xs:element name="ShouldDecrementDesiredCapacity" type="xs:boolean"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="TerminateInstanceInAutoScalingGroupResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:TerminateInstanceInAutoScalingGroupResult"/>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="TerminateInstanceInAutoScalingGroupResult">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Activity" type="tns:Activity" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:complexType name="MetricGranularityType">
+        <xs:sequence>
+            <xs:element name="Granularity" type="tns:XmlStringMaxLen255" minOccurs="0"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="SuspendedProcesses">
+        <xs:sequence>
+          <xs:element name="member" type="tns:SuspendedProcess" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="LoadBalancerNames">
+        <xs:sequence>
+          <xs:element name="member" type="tns:XmlStringMaxLen255" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="Tag">
+        <xs:sequence>
+            <xs:element name="ResourceId" type="tns:XmlString" minOccurs="0"/>
+            <xs:element name="ResourceType" type="tns:XmlString" minOccurs="0"/>
+            <xs:element name="Key" type="tns:TagKey"/>
+            <xs:element name="Value" type="tns:TagValue" minOccurs="0"/>
+            <xs:element name="PropagateAtLaunch" type="xs:boolean" minOccurs="0"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="PolicyNames">
+        <xs:sequence>
+          <xs:element name="member" type="tns:ResourceName" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="TagDescription">
+        <xs:sequence>
+            <xs:element name="ResourceId" type="tns:XmlString" minOccurs="0"/>
+            <xs:element name="ResourceType" type="tns:XmlString" minOccurs="0"/>
+            <xs:element name="Key" type="tns:TagKey" minOccurs="0"/>
+            <xs:element name="Value" type="tns:TagValue" minOccurs="0"/>
+            <xs:element name="PropagateAtLaunch" type="xs:boolean" minOccurs="0"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="NotificationConfiguration">
+        <xs:sequence>
+            <xs:element name="AutoScalingGroupName" type="tns:ResourceName" minOccurs="0"/>
+            <xs:element name="TopicARN" type="tns:ResourceName" minOccurs="0"/>
+            <xs:element name="NotificationType" type="tns:XmlStringMaxLen255" minOccurs="0"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="AdjustmentTypes">
+        <xs:sequence>
+          <xs:element name="member" type="tns:AdjustmentType" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="ScheduledActionNames">
+        <xs:sequence>
+          <xs:element name="member" type="tns:ResourceName" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="NotificationConfigurations">
+        <xs:sequence>
+          <xs:element name="member" type="tns:NotificationConfiguration" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="LaunchConfigurations">
+        <xs:sequence>
+          <xs:element name="member" type="tns:LaunchConfiguration" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:simpleType name="XmlString">
+        <xs:restriction base="xs:string">
+          <xs:pattern value="[\u0020-\uD7FF\uE000-\uFFFD\uD800\uDC00-\uDBFF\uDFFF\r\n\t]*"/>
+        </xs:restriction>
+      </xs:simpleType>
+
+      <xs:complexType name="AutoScalingGroup">
+        <xs:sequence>
+            <xs:element name="AutoScalingGroupName" type="tns:XmlStringMaxLen255"/>
+            <xs:element name="AutoScalingGroupARN" type="tns:ResourceName" minOccurs="0"/>
+            <xs:element name="LaunchConfigurationName" type="tns:XmlStringMaxLen255"/>
+            <xs:element name="MinSize" type="xs:integer"/>
+            <xs:element name="MaxSize" type="xs:integer"/>
+            <xs:element name="DesiredCapacity" type="xs:integer"/>
+            <xs:element name="DefaultCooldown" type="xs:integer"/>
+            <xs:element name="AvailabilityZones" type="tns:AvailabilityZones"/>
+            <xs:element name="LoadBalancerNames" type="tns:LoadBalancerNames" minOccurs="0"/>
+            <xs:element name="HealthCheckType" type="tns:XmlStringMaxLen32"/>
+            <xs:element name="HealthCheckGracePeriod" type="xs:integer" minOccurs="0"/>
+            <xs:element name="Instances" type="tns:Instances" minOccurs="0"/>
+            <xs:element name="CreatedTime" type="xs:dateTime"/>
+            <xs:element name="SuspendedProcesses" type="tns:SuspendedProcesses" minOccurs="0"/>
+            <xs:element name="PlacementGroup" type="tns:XmlStringMaxLen255" minOccurs="0"/>
+            <xs:element name="VPCZoneIdentifier" type="tns:XmlStringMaxLen255" minOccurs="0"/>
+            <xs:element name="EnabledMetrics" type="tns:EnabledMetrics" minOccurs="0"/>
+            <xs:element name="Status" type="tns:XmlStringMaxLen255" minOccurs="0"/>
+            <xs:element name="Tags" type="tns:TagDescriptionList" minOccurs="0"/>
+            <xs:element name="TerminationPolicies" type="tns:TerminationPolicies" minOccurs="0"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="Ebs">
+        <xs:sequence>
+            <xs:element name="SnapshotId" type="tns:XmlStringMaxLen255" minOccurs="0"/>
+            <xs:element name="VolumeSize" type="tns:BlockDeviceEbsVolumeSize" minOccurs="0"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:simpleType name="BlockDeviceEbsVolumeSize">
+        <xs:restriction base="xs:integer">
+        </xs:restriction>
+      </xs:simpleType>
+
+      <xs:simpleType name="XmlStringMaxLen1600">
+        <xs:restriction base="xs:string">
+          <xs:pattern value="[\u0020-\uD7FF\uE000-\uFFFD\uD800\uDC00-\uDBFF\uDFFF\r\n\t]*"/>
+          <xs:minLength value="1"/>
+          <xs:maxLength value="1600"/>
+        </xs:restriction>
+      </xs:simpleType>
+
+      <xs:simpleType name="LifecycleState">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Pending"/>
+          <xs:enumeration value="Quarantined"/>
+          <xs:enumeration value="InService"/>
+          <xs:enumeration value="Terminating"/>
+          <xs:enumeration value="Terminated"/>
+        </xs:restriction>
+      </xs:simpleType>
+
+      <xs:simpleType name="SpotPrice">
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="255"/>
+        </xs:restriction>
+      </xs:simpleType>
+
+      <xs:complexType name="BlockDeviceMapping">
+        <xs:sequence>
+            <xs:element name="VirtualName" type="tns:XmlStringMaxLen255" minOccurs="0"/>
+            <xs:element name="DeviceName" type="tns:XmlStringMaxLen255"/>
+            <xs:element name="Ebs" type="tns:Ebs" minOccurs="0"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="Instance">
+        <xs:sequence>
+            <xs:element name="InstanceId" type="tns:XmlStringMaxLen16"/>
+            <xs:element name="AvailabilityZone" type="tns:XmlStringMaxLen255"/>
+            <xs:element name="LifecycleState" type="tns:LifecycleState"/>
+            <xs:element name="HealthStatus" type="tns:XmlStringMaxLen32"/>
+            <xs:element name="LaunchConfigurationName" type="tns:XmlStringMaxLen255"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="Instances">
+        <xs:sequence>
+          <xs:element name="member" type="tns:Instance" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="ScheduledUpdateGroupActions">
+        <xs:sequence>
+          <xs:element name="member" type="tns:ScheduledUpdateGroupAction" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="Tags">
+        <xs:sequence>
+          <xs:element name="member" type="tns:Tag" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="MetricCollectionTypes">
+        <xs:sequence>
+          <xs:element name="member" type="tns:MetricCollectionType" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:simpleType name="XmlStringMaxLen1023">
+        <xs:restriction base="xs:string">
+          <xs:pattern value="[\u0020-\uD7FF\uE000-\uFFFD\uD800\uDC00-\uDBFF\uDFFF\r\n\t]*"/>
+          <xs:minLength value="1"/>
+          <xs:maxLength value="1023"/>
+        </xs:restriction>
+      </xs:simpleType>
+
+      <xs:simpleType name="TagKey">
+        <xs:restriction base="xs:string">
+          <xs:pattern value="[\u0020-\uD7FF\uE000-\uFFFD\uD800\uDC00-\uDBFF\uDFFF\r\n\t]*"/>
+          <xs:minLength value="1"/>
+          <xs:maxLength value="128"/>
+        </xs:restriction>
+      </xs:simpleType>
+
+      <xs:complexType name="AutoScalingInstanceDetails">
+        <xs:sequence>
+            <xs:element name="InstanceId" type="tns:XmlStringMaxLen16"/>
+            <xs:element name="AutoScalingGroupName" type="tns:XmlStringMaxLen255"/>
+            <xs:element name="AvailabilityZone" type="tns:XmlStringMaxLen255"/>
+            <xs:element name="LifecycleState" type="tns:XmlStringMaxLen32"/>
+            <xs:element name="HealthStatus" type="tns:XmlStringMaxLen32"/>
+            <xs:element name="LaunchConfigurationName" type="tns:XmlStringMaxLen255"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:simpleType name="TagValue">
+        <xs:restriction base="xs:string">
+          <xs:pattern value="[\u0020-\uD7FF\uE000-\uFFFD\uD800\uDC00-\uDBFF\uDFFF\r\n\t]*"/>
+          <xs:minLength value="0"/>
+          <xs:maxLength value="256"/>
+        </xs:restriction>
+      </xs:simpleType>
+
+      <xs:complexType name="EnabledMetrics">
+        <xs:sequence>
+          <xs:element name="member" type="tns:EnabledMetric" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="Metrics">
+        <xs:sequence>
+          <xs:element name="member" type="tns:XmlStringMaxLen255" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="Activity">
+        <xs:sequence>
+            <xs:element name="ActivityId" type="tns:XmlString"/>
+            <xs:element name="AutoScalingGroupName" type="tns:XmlStringMaxLen255"/>
+            <xs:element name="Description" type="tns:XmlString" minOccurs="0"/>
+            <xs:element name="Cause" type="tns:XmlStringMaxLen1023"/>
+            <xs:element name="StartTime" type="xs:dateTime"/>
+            <xs:element name="EndTime" type="xs:dateTime" minOccurs="0"/>
+            <xs:element name="StatusCode" type="tns:ScalingActivityStatusCode"/>
+            <xs:element name="StatusMessage" type="tns:XmlStringMaxLen255" minOccurs="0"/>
+            <xs:element name="Progress" type="xs:integer" minOccurs="0"/>
+            <xs:element name="Details" type="tns:XmlString" minOccurs="0"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="ScalingPolicy">
+        <xs:sequence>
+            <xs:element name="AutoScalingGroupName" type="tns:XmlStringMaxLen255" minOccurs="0"/>
+            <xs:element name="PolicyName" type="tns:XmlStringMaxLen255" minOccurs="0"/>
+            <xs:element name="ScalingAdjustment" type="xs:integer" minOccurs="0"/>
+            <xs:element name="AdjustmentType" type="tns:XmlStringMaxLen255" minOccurs="0"/>
+            <xs:element name="Cooldown" type="xs:integer" minOccurs="0"/>
+            <xs:element name="PolicyARN" type="tns:ResourceName" minOccurs="0"/>
+            <xs:element name="Alarms" type="tns:Alarms" minOccurs="0"/>
+            <xs:element name="MinAdjustmentStep" type="xs:integer" minOccurs="0"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="Values">
+        <xs:sequence>
+          <xs:element name="member" type="tns:XmlString" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="AutoScalingInstances">
+        <xs:sequence>
+          <xs:element name="member" type="tns:AutoScalingInstanceDetails" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="SecurityGroups">
+        <xs:sequence>
+          <xs:element name="member" type="tns:XmlString" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:simpleType name="XmlStringMaxLen32">
+        <xs:restriction base="xs:string">
+          <xs:pattern value="[\u0020-\uD7FF\uE000-\uFFFD\uD800\uDC00-\uDBFF\uDFFF\r\n\t]*"/>
+          <xs:minLength value="1"/>
+          <xs:maxLength value="32"/>
+        </xs:restriction>
+      </xs:simpleType>
+
+      <xs:complexType name="ProcessType">
+        <xs:sequence>
+            <xs:element name="ProcessName" type="tns:XmlStringMaxLen255"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="Processes">
+        <xs:sequence>
+          <xs:element name="member" type="tns:ProcessType" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="AdjustmentType">
+        <xs:sequence>
+            <xs:element name="AdjustmentType" type="tns:XmlStringMaxLen255" minOccurs="0"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="AvailabilityZones">
+        <xs:sequence>
+          <xs:element name="member" type="tns:XmlStringMaxLen255" minOccurs="1" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="Alarm">
+        <xs:sequence>
+            <xs:element name="AlarmName" type="tns:XmlStringMaxLen255" minOccurs="0"/>
+            <xs:element name="AlarmARN" type="tns:ResourceName" minOccurs="0"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="InstanceIds">
+        <xs:sequence>
+          <xs:element name="member" type="tns:XmlStringMaxLen16" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:simpleType name="XmlStringMaxLen255">
+        <xs:restriction base="xs:string">
+          <xs:pattern value="[\u0020-\uD7FF\uE000-\uFFFD\uD800\uDC00-\uDBFF\uDFFF\r\n\t]*"/>
+          <xs:minLength value="1"/>
+          <xs:maxLength value="255"/>
+        </xs:restriction>
+      </xs:simpleType>
+
+      <xs:complexType name="LaunchConfigurationNames">
+        <xs:sequence>
+          <xs:element name="member" type="tns:ResourceName" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="TagDescriptionList">
+        <xs:sequence>
+          <xs:element name="member" type="tns:TagDescription" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="MetricCollectionType">
+        <xs:sequence>
+            <xs:element name="Metric" type="tns:XmlStringMaxLen255" minOccurs="0"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="ScheduledUpdateGroupAction">
+        <xs:sequence>
+            <xs:element name="AutoScalingGroupName" type="tns:XmlStringMaxLen255" minOccurs="0"/>
+            <xs:element name="ScheduledActionName" type="tns:XmlStringMaxLen255" minOccurs="0"/>
+            <xs:element name="ScheduledActionARN" type="tns:ResourceName" minOccurs="0"/>
+            <xs:element name="Time" type="xs:dateTime" minOccurs="0"/>
+            <xs:element name="StartTime" type="xs:dateTime" minOccurs="0"/>
+            <xs:element name="EndTime" type="xs:dateTime" minOccurs="0"/>
+            <xs:element name="Recurrence" type="tns:XmlStringMaxLen255" minOccurs="0"/>
+            <xs:element name="MinSize" type="xs:integer" minOccurs="0"/>
+            <xs:element name="MaxSize" type="xs:integer" minOccurs="0"/>
+            <xs:element name="DesiredCapacity" type="xs:integer" minOccurs="0"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:simpleType name="ScalingActivityStatusCode">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="WaitingForSpotInstanceRequestId"/>
+          <xs:enumeration value="WaitingForSpotInstanceId"/>
+          <xs:enumeration value="WaitingForInstanceId"/>
+          <xs:enumeration value="PreInService"/>
+          <xs:enumeration value="InProgress"/>
+          <xs:enumeration value="Successful"/>
+          <xs:enumeration value="Failed"/>
+          <xs:enumeration value="Cancelled"/>
+        </xs:restriction>
+      </xs:simpleType>
+
+      <xs:complexType name="MetricGranularityTypes">
+        <xs:sequence>
+          <xs:element name="member" type="tns:MetricGranularityType" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="SuspendedProcess">
+        <xs:sequence>
+            <xs:element name="ProcessName" type="tns:XmlStringMaxLen255" minOccurs="0"/>
+            <xs:element name="SuspensionReason" type="tns:XmlStringMaxLen255" minOccurs="0"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="BlockDeviceMappings">
+        <xs:sequence>
+          <xs:element name="member" type="tns:BlockDeviceMapping" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="AutoScalingGroupNames">
+        <xs:sequence>
+          <xs:element name="member" type="tns:ResourceName" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:simpleType name="ResourceName">
+        <xs:restriction base="xs:string">
+          <xs:pattern value="[\u0020-\uD7FF\uE000-\uFFFD\uD800\uDC00-\uDBFF\uDFFF\r\n\t]*"/>
+          <xs:minLength value="1"/>
+          <xs:maxLength value="1600"/>
+        </xs:restriction>
+      </xs:simpleType>
+
+      <xs:complexType name="Filters">
+        <xs:sequence>
+          <xs:element name="member" type="tns:Filter" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="Filter">
+        <xs:sequence>
+            <xs:element name="Name" type="tns:XmlString" minOccurs="0"/>
+            <xs:element name="Values" type="tns:Values" minOccurs="0"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="InstanceMonitoring">
+        <xs:sequence>
+            <xs:element name="Enabled" type="xs:boolean" minOccurs="0"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="AutoScalingGroups">
+        <xs:sequence>
+          <xs:element name="member" type="tns:AutoScalingGroup" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="Alarms">
+        <xs:sequence>
+          <xs:element name="member" type="tns:Alarm" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="AutoScalingNotificationTypes">
+        <xs:sequence>
+          <xs:element name="member" type="tns:XmlStringMaxLen255" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="ScalingPolicies">
+        <xs:sequence>
+          <xs:element name="member" type="tns:ScalingPolicy" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="Activities">
+        <xs:sequence>
+          <xs:element name="member" type="tns:Activity" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="ActivityIds">
+        <xs:sequence>
+          <xs:element name="member" type="tns:XmlString" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:simpleType name="XmlStringUserData">
+        <xs:restriction base="xs:string">
+          <xs:pattern value="[\u0020-\uD7FF\uE000-\uFFFD\uD800\uDC00-\uDBFF\uDFFF\r\n\t]*"/>
+          <xs:minLength value="0"/>
+          <xs:maxLength value="21847"/>
+        </xs:restriction>
+      </xs:simpleType>
+
+      <xs:complexType name="TerminationPolicies">
+        <xs:sequence>
+          <xs:element name="member" type="tns:XmlStringMaxLen1600" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="ProcessNames">
+        <xs:sequence>
+          <xs:element name="member" type="tns:XmlStringMaxLen255" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="LaunchConfiguration">
+        <xs:sequence>
+            <xs:element name="LaunchConfigurationName" type="tns:XmlStringMaxLen255"/>
+            <xs:element name="LaunchConfigurationARN" type="tns:ResourceName" minOccurs="0"/>
+            <xs:element name="ImageId" type="tns:XmlStringMaxLen255"/>
+            <xs:element name="KeyName" type="tns:XmlStringMaxLen255" minOccurs="0"/>
+            <xs:element name="SecurityGroups" type="tns:SecurityGroups" minOccurs="0"/>
+            <xs:element name="UserData" type="tns:XmlStringUserData" minOccurs="0"/>
+            <xs:element name="InstanceType" type="tns:XmlStringMaxLen255"/>
+            <xs:element name="KernelId" type="tns:XmlStringMaxLen255" minOccurs="0"/>
+            <xs:element name="RamdiskId" type="tns:XmlStringMaxLen255" minOccurs="0"/>
+            <xs:element name="BlockDeviceMappings" type="tns:BlockDeviceMappings" minOccurs="0"/>
+            <xs:element name="InstanceMonitoring" type="tns:InstanceMonitoring" minOccurs="0"/>
+            <xs:element name="SpotPrice" type="tns:SpotPrice" minOccurs="0"/>
+            <xs:element name="IamInstanceProfile" type="tns:XmlStringMaxLen1600" minOccurs="0"/>
+            <xs:element name="CreatedTime" type="xs:dateTime"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="EnabledMetric">
+        <xs:sequence>
+            <xs:element name="Metric" type="tns:XmlStringMaxLen255" minOccurs="0"/>
+            <xs:element name="Granularity" type="tns:XmlStringMaxLen255" minOccurs="0"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:simpleType name="MaxRecords">
+        <xs:restriction base="xs:integer">
+        </xs:restriction>
+      </xs:simpleType>
+
+      <xs:simpleType name="XmlStringMaxLen16">
+        <xs:restriction base="xs:string">
+          <xs:pattern value="[\u0020-\uD7FF\uE000-\uFFFD\uD800\uDC00-\uDBFF\uDFFF\r\n\t]*"/>
+          <xs:minLength value="1"/>
+          <xs:maxLength value="16"/>
+        </xs:restriction>
+      </xs:simpleType>
+
+    </xs:schema>
+
+  </wsdl:types>
+
+  <wsdl:message name="DescribeAutoScalingGroupsRequestMsg">
+    <wsdl:part element="tns:DescribeAutoScalingGroups" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DescribeAutoScalingGroupsResponseMsg">
+    <wsdl:part element="tns:DescribeAutoScalingGroupsResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="EnableMetricsCollectionRequestMsg">
+    <wsdl:part element="tns:EnableMetricsCollection" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="EnableMetricsCollectionResponseMsg">
+    <wsdl:part element="tns:EnableMetricsCollectionResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="ResumeProcessesRequestMsg">
+    <wsdl:part element="tns:ResumeProcesses" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="ResumeProcessesResponseMsg">
+    <wsdl:part element="tns:ResumeProcessesResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DeleteLaunchConfigurationRequestMsg">
+    <wsdl:part element="tns:DeleteLaunchConfiguration" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DeleteLaunchConfigurationResponseMsg">
+    <wsdl:part element="tns:DeleteLaunchConfigurationResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DescribePoliciesRequestMsg">
+    <wsdl:part element="tns:DescribePolicies" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DescribePoliciesResponseMsg">
+    <wsdl:part element="tns:DescribePoliciesResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DescribeScalingProcessTypesRequestMsg">
+    <wsdl:part element="tns:DescribeScalingProcessTypes" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DescribeScalingProcessTypesResponseMsg">
+    <wsdl:part element="tns:DescribeScalingProcessTypesResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="CreateAutoScalingGroupRequestMsg">
+    <wsdl:part element="tns:CreateAutoScalingGroup" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="CreateAutoScalingGroupResponseMsg">
+    <wsdl:part element="tns:CreateAutoScalingGroupResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DescribeScalingActivitiesRequestMsg">
+    <wsdl:part element="tns:DescribeScalingActivities" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DescribeScalingActivitiesResponseMsg">
+    <wsdl:part element="tns:DescribeScalingActivitiesResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DescribeNotificationConfigurationsRequestMsg">
+    <wsdl:part element="tns:DescribeNotificationConfigurations" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DescribeNotificationConfigurationsResponseMsg">
+    <wsdl:part element="tns:DescribeNotificationConfigurationsResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DescribeTerminationPolicyTypesRequestMsg">
+    <wsdl:part element="tns:DescribeTerminationPolicyTypes" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DescribeTerminationPolicyTypesResponseMsg">
+    <wsdl:part element="tns:DescribeTerminationPolicyTypesResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DescribeTagsRequestMsg">
+    <wsdl:part element="tns:DescribeTags" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DescribeTagsResponseMsg">
+    <wsdl:part element="tns:DescribeTagsResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="ExecutePolicyRequestMsg">
+    <wsdl:part element="tns:ExecutePolicy" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="ExecutePolicyResponseMsg">
+    <wsdl:part element="tns:ExecutePolicyResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DeleteTagsRequestMsg">
+    <wsdl:part element="tns:DeleteTags" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DeleteTagsResponseMsg">
+    <wsdl:part element="tns:DeleteTagsResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="PutScalingPolicyRequestMsg">
+    <wsdl:part element="tns:PutScalingPolicy" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="PutScalingPolicyResponseMsg">
+    <wsdl:part element="tns:PutScalingPolicyResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="PutNotificationConfigurationRequestMsg">
+    <wsdl:part element="tns:PutNotificationConfiguration" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="PutNotificationConfigurationResponseMsg">
+    <wsdl:part element="tns:PutNotificationConfigurationResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DeletePolicyRequestMsg">
+    <wsdl:part element="tns:DeletePolicy" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DeletePolicyResponseMsg">
+    <wsdl:part element="tns:DeletePolicyResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DeleteNotificationConfigurationRequestMsg">
+    <wsdl:part element="tns:DeleteNotificationConfiguration" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DeleteNotificationConfigurationResponseMsg">
+    <wsdl:part element="tns:DeleteNotificationConfigurationResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DeleteScheduledActionRequestMsg">
+    <wsdl:part element="tns:DeleteScheduledAction" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DeleteScheduledActionResponseMsg">
+    <wsdl:part element="tns:DeleteScheduledActionResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="SetInstanceHealthRequestMsg">
+    <wsdl:part element="tns:SetInstanceHealth" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="SetInstanceHealthResponseMsg">
+    <wsdl:part element="tns:SetInstanceHealthResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DescribeAutoScalingNotificationTypesRequestMsg">
+    <wsdl:part element="tns:DescribeAutoScalingNotificationTypes" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DescribeAutoScalingNotificationTypesResponseMsg">
+    <wsdl:part element="tns:DescribeAutoScalingNotificationTypesResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="CreateOrUpdateTagsRequestMsg">
+    <wsdl:part element="tns:CreateOrUpdateTags" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="CreateOrUpdateTagsResponseMsg">
+    <wsdl:part element="tns:CreateOrUpdateTagsResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="SuspendProcessesRequestMsg">
+    <wsdl:part element="tns:SuspendProcesses" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="SuspendProcessesResponseMsg">
+    <wsdl:part element="tns:SuspendProcessesResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DescribeAutoScalingInstancesRequestMsg">
+    <wsdl:part element="tns:DescribeAutoScalingInstances" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DescribeAutoScalingInstancesResponseMsg">
+    <wsdl:part element="tns:DescribeAutoScalingInstancesResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="CreateLaunchConfigurationRequestMsg">
+    <wsdl:part element="tns:CreateLaunchConfiguration" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="CreateLaunchConfigurationResponseMsg">
+    <wsdl:part element="tns:CreateLaunchConfigurationResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DeleteAutoScalingGroupRequestMsg">
+    <wsdl:part element="tns:DeleteAutoScalingGroup" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DeleteAutoScalingGroupResponseMsg">
+    <wsdl:part element="tns:DeleteAutoScalingGroupResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DisableMetricsCollectionRequestMsg">
+    <wsdl:part element="tns:DisableMetricsCollection" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DisableMetricsCollectionResponseMsg">
+    <wsdl:part element="tns:DisableMetricsCollectionResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="UpdateAutoScalingGroupRequestMsg">
+    <wsdl:part element="tns:UpdateAutoScalingGroup" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="UpdateAutoScalingGroupResponseMsg">
+    <wsdl:part element="tns:UpdateAutoScalingGroupResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DescribeLaunchConfigurationsRequestMsg">
+    <wsdl:part element="tns:DescribeLaunchConfigurations" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DescribeLaunchConfigurationsResponseMsg">
+    <wsdl:part element="tns:DescribeLaunchConfigurationsResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DescribeAdjustmentTypesRequestMsg">
+    <wsdl:part element="tns:DescribeAdjustmentTypes" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DescribeAdjustmentTypesResponseMsg">
+    <wsdl:part element="tns:DescribeAdjustmentTypesResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DescribeScheduledActionsRequestMsg">
+    <wsdl:part element="tns:DescribeScheduledActions" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DescribeScheduledActionsResponseMsg">
+    <wsdl:part element="tns:DescribeScheduledActionsResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="PutScheduledUpdateGroupActionRequestMsg">
+    <wsdl:part element="tns:PutScheduledUpdateGroupAction" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="PutScheduledUpdateGroupActionResponseMsg">
+    <wsdl:part element="tns:PutScheduledUpdateGroupActionResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DescribeMetricCollectionTypesRequestMsg">
+    <wsdl:part element="tns:DescribeMetricCollectionTypes" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DescribeMetricCollectionTypesResponseMsg">
+    <wsdl:part element="tns:DescribeMetricCollectionTypesResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="SetDesiredCapacityRequestMsg">
+    <wsdl:part element="tns:SetDesiredCapacity" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="SetDesiredCapacityResponseMsg">
+    <wsdl:part element="tns:SetDesiredCapacityResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="TerminateInstanceInAutoScalingGroupRequestMsg">
+    <wsdl:part element="tns:TerminateInstanceInAutoScalingGroup" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="TerminateInstanceInAutoScalingGroupResponseMsg">
+    <wsdl:part element="tns:TerminateInstanceInAutoScalingGroupResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:portType name="AutoScaling_2011_01_01PortType">
+
+    <wsdl:operation name="DescribeAutoScalingGroups">
+      <wsdl:input message="tns:DescribeAutoScalingGroupsRequestMsg" wsa:Action="urn:DescribeAutoScalingGroups"/>
+      <wsdl:output message="tns:DescribeAutoScalingGroupsResponseMsg" wsa:Action="urn:DescribeAutoScalingGroups:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="EnableMetricsCollection">
+      <wsdl:input message="tns:EnableMetricsCollectionRequestMsg" wsa:Action="urn:EnableMetricsCollection"/>
+      <wsdl:output message="tns:EnableMetricsCollectionResponseMsg" wsa:Action="urn:EnableMetricsCollection:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="ResumeProcesses">
+      <wsdl:input message="tns:ResumeProcessesRequestMsg" wsa:Action="urn:ResumeProcesses"/>
+      <wsdl:output message="tns:ResumeProcessesResponseMsg" wsa:Action="urn:ResumeProcesses:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="DeleteLaunchConfiguration">
+      <wsdl:input message="tns:DeleteLaunchConfigurationRequestMsg" wsa:Action="urn:DeleteLaunchConfiguration"/>
+      <wsdl:output message="tns:DeleteLaunchConfigurationResponseMsg" wsa:Action="urn:DeleteLaunchConfiguration:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="DescribePolicies">
+      <wsdl:input message="tns:DescribePoliciesRequestMsg" wsa:Action="urn:DescribePolicies"/>
+      <wsdl:output message="tns:DescribePoliciesResponseMsg" wsa:Action="urn:DescribePolicies:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="DescribeScalingProcessTypes">
+      <wsdl:input message="tns:DescribeScalingProcessTypesRequestMsg" wsa:Action="urn:DescribeScalingProcessTypes"/>
+      <wsdl:output message="tns:DescribeScalingProcessTypesResponseMsg" wsa:Action="urn:DescribeScalingProcessTypes:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="CreateAutoScalingGroup">
+      <wsdl:input message="tns:CreateAutoScalingGroupRequestMsg" wsa:Action="urn:CreateAutoScalingGroup"/>
+      <wsdl:output message="tns:CreateAutoScalingGroupResponseMsg" wsa:Action="urn:CreateAutoScalingGroup:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="DescribeScalingActivities">
+      <wsdl:input message="tns:DescribeScalingActivitiesRequestMsg" wsa:Action="urn:DescribeScalingActivities"/>
+      <wsdl:output message="tns:DescribeScalingActivitiesResponseMsg" wsa:Action="urn:DescribeScalingActivities:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="DescribeNotificationConfigurations">
+      <wsdl:input message="tns:DescribeNotificationConfigurationsRequestMsg" wsa:Action="urn:DescribeNotificationConfigurations"/>
+      <wsdl:output message="tns:DescribeNotificationConfigurationsResponseMsg" wsa:Action="urn:DescribeNotificationConfigurations:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="DescribeTerminationPolicyTypes">
+      <wsdl:input message="tns:DescribeTerminationPolicyTypesRequestMsg" wsa:Action="urn:DescribeTerminationPolicyTypes"/>
+      <wsdl:output message="tns:DescribeTerminationPolicyTypesResponseMsg" wsa:Action="urn:DescribeTerminationPolicyTypes:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="DescribeTags">
+      <wsdl:input message="tns:DescribeTagsRequestMsg" wsa:Action="urn:DescribeTags"/>
+      <wsdl:output message="tns:DescribeTagsResponseMsg" wsa:Action="urn:DescribeTags:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="ExecutePolicy">
+      <wsdl:input message="tns:ExecutePolicyRequestMsg" wsa:Action="urn:ExecutePolicy"/>
+      <wsdl:output message="tns:ExecutePolicyResponseMsg" wsa:Action="urn:ExecutePolicy:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="DeleteTags">
+      <wsdl:input message="tns:DeleteTagsRequestMsg" wsa:Action="urn:DeleteTags"/>
+      <wsdl:output message="tns:DeleteTagsResponseMsg" wsa:Action="urn:DeleteTags:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="PutScalingPolicy">
+      <wsdl:input message="tns:PutScalingPolicyRequestMsg" wsa:Action="urn:PutScalingPolicy"/>
+      <wsdl:output message="tns:PutScalingPolicyResponseMsg" wsa:Action="urn:PutScalingPolicy:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="PutNotificationConfiguration">
+      <wsdl:input message="tns:PutNotificationConfigurationRequestMsg" wsa:Action="urn:PutNotificationConfiguration"/>
+      <wsdl:output message="tns:PutNotificationConfigurationResponseMsg" wsa:Action="urn:PutNotificationConfiguration:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="DeletePolicy">
+      <wsdl:input message="tns:DeletePolicyRequestMsg" wsa:Action="urn:DeletePolicy"/>
+      <wsdl:output message="tns:DeletePolicyResponseMsg" wsa:Action="urn:DeletePolicy:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="DeleteNotificationConfiguration">
+      <wsdl:input message="tns:DeleteNotificationConfigurationRequestMsg" wsa:Action="urn:DeleteNotificationConfiguration"/>
+      <wsdl:output message="tns:DeleteNotificationConfigurationResponseMsg" wsa:Action="urn:DeleteNotificationConfiguration:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="DeleteScheduledAction">
+      <wsdl:input message="tns:DeleteScheduledActionRequestMsg" wsa:Action="urn:DeleteScheduledAction"/>
+      <wsdl:output message="tns:DeleteScheduledActionResponseMsg" wsa:Action="urn:DeleteScheduledAction:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="SetInstanceHealth">
+      <wsdl:input message="tns:SetInstanceHealthRequestMsg" wsa:Action="urn:SetInstanceHealth"/>
+      <wsdl:output message="tns:SetInstanceHealthResponseMsg" wsa:Action="urn:SetInstanceHealth:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="DescribeAutoScalingNotificationTypes">
+      <wsdl:input message="tns:DescribeAutoScalingNotificationTypesRequestMsg" wsa:Action="urn:DescribeAutoScalingNotificationTypes"/>
+      <wsdl:output message="tns:DescribeAutoScalingNotificationTypesResponseMsg" wsa:Action="urn:DescribeAutoScalingNotificationTypes:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="CreateOrUpdateTags">
+      <wsdl:input message="tns:CreateOrUpdateTagsRequestMsg" wsa:Action="urn:CreateOrUpdateTags"/>
+      <wsdl:output message="tns:CreateOrUpdateTagsResponseMsg" wsa:Action="urn:CreateOrUpdateTags:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="SuspendProcesses">
+      <wsdl:input message="tns:SuspendProcessesRequestMsg" wsa:Action="urn:SuspendProcesses"/>
+      <wsdl:output message="tns:SuspendProcessesResponseMsg" wsa:Action="urn:SuspendProcesses:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="DescribeAutoScalingInstances">
+      <wsdl:input message="tns:DescribeAutoScalingInstancesRequestMsg" wsa:Action="urn:DescribeAutoScalingInstances"/>
+      <wsdl:output message="tns:DescribeAutoScalingInstancesResponseMsg" wsa:Action="urn:DescribeAutoScalingInstances:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="CreateLaunchConfiguration">
+      <wsdl:input message="tns:CreateLaunchConfigurationRequestMsg" wsa:Action="urn:CreateLaunchConfiguration"/>
+      <wsdl:output message="tns:CreateLaunchConfigurationResponseMsg" wsa:Action="urn:CreateLaunchConfiguration:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="DeleteAutoScalingGroup">
+      <wsdl:input message="tns:DeleteAutoScalingGroupRequestMsg" wsa:Action="urn:DeleteAutoScalingGroup"/>
+      <wsdl:output message="tns:DeleteAutoScalingGroupResponseMsg" wsa:Action="urn:DeleteAutoScalingGroup:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="DisableMetricsCollection">
+      <wsdl:input message="tns:DisableMetricsCollectionRequestMsg" wsa:Action="urn:DisableMetricsCollection"/>
+      <wsdl:output message="tns:DisableMetricsCollectionResponseMsg" wsa:Action="urn:DisableMetricsCollection:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="UpdateAutoScalingGroup">
+      <wsdl:input message="tns:UpdateAutoScalingGroupRequestMsg" wsa:Action="urn:UpdateAutoScalingGroup"/>
+      <wsdl:output message="tns:UpdateAutoScalingGroupResponseMsg" wsa:Action="urn:UpdateAutoScalingGroup:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="DescribeLaunchConfigurations">
+      <wsdl:input message="tns:DescribeLaunchConfigurationsRequestMsg" wsa:Action="urn:DescribeLaunchConfigurations"/>
+      <wsdl:output message="tns:DescribeLaunchConfigurationsResponseMsg" wsa:Action="urn:DescribeLaunchConfigurations:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="DescribeAdjustmentTypes">
+      <wsdl:input message="tns:DescribeAdjustmentTypesRequestMsg" wsa:Action="urn:DescribeAdjustmentTypes"/>
+      <wsdl:output message="tns:DescribeAdjustmentTypesResponseMsg" wsa:Action="urn:DescribeAdjustmentTypes:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="DescribeScheduledActions">
+      <wsdl:input message="tns:DescribeScheduledActionsRequestMsg" wsa:Action="urn:DescribeScheduledActions"/>
+      <wsdl:output message="tns:DescribeScheduledActionsResponseMsg" wsa:Action="urn:DescribeScheduledActions:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="PutScheduledUpdateGroupAction">
+      <wsdl:input message="tns:PutScheduledUpdateGroupActionRequestMsg" wsa:Action="urn:PutScheduledUpdateGroupAction"/>
+      <wsdl:output message="tns:PutScheduledUpdateGroupActionResponseMsg" wsa:Action="urn:PutScheduledUpdateGroupAction:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="DescribeMetricCollectionTypes">
+      <wsdl:input message="tns:DescribeMetricCollectionTypesRequestMsg" wsa:Action="urn:DescribeMetricCollectionTypes"/>
+      <wsdl:output message="tns:DescribeMetricCollectionTypesResponseMsg" wsa:Action="urn:DescribeMetricCollectionTypes:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="SetDesiredCapacity">
+      <wsdl:input message="tns:SetDesiredCapacityRequestMsg" wsa:Action="urn:SetDesiredCapacity"/>
+      <wsdl:output message="tns:SetDesiredCapacityResponseMsg" wsa:Action="urn:SetDesiredCapacity:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="TerminateInstanceInAutoScalingGroup">
+      <wsdl:input message="tns:TerminateInstanceInAutoScalingGroupRequestMsg" wsa:Action="urn:TerminateInstanceInAutoScalingGroup"/>
+      <wsdl:output message="tns:TerminateInstanceInAutoScalingGroupResponseMsg" wsa:Action="urn:TerminateInstanceInAutoScalingGroup:Response"/>
+    </wsdl:operation>
+
+  </wsdl:portType>
+
+  <wsdl:binding name="AutoScaling_2011_01_01Binding" type="tns:AutoScaling_2011_01_01PortType">
+
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+
+    <wsdl:operation name="DescribeAutoScalingGroups">
+      <soap:operation soapAction="DescribeAutoScalingGroups"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="EnableMetricsCollection">
+      <soap:operation soapAction="EnableMetricsCollection"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="ResumeProcesses">
+      <soap:operation soapAction="ResumeProcesses"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="DeleteLaunchConfiguration">
+      <soap:operation soapAction="DeleteLaunchConfiguration"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="DescribePolicies">
+      <soap:operation soapAction="DescribePolicies"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="DescribeScalingProcessTypes">
+      <soap:operation soapAction="DescribeScalingProcessTypes"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="CreateAutoScalingGroup">
+      <soap:operation soapAction="CreateAutoScalingGroup"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="DescribeScalingActivities">
+      <soap:operation soapAction="DescribeScalingActivities"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="DescribeNotificationConfigurations">
+      <soap:operation soapAction="DescribeNotificationConfigurations"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="DescribeTerminationPolicyTypes">
+      <soap:operation soapAction="DescribeTerminationPolicyTypes"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="DescribeTags">
+      <soap:operation soapAction="DescribeTags"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="ExecutePolicy">
+      <soap:operation soapAction="ExecutePolicy"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="DeleteTags">
+      <soap:operation soapAction="DeleteTags"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="PutScalingPolicy">
+      <soap:operation soapAction="PutScalingPolicy"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="PutNotificationConfiguration">
+      <soap:operation soapAction="PutNotificationConfiguration"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="DeletePolicy">
+      <soap:operation soapAction="DeletePolicy"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="DeleteNotificationConfiguration">
+      <soap:operation soapAction="DeleteNotificationConfiguration"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="DeleteScheduledAction">
+      <soap:operation soapAction="DeleteScheduledAction"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="SetInstanceHealth">
+      <soap:operation soapAction="SetInstanceHealth"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="DescribeAutoScalingNotificationTypes">
+      <soap:operation soapAction="DescribeAutoScalingNotificationTypes"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="CreateOrUpdateTags">
+      <soap:operation soapAction="CreateOrUpdateTags"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="SuspendProcesses">
+      <soap:operation soapAction="SuspendProcesses"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="DescribeAutoScalingInstances">
+      <soap:operation soapAction="DescribeAutoScalingInstances"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="CreateLaunchConfiguration">
+      <soap:operation soapAction="CreateLaunchConfiguration"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="DeleteAutoScalingGroup">
+      <soap:operation soapAction="DeleteAutoScalingGroup"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="DisableMetricsCollection">
+      <soap:operation soapAction="DisableMetricsCollection"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="UpdateAutoScalingGroup">
+      <soap:operation soapAction="UpdateAutoScalingGroup"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="DescribeLaunchConfigurations">
+      <soap:operation soapAction="DescribeLaunchConfigurations"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="DescribeAdjustmentTypes">
+      <soap:operation soapAction="DescribeAdjustmentTypes"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="DescribeScheduledActions">
+      <soap:operation soapAction="DescribeScheduledActions"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="PutScheduledUpdateGroupAction">
+      <soap:operation soapAction="PutScheduledUpdateGroupAction"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="DescribeMetricCollectionTypes">
+      <soap:operation soapAction="DescribeMetricCollectionTypes"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="SetDesiredCapacity">
+      <soap:operation soapAction="SetDesiredCapacity"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="TerminateInstanceInAutoScalingGroup">
+      <soap:operation soapAction="TerminateInstanceInAutoScalingGroup"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+  </wsdl:binding>
+
+  <wsdl:service name="AutoScaling_2011_01_01">
+    <wsdl:port name="AutoScaling_2011_01_01Port" binding="tns:AutoScaling_2011_01_01Binding">
+      <soap:address location="https://autoscaling.amazonaws.com"/>
+    </wsdl:port>
+  </wsdl:service>
+
+</wsdl:definitions>

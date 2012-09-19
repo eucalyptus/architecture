@@ -1,0 +1,1126 @@
+<?xml version="1.0"?>
+<wsdl:definitions
+  targetNamespace="http://sns.amazonaws.com/doc/2010-03-31/"
+  xmlns:tns="http://sns.amazonaws.com/doc/2010-03-31/"
+  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+  xmlns:wsa="http://www.w3.org/2005/08/addressing/"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <wsdl:types>
+
+    <xs:schema
+      targetNamespace="http://sns.amazonaws.com/doc/2010-03-31/"
+      elementFormDefault="qualified">
+
+      <xs:element name="ResponseMetadata">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="RequestId" type="xs:string"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="Error">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Type">
+              <xs:simpleType>
+                <xs:restriction base="xs:string">
+                  <xs:enumeration value="Receiver"/>
+                  <xs:enumeration value="Sender"/>
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:element>
+            <xs:element name="Code" type="xs:string"/>
+            <xs:element name="Message" type="xs:string"/>
+            <xs:element name="Detail">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:any maxOccurs="unbounded" minOccurs="0" namespace="##any" processContents="lax"/>
+                </xs:sequence>
+                <xs:anyAttribute namespace="##other" processContents="lax"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="ErrorResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:Error" maxOccurs="unbounded"/>
+            <xs:element name="RequestId" type="xs:string"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="ConfirmSubscription">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="TopicArn" type="xs:string"/>
+            <xs:element name="Token" type="xs:string"/>
+            <xs:element name="AuthenticateOnUnsubscribe" type="xs:string" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="ConfirmSubscriptionResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:ConfirmSubscriptionResult"/>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="ConfirmSubscriptionResult">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SubscriptionArn" type="xs:string" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="GetTopicAttributes">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="TopicArn" type="xs:string"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="GetTopicAttributesResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:GetTopicAttributesResult"/>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="GetTopicAttributesResult">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Attributes" type="tns:TopicAttributesMap" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="Subscribe">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="TopicArn" type="xs:string"/>
+            <xs:element name="Protocol" type="xs:string"/>
+            <xs:element name="Endpoint" type="xs:string"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="SubscribeResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:SubscribeResult"/>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="SubscribeResult">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SubscriptionArn" type="xs:string" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="SetTopicAttributes">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="TopicArn" type="xs:string"/>
+            <xs:element name="AttributeName" type="xs:string"/>
+            <xs:element name="AttributeValue" type="xs:string"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="SetTopicAttributesResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DeleteTopic">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="TopicArn" type="xs:string"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="DeleteTopicResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="RemovePermission">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="TopicArn" type="xs:string"/>
+            <xs:element name="Label" type="xs:string"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="RemovePermissionResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="ListSubscriptions">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="NextToken" type="xs:string" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="ListSubscriptionsResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:ListSubscriptionsResult"/>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="ListSubscriptionsResult">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Subscriptions" type="tns:SubscriptionsList" minOccurs="0"/>
+            <xs:element name="NextToken" type="xs:string" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="AddPermission">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="TopicArn" type="xs:string"/>
+            <xs:element name="Label" type="xs:string"/>
+            <xs:element name="AWSAccountId" type="tns:DelegatesList"/>
+            <xs:element name="ActionName" type="tns:ActionsList"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="AddPermissionResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="CreateTopic">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Name" type="xs:string"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="CreateTopicResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:CreateTopicResult"/>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="CreateTopicResult">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="TopicArn" type="xs:string" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="ListTopics">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="NextToken" type="xs:string" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="ListTopicsResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:ListTopicsResult"/>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="ListTopicsResult">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Topics" type="tns:TopicsList" minOccurs="0"/>
+            <xs:element name="NextToken" type="xs:string" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="Unsubscribe">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SubscriptionArn" type="xs:string"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="UnsubscribeResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="ListSubscriptionsByTopic">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="TopicArn" type="xs:string"/>
+            <xs:element name="NextToken" type="xs:string" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="ListSubscriptionsByTopicResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:ListSubscriptionsByTopicResult"/>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="ListSubscriptionsByTopicResult">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Subscriptions" type="tns:SubscriptionsList" minOccurs="0"/>
+            <xs:element name="NextToken" type="xs:string" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="Publish">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="TopicArn" type="xs:string"/>
+            <xs:element name="Message" type="xs:string"/>
+            <xs:element name="Subject" type="xs:string" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="PublishResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:PublishResult"/>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="PublishResult">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="MessageId" type="xs:string" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:complexType name="Topic">
+
+        <xs:annotation>
+          <xs:documentation><![CDATA[<p>A wrapper type for the topic's Amazon Resource Name (ARN). To retrieve a topic's attributes, use GetTopicAttributes.</p>]]></xs:documentation>
+        </xs:annotation>
+        
+        <xs:sequence>
+            <xs:element name="TopicArn" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="TopicAttributesMap">
+        <xs:sequence>
+          <xs:element name="entry" type="tns:TopicAttributesMapEntry" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="TopicAttributesMapEntry">
+        <xs:sequence>
+          <xs:element name="key" type="xs:string" minOccurs="1"/>
+          <xs:element name="value" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="Subscription">
+
+        <xs:annotation>
+          <xs:documentation><![CDATA[<p>A wrapper type for the attributes of an SNS subscription.</p>]]></xs:documentation>
+        </xs:annotation>
+        
+        <xs:sequence>
+            <xs:element name="SubscriptionArn" type="xs:string" minOccurs="0"/>
+            <xs:element name="Owner" type="xs:string" minOccurs="0"/>
+            <xs:element name="Protocol" type="xs:string" minOccurs="0"/>
+            <xs:element name="Endpoint" type="xs:string" minOccurs="0"/>
+            <xs:element name="TopicArn" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="ActionsList">
+        <xs:sequence>
+          <xs:element name="member" type="xs:string" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="DelegatesList">
+        <xs:sequence>
+          <xs:element name="member" type="xs:string" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="SubscriptionsList">
+        <xs:sequence>
+          <xs:element name="member" type="tns:Subscription" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="TopicsList">
+        <xs:sequence>
+          <xs:element name="member" type="tns:Topic" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+
+    </xs:schema>
+
+  </wsdl:types>
+
+  <wsdl:message name="ConfirmSubscriptionRequestMsg">
+    <wsdl:part element="tns:ConfirmSubscription" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="ConfirmSubscriptionResponseMsg">
+    <wsdl:part element="tns:ConfirmSubscriptionResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="GetTopicAttributesRequestMsg">
+    <wsdl:part element="tns:GetTopicAttributes" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="GetTopicAttributesResponseMsg">
+    <wsdl:part element="tns:GetTopicAttributesResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="SubscribeRequestMsg">
+    <wsdl:part element="tns:Subscribe" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="SubscribeResponseMsg">
+    <wsdl:part element="tns:SubscribeResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="SetTopicAttributesRequestMsg">
+    <wsdl:part element="tns:SetTopicAttributes" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="SetTopicAttributesResponseMsg">
+    <wsdl:part element="tns:SetTopicAttributesResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DeleteTopicRequestMsg">
+    <wsdl:part element="tns:DeleteTopic" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="DeleteTopicResponseMsg">
+    <wsdl:part element="tns:DeleteTopicResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="RemovePermissionRequestMsg">
+    <wsdl:part element="tns:RemovePermission" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="RemovePermissionResponseMsg">
+    <wsdl:part element="tns:RemovePermissionResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="ListSubscriptionsRequestMsg">
+    <wsdl:part element="tns:ListSubscriptions" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="ListSubscriptionsResponseMsg">
+    <wsdl:part element="tns:ListSubscriptionsResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="AddPermissionRequestMsg">
+    <wsdl:part element="tns:AddPermission" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="AddPermissionResponseMsg">
+    <wsdl:part element="tns:AddPermissionResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="CreateTopicRequestMsg">
+    <wsdl:part element="tns:CreateTopic" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="CreateTopicResponseMsg">
+    <wsdl:part element="tns:CreateTopicResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="ListTopicsRequestMsg">
+    <wsdl:part element="tns:ListTopics" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="ListTopicsResponseMsg">
+    <wsdl:part element="tns:ListTopicsResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="UnsubscribeRequestMsg">
+    <wsdl:part element="tns:Unsubscribe" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="UnsubscribeResponseMsg">
+    <wsdl:part element="tns:UnsubscribeResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="ListSubscriptionsByTopicRequestMsg">
+    <wsdl:part element="tns:ListSubscriptionsByTopic" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="ListSubscriptionsByTopicResponseMsg">
+    <wsdl:part element="tns:ListSubscriptionsByTopicResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="PublishRequestMsg">
+    <wsdl:part element="tns:Publish" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="PublishResponseMsg">
+    <wsdl:part element="tns:PublishResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:portType name="AmazonSimpleNotificationServicePortType">
+
+    <wsdl:operation name="ConfirmSubscription">
+      <wsdl:documentation><![CDATA[
+    <p>The ConfirmSubscription action verifies an endpoint owner's intent to receive messages by validating
+      the token sent to the endpoint by an earlier Subscribe action. If the
+      token is valid, the action creates a new subscription and returns its
+      Amazon Resource Name (ARN). This call requires an AWS signature only when the AuthenticateOnUnsubscribe flag is set to "true".</p>
+<examples>
+ <queryrequest>
+
+  https://sns.us-east-1.amazonaws.com/
+  ?Action=ConfirmSubscription
+  &TopicArn=arn:aws:sns:us-east-1:123456789012:My-Topic
+  &Token=51b2ff3edb475b7d91550e0ab6edf0c1de2a34e6ebaf6
+   c2262a001bcb7e051c43aa00022ceecce70bd2a67b2042da8d8
+   eb47fef7a4e4e942d23e7fa56146b9ee35da040b4b8af564cc4
+   184a7391c834cb75d75c22981f776ad1ce8805e9bab29da2329
+   985337bb8095627907b46c8577c8440556b6f86582a95475802
+   6f41fc62041c4b3f67b0f5921232b5dae5aaca1
+
+ </queryrequest>
+ <queryresponse>
+  
+<ConfirmSubscriptionResponse xmlns="http://sns.amazonaws.com/doc/2010-03-31/">
+  <ConfirmSubscriptionResult>
+    <SubscriptionArn>arn:aws:sns:us-east-1:123456789012:My-Topic:80289ba6-0fd4-4079-afb4-ce8c8260f0ca</SubscriptionArn>
+  </ConfirmSubscriptionResult>
+  <ResponseMetadata>
+    <RequestId>7a50221f-3774-11df-a9b7-05d48da6f042</RequestId>
+  </ResponseMetadata>
+</ConfirmSubscriptionResponse>
+  
+ </queryresponse>
+</examples>
+
+
+  ]]></wsdl:documentation>
+      <wsdl:input message="tns:ConfirmSubscriptionRequestMsg" wsa:Action="urn:ConfirmSubscription"/>
+      <wsdl:output message="tns:ConfirmSubscriptionResponseMsg" wsa:Action="urn:ConfirmSubscription:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="GetTopicAttributes">
+      <wsdl:documentation><![CDATA[
+    <p>The GetTopicAttribtues action returns all of the properties of a topic customers have created. Topic
+      properties returned might differ based on the authorization of the user. </p>
+<examples>
+ <queryrequest>
+
+  http://sns.us-east-1.amazonaws.com/
+  ?TopicArn=arn%3Aaws%3Asns%3Aus-east-1%3A123456789012%3AMy-Topic
+  &Action=GetTopicAttributes
+  &SignatureVersion=2
+  &SignatureMethod=HmacSHA256
+  &Timestamp=2010-03-31T12%3A00%3A00.000Z
+  &AWSAccessKeyId=(AWS Access Key Id)
+  &Signature=92lBGRVq0%2BxhaACaBGqtdemy%2Bi9isfgyTljCbJM80Yk%3D
+
+ </queryrequest>
+ <queryresponse>
+  
+<GetTopicAttributesResponse xmlns="http://sns.amazonaws.com/doc/2010-03-31/">
+  <GetTopicAttributesResult>
+    <Attributes>
+      <entry>
+        <key>Owner</key>
+        <value>123456789012</value>
+      </entry>
+      <entry>
+        <key>Policy</key>
+        <value>{
+&quot;Version&quot;:&quot;2008-10-17&quot;,&quot;Id&quot;:&quot;us-east-1/698519295917/test__default_policy_ID&quot;,&quot;Statement&quot; : [{&quot;Effect&quot;:&quot;Allow&quot;,&quot;Sid&quot;:&quot;us-east-1/698519295917/test__default_statement_ID&quot;,&quot;Principal&quot; : {&quot;AWS&quot;: &quot;*&quot;},&quot;Action&quot;:[&quot;SNS:GetTopicAttributes&quot;,&quot;SNS:SetTopicAttributes&quot;,&quot;SNS:AddPermission&quot;,&quot;SNS:RemovePermission&quot;,&quot;SNS:DeleteTopic&quot;,&quot;SNS:Subscribe&quot;,&quot;SNS:ListSubscriptionsByTopic&quot;,&quot;SNS:Publish&quot;,&quot;SNS:Receive&quot;],&quot;Resource&quot;:&quot;arn:aws:sns:us-east-1:698519295917:test&quot;,&quot;Condition&quot; : {&quot;StringLike&quot; : {&quot;AWS:SourceArn&quot;: &quot;arn:aws:*:*:698519295917:*&quot;}}}]}</value>
+      </entry>
+      <entry>
+        <key>TopicArn</key>
+        <value>arn:aws:sns:us-east-1:123456789012:My-Topic</value>
+      </entry>
+    </Attributes>
+  </GetTopicAttributesResult>
+  <ResponseMetadata>
+    <RequestId>057f074c-33a7-11df-9540-99d0768312d3</RequestId>
+  </ResponseMetadata>
+</GetTopicAttributesResponse>
+  
+ </queryresponse>
+</examples>
+  ]]></wsdl:documentation>
+      <wsdl:input message="tns:GetTopicAttributesRequestMsg" wsa:Action="urn:GetTopicAttributes"/>
+      <wsdl:output message="tns:GetTopicAttributesResponseMsg" wsa:Action="urn:GetTopicAttributes:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="Subscribe">
+      <wsdl:documentation><![CDATA[
+    <p>The Subscribe action prepares to subscribe an endpoint by sending the endpoint a confirmation message. To actually create a
+      subscription, the endpoint owner must call the ConfirmSubscription
+      action with the token from the confirmation message. Confirmation tokens are
+      valid for twenty-four hours.</p>
+<examples>
+ <queryrequest>
+
+  http://sns.us-east-1.amazonaws.com/
+  ?TopicArn=arn%3Aaws%3Asns%3Aus-east-1%3A123456789012%3AMy-Topic
+  &Endpoint=example%40amazon.com
+  &Protocol=email
+  &Action=Subscribe
+  &SignatureVersion=2
+  &SignatureMethod=HmacSHA256
+  &Timestamp=2010-03-31T12%3A00%3A00.000Z
+  &AWSAccessKeyId=(AWS Access Key ID)
+  &Signature=1%2FeGaDphxXq%2Fa89x6HvKh%2Fc1yLGXzuhS7vS2MslToDM%3D
+
+ </queryrequest>
+ <queryresponse>
+  
+<SubscribeResponse xmlns="http://sns.amazonaws.com/doc/2010-03-31/">
+  <SubscribeResult>
+    <SubscriptionArn>pending confirmation</SubscriptionArn>
+  </SubscribeResult>
+  <ResponseMetadata>
+    <RequestId>a169c740-3766-11df-8963-01868b7c937a</RequestId>
+  </ResponseMetadata>
+</SubscribeResponse>
+  
+ </queryresponse>
+</examples>
+  ]]></wsdl:documentation>
+      <wsdl:input message="tns:SubscribeRequestMsg" wsa:Action="urn:Subscribe"/>
+      <wsdl:output message="tns:SubscribeResponseMsg" wsa:Action="urn:Subscribe:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="SetTopicAttributes">
+      <wsdl:documentation><![CDATA[
+    <p>The SetTopicAttributes action allows a topic owner to set an attribute of the topic to a new value.</p>
+<examples>
+ <queryrequest>
+
+  http://sns.us-east-1.amazonaws.com/
+  ?AttributeValue=MyTopicName
+  &TopicArn=arn%3Aaws%3Asns%3Aus-east-1%3A123456789012%3AMy-Topic
+  &AttributeName=DisplayName
+  &Action=SetTopicAttributes
+  &SignatureVersion=2
+  &SignatureMethod=HmacSHA256
+  &Timestamp=2010-03-31T12%3A00%3A00.000Z
+  &AWSAccessKeyId=(AWS Access Key Id)
+  &Signature=mQA3nJI%2BcmAIY7r8HCArGElSqPX5JG4UGzF4yo0RygE%3D
+
+ </queryrequest>
+ <queryresponse>
+  
+<SetTopicAttributesResponse xmlns="http://sns.amazonaws.com/doc/2010-03-31/">
+  <ResponseMetadata>
+    <RequestId>a8763b99-33a7-11df-a9b7-05d48da6f042</RequestId>
+  </ResponseMetadata>
+</SetTopicAttributesResponse>
+  
+ </queryresponse>
+</examples>
+
+
+  ]]></wsdl:documentation>
+      <wsdl:input message="tns:SetTopicAttributesRequestMsg" wsa:Action="urn:SetTopicAttributes"/>
+      <wsdl:output message="tns:SetTopicAttributesResponseMsg" wsa:Action="urn:SetTopicAttributes:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="DeleteTopic">
+      <wsdl:documentation><![CDATA[
+    <p>The DeleteTopic action deletes a topic and all its subscriptions. Deleting a topic might
+      prevent some messages previously sent to the topic from being delivered to
+      subscribers. This action is idempotent, so deleting a topic that does not
+      exist will not result in an error.</p>
+<examples>
+<queryrequest>
+
+  http://sns.us-east-1.amazonaws.com/
+  &TopicArn=arn%3Aaws%3Asns%3Aus-east-1%3A123456789012%3AMy-Topic
+  &Action=DeleteTopic
+  &SignatureVersion=2
+  &SignatureMethod=HmacSHA256
+  &Timestamp=2010-03-31T12%3A00%3A00.000Z
+  &AWSAccessKeyId=(AWS Access Key Id)
+  &Signature=mQA3nJI%2BcmAIY7r8HCArGElSqPX5JG4UGzF4yo0RygE%3D
+
+</queryrequest>
+<queryresponse>
+
+<DeleteTopicResponse xmlns="http://sns.amazonaws.com/doc/2010-03-31/">
+  <ResponseMetadata>
+    <RequestId>f3aa9ac9-3c3d-11df-8235-9dab105e9c32</RequestId>
+  </ResponseMetadata>
+</DeleteTopicResponse>
+
+</queryresponse>
+</examples>
+  ]]></wsdl:documentation>
+      <wsdl:input message="tns:DeleteTopicRequestMsg" wsa:Action="urn:DeleteTopic"/>
+      <wsdl:output message="tns:DeleteTopicResponseMsg" wsa:Action="urn:DeleteTopic:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="RemovePermission">
+      <wsdl:documentation><![CDATA[
+    <p>The RemovePermission action removes a statement from a topic's access control policy.</p>
+<examples>
+ <queryrequest>
+
+  http://sns.us-east-1.amazonaws.com/
+  ?TopicArn=arn%3Aaws%3Asns%3Aus-east-1%3A123456789012%3AMy-Test
+  &Label=NewPermission
+  &Action=RemovePermission
+  &SignatureVersion=2
+  &SignatureMethod=HmacSHA256
+  &Timestamp=2010-03-31T12%3A00%3A00.000Z
+  &AWSAccessKeyId=(AWS Access Key ID)
+  &Signature=N1abwRY9i7zaSQmbAlm71pPf9EEFOqNbQL1alzw2yCg%3D
+
+ </queryrequest>
+ <queryresponse>
+  
+<RemovePermissionResponse xmlns="http://sns.amazonaws.com/doc/2010-03-31/">
+  <ResponseMetadata>
+    <RequestId>d170b150-33a8-11df-995a-2d6fbe836cc1</RequestId>
+  </ResponseMetadata>
+</RemovePermissionResponse>
+  
+ </queryresponse>
+</examples>
+  ]]></wsdl:documentation>
+      <wsdl:input message="tns:RemovePermissionRequestMsg" wsa:Action="urn:RemovePermission"/>
+      <wsdl:output message="tns:RemovePermissionResponseMsg" wsa:Action="urn:RemovePermission:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="ListSubscriptions">
+      <wsdl:documentation><![CDATA[
+    <p>The ListSubscriptions action returns a list of the requester's subscriptions. Each call returns a limited list
+     of subscriptions. If there are more subscriptions, a NextToken is also returned. Use the NextToken parameter in a 
+     new ListSubscriptions call to get further results.</p>
+<examples>
+ <queryrequest>
+
+  http://sns.us-east-1.amazonaws.com/
+  &Action=ListSubscriptions
+  &SignatureVersion=2
+  &SignatureMethod=HmacSHA256
+  &Timestamp=2010-03-31T12%3A00%3A00.000Z
+  &AWSAccessKeyId=(AWS Access Key ID)
+  &Signature=SZmBxEPqfs9R7xxhSt6C1b7PnOEvg%2BSVyyMYJfLRFCA%3D
+
+ </queryrequest>
+ <queryresponse>
+  
+<ListSubscriptionsResponse xmlns="http://sns.amazonaws.com/doc/2010-03-31/">
+  <ListSubscriptionsResult>
+    <Subscriptions>
+      <member>
+        <TopicArn>arn:aws:sns:us-east-1:698519295917:My-Topic</TopicArn>
+        <Protocol>email</Protocol>
+        <SubscriptionArn>arn:aws:sns:us-east-1:123456789012:My-Topic:80289ba6-0fd4-4079-afb4-ce8c8260f0ca</SubscriptionArn>
+        <Owner>123456789012</Owner>
+        <Endpoint>example@amazon.com</Endpoint>
+      </member>
+    </Subscriptions>
+  </ListSubscriptionsResult>
+  <ResponseMetadata>
+    <RequestId>384ac68d-3775-11df-8963-01868b7c937a</RequestId>
+  </ResponseMetadata>
+</ListSubscriptionsResponse>
+  
+ </queryresponse>
+</examples>
+  ]]></wsdl:documentation>
+      <wsdl:input message="tns:ListSubscriptionsRequestMsg" wsa:Action="urn:ListSubscriptions"/>
+      <wsdl:output message="tns:ListSubscriptionsResponseMsg" wsa:Action="urn:ListSubscriptions:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="AddPermission">
+      <wsdl:documentation><![CDATA[
+    <p>The AddPermission action adds a statement to a topic's access control policy, granting access for the specified AWS accounts to the specified actions.</p>
+<examples>
+ <queryrequest>
+
+  http://sns.us-east-1.amazonaws.com/
+  ?TopicArn=arn%3Aaws%3Asns%3Aus-east-1%3A123456789012%3AMy-Test
+  &ActionName.member.1=SNS%3APublish
+  &ActionName.member.2=SNS%3AGetTopicAttributes
+  &Label=NewPermission
+  &AWSAccountId.member.1=987654321000
+  &AWSAccountId.member.2=876543210000
+  &Action=AddPermission
+  &SignatureVersion=2
+  &SignatureMethod=HmacSHA256
+  &Timestamp=2010-03-31T12%3A00%3A00.000Z
+  &AWSAccessKeyId=(AWS Access Key ID)
+  &Signature=k%2FAU%2FKp13pjndwJ7rr1sZszy6MZMlOhRBCHx1ZaZFiw%3D
+
+ </queryrequest>
+ <queryresponse>
+  
+<AddPermissionResponse xmlns="http://sns.amazonaws.com/doc/2010-03-31/">
+  <ResponseMetadata>
+    <RequestId>6a213e4e-33a8-11df-9540-99d0768312d3</RequestId>
+  </ResponseMetadata>
+</AddPermissionResponse>
+  
+ </queryresponse>
+</examples>
+  ]]></wsdl:documentation>
+      <wsdl:input message="tns:AddPermissionRequestMsg" wsa:Action="urn:AddPermission"/>
+      <wsdl:output message="tns:AddPermissionResponseMsg" wsa:Action="urn:AddPermission:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="CreateTopic">
+      <wsdl:documentation><![CDATA[
+    <p>The CreateTopic action creates a topic to which notifications can be published. Users can create
+     at most 25 topics. This action is idempotent, so if the requester 
+     already owns a topic with the specified name, that topic's ARN will be 
+     returned without creating a new topic.</p>
+<examples>
+ <queryrequest>
+
+  http://sns.us-east-1.amazonaws.com/
+  ?Name=My-Topic
+  &Action=CreateTopic
+  &SignatureVersion=2
+  &SignatureMethod=HmacSHA256
+  &Timestamp=2010-03-31T12%3A00%3A00.000Z
+  &AWSAccessKeyId=(AWS Access Key ID)
+  &Signature=gfzIF53exFVdpSNb8AiwN3Lv%2FNYXh6S%2Br3yySK70oX4%3D
+
+ </queryrequest>
+ <queryresponse>
+  
+   <CreateTopicResponse xmlns="http://sns.amazonaws.com/doc/2010-03-31/">
+     <CreateTopicResult>
+       <TopicArn>arn:aws:sns:us-east-1:123456789012:My-Topic</TopicArn>
+     </CreateTopicResult>
+     <ResponseMetadata>
+       <RequestId>a8dec8b3-33a4-11df-8963-01868b7c937a</RequestId>
+     </ResponseMetadata>
+   </CreateTopicResponse>
+  
+ </queryresponse>
+</examples>
+  ]]></wsdl:documentation>
+      <wsdl:input message="tns:CreateTopicRequestMsg" wsa:Action="urn:CreateTopic"/>
+      <wsdl:output message="tns:CreateTopicResponseMsg" wsa:Action="urn:CreateTopic:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="ListTopics">
+      <wsdl:documentation><![CDATA[
+    <p>The ListTopics action returns a list of the requester's topics. Each call returns a limited list of topics. If
+     there are more topics, a NextToken is also returned. Use the NextToken parameter in a new ListTopics call to get 
+     further results.</p>
+<examples>
+ <queryrequest>
+
+  http://sns.us-east-1.amazonaws.com/
+  ?Action=ListTopics
+  &SignatureVersion=2
+  &SignatureMethod=HmacSHA256
+  &Timestamp=2010-03-31T12%3A00%3A00.000Z
+  &AWSAccessKeyId=(AWS Access Key ID)
+  &Signature=tPg1qKNTNVPydnL3Yx5Fqm2O9GxCr9vh3EF5r9%2F5%2BJs%3D
+
+ </queryrequest>
+ <queryresponse>
+  
+<ListTopicsResponse xmlns="http://sns.amazonaws.com/doc/2010-03-31/">
+  <ListTopicsResult>
+    <Topics>
+      <member>
+        <TopicArn>arn:aws:sns:us-east-1:123456789012:My-Topic</TopicArn>
+      </member>
+    </Topics>
+  </ListTopicsResult>
+  <ResponseMetadata>
+    <RequestId>3f1478c7-33a9-11df-9540-99d0768312d3</RequestId>
+  </ResponseMetadata>
+</ListTopicsResponse>
+  
+ </queryresponse>
+</examples>
+  ]]></wsdl:documentation>
+      <wsdl:input message="tns:ListTopicsRequestMsg" wsa:Action="urn:ListTopics"/>
+      <wsdl:output message="tns:ListTopicsResponseMsg" wsa:Action="urn:ListTopics:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="Unsubscribe">
+      <wsdl:documentation><![CDATA[
+    <p>The Unsubscribe action deletes a subscription. If the subscription requires authentication for 
+    deletion, only the owner of the subscription or the its topic's owner 
+    can unsubscribe, and an AWS signature is required. If the 
+    Unsubscribe call does not require authentication and the requester is not 
+    the subscription owner, a final cancellation message is delivered to the 
+    endpoint, so that the endpoint owner can easily resubscribe to the topic if 
+    the Unsubscribe request was unintended.</p>
+<examples>
+ <queryrequest>
+
+  http://sns.us-east-1.amazonaws.com/
+  ?SubscriptionArn=arn%3Aaws%3Asns%3Aus-east-1%3A123456789012%3AMy-Topic%3A80289ba6-0fd4-4079-afb4-ce8c8260f0ca
+  &Action=Unsubscribe
+  &SignatureVersion=2
+  &SignatureMethod=HmacSHA256
+  &Timestamp=2010-03-31T12%3A00%3A00.000Z
+  &AWSAccessKeyId=(AWS Access Key ID)
+  &Signature=e8IwhPzuWeMvPDVrN7jUVxasd3Wv2LuO8x6rE23VCv8%3D
+
+ </queryrequest>
+ <queryresponse>
+  
+<UnsubscribeResponse xmlns="http://sns.amazonaws.com/doc/2010-03-31/">
+  <ResponseMetadata>
+    <RequestId>18e0ac39-3776-11df-84c0-b93cc1666b84</RequestId>
+  </ResponseMetadata>
+</UnsubscribeResponse>
+  
+ </queryresponse>
+</examples>
+  ]]></wsdl:documentation>
+      <wsdl:input message="tns:UnsubscribeRequestMsg" wsa:Action="urn:Unsubscribe"/>
+      <wsdl:output message="tns:UnsubscribeResponseMsg" wsa:Action="urn:Unsubscribe:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="ListSubscriptionsByTopic">
+      <wsdl:documentation><![CDATA[
+    <p>The ListSubscriptionsByTopic action returns a list of the subscriptions to a specific topic. Each call returns 
+    a limited list of subscriptions. If there are more subscriptions, a NextToken is also returned. Use the NextToken 
+    parameter in a new ListSubscriptionsByTopic call to get further results.</p>
+<examples>
+ <queryrequest>
+
+  http://sns.us-east-1.amazonaws.com/
+  ?TopicArn=arn%3Aaws%3Asns%3Aus-east-1%3A123456789012%3AMy-Topic
+  &Action=ListSubscriptionsByTopic
+  &SignatureVersion=2
+  &SignatureMethod=HmacSHA256
+  &Timestamp=2010-03-31T12%3A00%3A00.000Z
+  &AWSAccessKeyId=(AWS Access Key ID)
+  &Signature=SZmBxEPqfs9R7xxhSt6C1b7PnOEvg%2BSVyyMYJfLRFCA%3D
+
+ </queryrequest>
+ <queryresponse>
+  
+<ListSubscriptionsByTopicResponse xmlns="http://sns.amazonaws.com/doc/2010-03-31/">
+  <ListSubscriptionsByTopicResult>
+    <Subscriptions>
+      <member>
+        <TopicArn>arn:aws:sns:us-east-1:123456789012:My-Topic</TopicArn>
+        <Protocol>email</Protocol>
+        <SubscriptionArn>arn:aws:sns:us-east-1:123456789012:My-Topic:80289ba6-0fd4-4079-afb4-ce8c8260f0ca</SubscriptionArn>
+        <Owner>123456789012</Owner>
+        <Endpoint>example@amazon.com</Endpoint>
+      </member>
+    </Subscriptions>
+  </ListSubscriptionsByTopicResult>
+  <ResponseMetadata>
+    <RequestId>b9275252-3774-11df-9540-99d0768312d3</RequestId>
+  </ResponseMetadata>
+</ListSubscriptionsByTopicResponse>
+  
+ </queryresponse>
+</examples>
+  ]]></wsdl:documentation>
+      <wsdl:input message="tns:ListSubscriptionsByTopicRequestMsg" wsa:Action="urn:ListSubscriptionsByTopic"/>
+      <wsdl:output message="tns:ListSubscriptionsByTopicResponseMsg" wsa:Action="urn:ListSubscriptionsByTopic:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="Publish">
+      <wsdl:documentation><![CDATA[
+    <p>The Publish action sends a message to all of a topic's subscribed endpoints. When a
+    messageId is returned, the message has been saved and Amazon SNS will attempt to deliver it 
+    to the topic's subscribers shortly. The format of the outgoing message to each
+    subscribed endpoint depends on the notification protocol selected.</p>
+<examples>
+ <queryrequest>
+
+  http://sns.us-east-1.amazonaws.com/
+  ?Subject=My%20first%20message
+  &TopicArn=arn%3Aaws%3Asns%3Aus-east-1%3A698519295917%3AMy-Topic
+  &Message=Hello%20world%21
+  &Action=Publish
+  &SignatureVersion=2
+  &SignatureMethod=HmacSHA256
+  &Timestamp=2010-03-31T12%3A00%3A00.000Z
+  &AWSAccessKeyId=AKIAJHS4T6XPF7XIURNA
+  &Signature=9GZysQ4Jpnz%2BHklqM7VFTvEcjR2LIUtn6jW47054xxE%3D
+
+ </queryrequest>
+ <queryresponse>
+  
+<PublishResponse xmlns="http://sns.amazonaws.com/doc/2010-03-31/">
+  <PublishResult>
+    <MessageId>94f20ce6-13c5-43a0-9a9e-ca52d816e90b</MessageId>
+  </PublishResult>
+  <ResponseMetadata>
+    <RequestId>f187a3c1-376f-11df-8963-01868b7c937a</RequestId>
+  </ResponseMetadata>
+</PublishResponse>
+  
+ </queryresponse>
+</examples>
+  ]]></wsdl:documentation>
+      <wsdl:input message="tns:PublishRequestMsg" wsa:Action="urn:Publish"/>
+      <wsdl:output message="tns:PublishResponseMsg" wsa:Action="urn:Publish:Response"/>
+    </wsdl:operation>
+
+  </wsdl:portType>
+
+  <wsdl:binding name="AmazonSimpleNotificationServiceBinding" type="tns:AmazonSimpleNotificationServicePortType">
+
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+
+    <wsdl:operation name="ConfirmSubscription">
+      <soap:operation soapAction="ConfirmSubscription"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="GetTopicAttributes">
+      <soap:operation soapAction="GetTopicAttributes"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="Subscribe">
+      <soap:operation soapAction="Subscribe"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="SetTopicAttributes">
+      <soap:operation soapAction="SetTopicAttributes"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="DeleteTopic">
+      <soap:operation soapAction="DeleteTopic"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="RemovePermission">
+      <soap:operation soapAction="RemovePermission"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="ListSubscriptions">
+      <soap:operation soapAction="ListSubscriptions"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="AddPermission">
+      <soap:operation soapAction="AddPermission"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="CreateTopic">
+      <soap:operation soapAction="CreateTopic"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="ListTopics">
+      <soap:operation soapAction="ListTopics"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="Unsubscribe">
+      <soap:operation soapAction="Unsubscribe"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="ListSubscriptionsByTopic">
+      <soap:operation soapAction="ListSubscriptionsByTopic"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="Publish">
+      <soap:operation soapAction="Publish"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+  </wsdl:binding>
+
+  <wsdl:service name="AmazonSimpleNotificationService">
+    <wsdl:documentation><![CDATA[
+    <fullname>Amazon Simple Notification Service</fullname>
+  ]]></wsdl:documentation>
+    <wsdl:port name="AmazonSimpleNotificationServicePort" binding="tns:AmazonSimpleNotificationServiceBinding">
+      <soap:address location="https://sns.us-east-1.amazonaws.com/"/>
+    </wsdl:port>
+  </wsdl:service>
+
+</wsdl:definitions>

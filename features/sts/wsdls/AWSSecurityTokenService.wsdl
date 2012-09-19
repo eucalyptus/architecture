@@ -1,0 +1,549 @@
+<?xml version="1.0"?>
+<wsdl:definitions
+  targetNamespace="https://sts.amazonaws.com/doc/2011-06-15/"
+  xmlns:tns="https://sts.amazonaws.com/doc/2011-06-15/"
+  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+  xmlns:wsa="http://www.w3.org/2005/08/addressing/"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <wsdl:types>
+
+    <xs:schema
+      targetNamespace="https://sts.amazonaws.com/doc/2011-06-15/"
+      elementFormDefault="qualified">
+
+      <xs:element name="ResponseMetadata">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="RequestId" type="xs:string"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="Error">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Type">
+              <xs:simpleType>
+                <xs:restriction base="xs:string">
+                  <xs:enumeration value="Receiver"/>
+                  <xs:enumeration value="Sender"/>
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:element>
+            <xs:element name="Code" type="xs:string"/>
+            <xs:element name="Message" type="xs:string"/>
+            <xs:element name="Detail">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:any maxOccurs="unbounded" minOccurs="0" namespace="##any" processContents="lax"/>
+                </xs:sequence>
+                <xs:anyAttribute namespace="##other" processContents="lax"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="ErrorResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:Error" maxOccurs="unbounded"/>
+            <xs:element name="RequestId" type="xs:string"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="GetSessionToken">
+        <xs:complexType>
+
+          <xs:annotation>
+            <xs:documentation><![CDATA[]]></xs:documentation>
+          </xs:annotation>
+          
+          <xs:sequence>
+            <xs:element name="DurationSeconds" type="tns:durationSecondsType" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+              	<p>The duration, in seconds, that the credentials should remain valid. Acceptable durations for
+              	IAM user sessions range from 3600s (one hour) to 129600s (36 hours), with 43200s (12 hours) as the
+              	 default. Sessions for AWS account owners are restricted to a maximum of 3600s (one hour).</p>
+              ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="SerialNumber" type="tns:serialNumberType" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                  <p>The identification number of the MFA device for the user. If the IAM user has a policy requiring MFA authentication (or is in a group requiring MFA authentication) to access resources, provide the device value here.</p><p>The value is in the <b>Security Credentials</b> tab of the user's details pane in the IAM console. If the IAM user has an active MFA device, the details pane displays a <b>Multi-Factor Authentication Device</b> value. The value is either for a virtual device, such as <code>arn:aws:iam::123456789012:mfa/user</code>, or it is the device serial number for a hardware device (usually the number from the back of the device), such as <code>GAHT12345678</code>. For more information, see <a href="http://docs.amazonwebservices.com/IAM/latest/UserGuide/Using_ManagingMFA.html" target="_blank">Using Multi-Factor Authentication (MFA) Devices with AWS</a> in <i>Using IAM</i>.</p>
+              ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="TokenCode" type="tns:tokenCodeType" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+              	<p>The value provided by the MFA device. If the user has an access policy requiring an MFA code (or is in a group requiring an MFA code), provide the value here to get permission to resources as specified in the access policy. If MFA authentication is required, and the user does not provide a code when requesting a set of temporary security credentials, the user will receive an "access denied" response when requesting resources that require MFA authentication. For more information, see <a href="http://docs.amazonwebservices.com/IAM/latest/UserGuide/Using_ManagingMFA.html" target="_blank">Using Multi-Factor Authentication (MFA) Devices with AWS</a> in <i>Using IAM</i>.</p>
+              ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="GetSessionTokenResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:GetSessionTokenResult"/>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="GetSessionTokenResult">
+        <xs:complexType>
+
+            <xs:annotation>
+              <xs:documentation><![CDATA[
+                <p>Contains the result of a successful invocation of the <a>GetSessionToken</a> action.</p>
+              ]]></xs:documentation>
+            </xs:annotation>
+            
+          <xs:sequence>
+            <xs:element name="Credentials" type="tns:Credentials" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                  <p>The session credentials for API authentication. </p>
+              ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="GetFederationToken">
+        <xs:complexType>
+
+          <xs:annotation>
+            <xs:documentation><![CDATA[]]></xs:documentation>
+          </xs:annotation>
+          
+          <xs:sequence>
+            <xs:element name="Name" type="tns:userNameType">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                  <p>The name of the federated user associated with the credentials. For information about limitations on user
+                  names, go to <a href="http://docs.amazonwebservices.com/IAM/latest/UserGuide/LimitationsOnEntities.html">Limitations on IAM Entities</a>
+                  in <i>Using AWS Identity and Access Management</i>.</p>
+              ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="Policy" type="tns:sessionPolicyDocumentType" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                  <p>A policy specifying the permissions to associate with the credentials. The caller can delegate their own permissions by
+                     specifying a policy, and both policies will be checked when a service call is made. For more information about 
+              	how permissions work in the context of temporary credentials, see <a href="http://docs.amazonwebservices.com/IAM/latest/UserGuide/TokenPermissions.html" target="_blank">Controlling Permissions in Temporary Credentials</a> 
+              	in <i>Using AWS Identity and Access Management</i>.</p>
+              ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="DurationSeconds" type="tns:durationSecondsType" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                  <p>The duration, in seconds, that the session should last. Acceptable durations for federation sessions 
+                  range from 3600s (one hour) to 129600s (36 hours), with 43200s (12 hours) as the default. </p>
+              ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="GetFederationTokenResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="tns:GetFederationTokenResult"/>
+            <xs:element ref="tns:ResponseMetadata" minOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="GetFederationTokenResult">
+        <xs:complexType>
+
+            <xs:annotation>
+              <xs:documentation><![CDATA[
+                <p>Contains the result of a successful invocation of the <a>GetFederationToken</a> action.</p>
+              ]]></xs:documentation>
+            </xs:annotation>
+            
+          <xs:sequence>
+            <xs:element name="Credentials" type="tns:Credentials" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                  <p>Credentials for the service API authentication. </p>
+              ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="FederatedUser" type="tns:FederatedUser" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                  <p>Identifiers for the federated user associated with the credentials. You can use the federated user's ARN in 
+                  your resource policies.</p>
+              ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="PackedPolicySize" type="tns:nonNegativeIntegerType" minOccurs="0">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+                  <p>A percentage value indicating the size of the policy in packed form. Policies for which the packed size is greater than
+                     100% of the allowed value are rejected by the service.</p>
+              ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:simpleType name="sessionPolicyDocumentType">
+        <xs:restriction base="xs:string">
+          <xs:pattern value="[\u0009\u000A\u000D\u0020-\u00FF]+"/>
+          <xs:minLength value="1"/>
+          <xs:maxLength value="2048"/>
+        </xs:restriction>
+      </xs:simpleType>
+
+      <xs:simpleType name="userNameType">
+        <xs:restriction base="xs:string">
+          <xs:pattern value="[\w+=,.@-]*"/>
+          <xs:minLength value="2"/>
+          <xs:maxLength value="32"/>
+        </xs:restriction>
+      </xs:simpleType>
+
+      <xs:simpleType name="nonNegativeIntegerType">
+        <xs:restriction base="xs:integer">
+        </xs:restriction>
+      </xs:simpleType>
+
+      <xs:simpleType name="tokenCodeType">
+        <xs:restriction base="xs:string">
+          <xs:pattern value="[\d]*"/>
+          <xs:minLength value="6"/>
+          <xs:maxLength value="6"/>
+        </xs:restriction>
+      </xs:simpleType>
+
+      <xs:simpleType name="durationSecondsType">
+        <xs:restriction base="xs:integer">
+        </xs:restriction>
+      </xs:simpleType>
+
+      <xs:simpleType name="serialNumberType">
+        <xs:restriction base="xs:string">
+          <xs:pattern value="[\w+=/:,.@-]*"/>
+          <xs:minLength value="9"/>
+          <xs:maxLength value="256"/>
+        </xs:restriction>
+      </xs:simpleType>
+
+      <xs:simpleType name="arnType">
+        <xs:restriction base="xs:string">
+          <xs:minLength value="20"/>
+          <xs:maxLength value="2048"/>
+        </xs:restriction>
+      </xs:simpleType>
+
+      <xs:complexType name="FederatedUser">
+
+        <xs:annotation>
+          <xs:documentation><![CDATA[
+        	<p>Identifiers for the federated user associated with the credentials.</p>
+        ]]></xs:documentation>
+        </xs:annotation>
+        
+        <xs:sequence>
+            <xs:element name="FederatedUserId" type="tns:federatedIdType">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+              	<p>The string identifying the federated user associated with the credentials, similar to the UserId of an IAM user.</p>
+              ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="Arn" type="tns:arnType">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+              	<p>The ARN specifying the federated user associated with the credentials. For more information about ARNs and how
+                     to use them in policies, see  <a href="http://docs.amazonwebservices.com/IAM/latest/UserGuide/Using_Identifiers.html" target="_blank">Identifiers for IAM Entities</a> in <i>Using AWS Identity and Access Management</i>.</p>
+              ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:simpleType name="federatedIdType">
+        <xs:restriction base="xs:string">
+          <xs:pattern value="[\w+=,.@-\:]*"/>
+          <xs:minLength value="2"/>
+          <xs:maxLength value="96"/>
+        </xs:restriction>
+      </xs:simpleType>
+
+      <xs:simpleType name="accessKeyIdType">
+        <xs:restriction base="xs:string">
+          <xs:pattern value="[\w]*"/>
+          <xs:minLength value="16"/>
+          <xs:maxLength value="32"/>
+        </xs:restriction>
+      </xs:simpleType>
+
+      <xs:complexType name="Credentials">
+
+        <xs:annotation>
+          <xs:documentation><![CDATA[
+        	<p>AWS credentials for API authentication.</p>
+        ]]></xs:documentation>
+        </xs:annotation>
+        
+        <xs:sequence>
+            <xs:element name="AccessKeyId" type="tns:accessKeyIdType">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+              	<p>AccessKeyId ID that identifies the temporary credentials.</p>
+              ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="SecretAccessKey" type="xs:string">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+              	<p>The Secret Access Key to sign requests.</p>
+              ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="SessionToken" type="xs:string">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+              	<p>The security token that users must pass to the service API to use the temporary credentials.</p>
+              ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+            <xs:element name="Expiration" type="xs:dateTime">
+
+              <xs:annotation>
+                <xs:documentation><![CDATA[
+              	<p>The date on which these credentials expire.</p>
+              ]]></xs:documentation>
+              </xs:annotation>
+              
+            </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+
+    </xs:schema>
+
+  </wsdl:types>
+
+  <wsdl:message name="GetSessionTokenRequestMsg">
+    <wsdl:part element="tns:GetSessionToken" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="GetSessionTokenResponseMsg">
+    <wsdl:part element="tns:GetSessionTokenResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="GetFederationTokenRequestMsg">
+    <wsdl:part element="tns:GetFederationToken" name="body"/>
+  </wsdl:message>
+
+  <wsdl:message name="GetFederationTokenResponseMsg">
+    <wsdl:part element="tns:GetFederationTokenResponse" name="body"/>
+  </wsdl:message>
+
+  <wsdl:portType name="AWSSecurityTokenServiceV20110615PortType">
+
+    <wsdl:operation name="GetSessionToken">
+      <wsdl:documentation><![CDATA[
+	<p>The GetSessionToken action returns a set of temporary credentials for an AWS account or IAM user. 
+	The credentials consist of an Access Key ID, a Secret Access Key, and a security token. These credentials are 
+	valid for the specified duration only. The session duration for IAM users can be between one and 36 hours, 
+	with a default of 12 hours. The session duration for AWS account owners is restricted to one hour. Providing 
+	the AWS Multi-Factor Authentication (MFA) device serial number and the token code is optional.</p>
+	<p>For more information about using GetSessionToken to create temporary credentials, go to <a href="http://docs.amazonwebservices.com/IAM/latest/UserGuide/CreatingSessionTokens.html" target="_blank">Creating Temporary Credentials to Enable Access 
+	for IAM Users</a> in <i>Using IAM</i>.</p>
+	
+	
+	<examples>
+	<queryrequest>https://sts.amazonaws.com/
+?Version=2011-06-15
+&Action=GetSessionToken
+&DurationSeconds=3600
+&SerialNumber=YourMFADeviceSerialNumber
+&TokenCode=123456
+&AUTHPARAMS</queryrequest>
+
+<queryresponse><GetSessionTokenResponse xmlns="https://sts.amazonaws.com/doc/2011-06-15/">
+  <GetSessionTokenResult>
+    <Credentials>
+      <SessionToken>
+       AQoEXAMPLEH4aoAH0gNCAPyJxz4BlCFFxWNE1OPTgk5TthT+FvwqnKwRcOIfrRh3c/L
+       To6UDdyJwOOvEVPvLXCrrrUtdnniCEXAMPLE/IvU1dYUg2RVAJBanLiHb4IgRmpRV3z
+       rkuWJOgQs8IZZaIv2BXIa2R4OlgkBN9bkUDNCJiBeb/AXlzBBko7b15fjrBs2+cTQtp
+       Z3CYWFXG8C5zqx37wnOE49mRl/+OtkIKGO7fAE
+      </SessionToken>
+      <SecretAccessKey>
+      wJalrXUtnFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY
+      </SecretAccessKey>
+      <Expiration>2011-07-11T19:55:29.611Z</Expiration>
+      <AccessKeyId>AKIAIOSFODNN7EXAMPLE</AccessKeyId>
+    </Credentials>
+  </GetSessionTokenResult>
+  <ResponseMetadata>
+    <RequestId>58c5dbae-abef-11e0-8cfe-09039844ac7d</RequestId>
+  </ResponseMetadata>
+</GetSessionTokenResponse></queryresponse>
+	</examples>
+]]></wsdl:documentation>
+      <wsdl:input message="tns:GetSessionTokenRequestMsg" wsa:Action="urn:GetSessionToken"/>
+      <wsdl:output message="tns:GetSessionTokenResponseMsg" wsa:Action="urn:GetSessionToken:Response"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="GetFederationToken">
+      <wsdl:documentation><![CDATA[
+	<p>The GetFederationToken action returns a set of temporary credentials for a federated user with the
+	user name and policy specified in the request. The credentials consist of an Access Key ID, a Secret Access 
+	Key, and a security token. Credentials created by IAM users are valid for the specified duration, between 
+	one and 36 hours; credentials created using account credentials last one hour.</p>
+
+	<p>The federated user who holds these credentials has any permissions allowed by 
+	the intersection of the specified policy and any resource or user policies that apply to the caller of 
+	the GetFederationToken API, and any resource policies that apply to the federated user's Amazon Resource Name (ARN). 
+	For more information about how token permissions work, see <a href="http://docs.amazonwebservices.com/IAM/latest/UserGuide/TokenPermissions.html" target="_blank">Controlling Permissions in Temporary Credentials</a> 
+	in <i>Using AWS Identity and Access Management</i>. For information about using GetFederationToken to 
+	create temporary credentials, 
+	see <a href="http://docs.amazonwebservices.com/IAM/latest/UserGuide/CreatingFedTokens.html" target="_blank">Creating Temporary Credentials to Enable Access for Federated Users</a> 
+	in <i>Using AWS Identity and Access Management</i>.</p>
+
+	<examples>
+	<queryrequest>https://sts.amazonaws.com/
+?Version=2011-06-15
+&Action=GetFederationToken
+&Name=Bob
+&Policy=%7B%22Statement%22%3A%5B%7B%22Sid%22%3A%22Stmt1%22%2C%22Effect%22%
+ 3A%22Allow%22%2C%22Action%22%3A%22s3%3A*%22%2C%22Resource%22%3A%22*%22%7D
+ %5D%7D
+&DurationSeconds=3600
+&AUTHPARAMS</queryrequest>
+
+<queryresponse><GetFederationTokenResponse xmlns="https://sts.amazonaws.com/doc/
+2011-06-15/">
+  <GetFederationTokenResult>
+    <Credentials>
+      <SessionToken>
+       AQoDYXdzEPT//////////wEXAMPLEtc764bNrC9SAPBSM22wDOk4x4HIZ8j4FZTwdQW
+       LWsKWHGBuFqwAeMicRXmxfpSPfIeoIYRqTflfKD8YUuwthAx7mSEI/qkPpKPi/kMcGd
+       QrmGdeehM4IC1NtBmUpp2wUE8phUZampKsburEDy0KPkyQDYwT7WZ0wq5VSXDvp75YU
+       9HFvlRd8Tx6q6fE8YQcHNVXAkiY9q6d+xo0rKwT38xVqr7ZD0u0iPPkUL64lIZbqBAz
+       +scqKmlzm8FDrypNC9Yjc8fPOLn9FX9KSYvKTr4rvx3iSIlTJabIQwj2ICCR/oLxBA==
+      </SessionToken>
+      <SecretAccessKey>
+       wJalrXUtnFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY
+      </SecretAccessKey>
+      <Expiration>2011-07-15T23:28:33.359Z</Expiration>
+      <AccessKeyId>AKIAIOSFODNN7EXAMPLE</AccessKeyId>
+    </Credentials>
+    <FederatedUser>
+      <Arn>arn:aws:sts::123456789012:federated-user/Bob</Arn>
+      <FederatedUserId>123456789012:Bob</FederatedUserId>
+    </FederatedUser>
+    <PackedPolicySize>6</PackedPolicySize>
+  </GetFederationTokenResult>
+  <ResponseMetadata>
+    <RequestId>c6104cbe-af31-11e0-8154-cbc7ccf896c7</RequestId>
+  </ResponseMetadata>
+</GetFederationTokenResponse></queryresponse>
+
+	</examples>
+]]></wsdl:documentation>
+      <wsdl:input message="tns:GetFederationTokenRequestMsg" wsa:Action="urn:GetFederationToken"/>
+      <wsdl:output message="tns:GetFederationTokenResponseMsg" wsa:Action="urn:GetFederationToken:Response"/>
+    </wsdl:operation>
+
+  </wsdl:portType>
+
+  <wsdl:binding name="AWSSecurityTokenServiceV20110615Binding" type="tns:AWSSecurityTokenServiceV20110615PortType">
+
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+
+    <wsdl:operation name="GetSessionToken">
+      <soap:operation soapAction="GetSessionToken"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="GetFederationToken">
+      <soap:operation soapAction="GetFederationToken"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+    </wsdl:operation>
+
+  </wsdl:binding>
+
+  <wsdl:service name="AWSSecurityTokenServiceV20110615">
+    <wsdl:documentation><![CDATA[
+    <fullname>AWS Security Token Service</fullname>
+
+    <p>The AWS Security Token Service is a web service that enables you to request temporary, 
+    limited-privilege credentials for AWS Identity and Access Management (IAM) users or for users that you authenticate (federated users). This guide 
+    provides descriptions of the AWS Security Token Service API.</p> 
+    
+    <p>For more detailed information about using this service, go to <a href="http://docs.amazonwebservices.com/IAM/latest/UsingSTS/Welcome.html" target="_blank">Using Temporary Security Credentials</a>.</p>
+
+	<p>For information about setting up signatures and 
+		authorization through the API, go to <a href="http://docs.amazonwebservices.com/general/latest/gr/signing_aws_api_requests.html" target="_blank">Signing AWS API Requests</a> in the <i>AWS General Reference</i>. For general information about 
+		the Query API, go to <a href="http://docs.amazonwebservices.com/IAM/latest/UserGuide/IAM_UsingQueryAPI.html" target="_blank">Making Query Requests</a> in <i>Using IAM</i>. For information about using security tokens with other AWS products, go to
+		<a href="http://docs.amazonwebservices.com/IAM/latest/UsingSTS/UsingTokens.html">Using Temporary Security Credentials to Access AWS</a>
+	in <i>Using Temporary Security Credentials</i>.</p>
+
+        <p>If you're new to AWS and need additional technical information about a specific AWS product, you can find the product's
+technical documentation at <a href="http://aws.amazon.com/documentation/" target="_blank">http://aws.amazon.com/documentation/</a>.</p>
+    
+    <p>We will refer to Amazon Identity and Access Management using the abbreviated form IAM. 
+		All copyrights and legal protections still apply.</p>
+		
+ ]]></wsdl:documentation>
+    <wsdl:port name="AWSSecurityTokenServiceV20110615Port" binding="tns:AWSSecurityTokenServiceV20110615Binding">
+      <soap:address location="https://sts.amazonaws.com"/>
+    </wsdl:port>
+  </wsdl:service>
+
+</wsdl:definitions>
