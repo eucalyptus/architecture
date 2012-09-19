@@ -1,0 +1,24 @@
+===== Overview =====
+
+Specs and design docs go here.
+
+==== Organization ====
+
+This thing is organized.
+
+=== Directory Structure ===
+
+==== Documents ====
+
+* Requirements are referenced in JIRA (vis a vis Epic)
+* Epic/Feature specifications go here
+* Release/Feature specifications go here
+* Feature designs go here
+
+==== Formats ====
+
+* Mediawiki
+* Versionable graphics
+* That is alll
+
+==== Supporting Tools ====
