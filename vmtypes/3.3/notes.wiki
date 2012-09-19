@@ -1,0 +1,101 @@
+
+= Overview =
+
+VM Type support in Eucalyptus has two disjoint aspects:
+
+1. AWS compatibility as determined by published VM type names (but not necessarily characteristics).
+1. Private cloud administrator control over vm type definitions.
+
+
+== AWS compatibility ==
+Currently (09/18/12) the [[http://aws.amazon.com/ec2/instance-types/|vm type definitions used by AWS]] are:
+{|
+! Micro 
+| t1.micro 
+|-
+! Standard 
+| m1.small 
+| m1.medium 
+| m1.large 
+| m1.xlarge 
+|-
+! High CPU 
+| c1.medium 
+| c1.xlarge 
+|- 
+! High Mem 
+| m2.xlarge 
+| m2.2xlarge 
+| m2.4xlarge 
+|- 
+! Cluster Compute 
+| cc1.4xlarge 
+| cc2.8xlarge
+|-
+! High I/O 
+| hi1.4xlarge 
+|-
+! GPU 
+| cg1.4xlarge 
+|}
+
+=== Standard Instances ===
+* Small Instance (Default) 1.7 GB of memory, 1 EC2 Compute Unit (1 virtual core with 1 EC2 Compute Unit), 160 GB of local instance storage, 32-bit or 64-bit platform
+* Medium Instance 3.75 GB of memory, 2 EC2 Compute Units (1 virtual core with 2 EC2 Compute Units each), 410 GB of local instance storage, 32-bit or 64-bit platform
+* Large Instance 7.5 GB of memory, 4 EC2 Compute Units (2 virtual cores with 2 EC2 Compute Units each), 850 GB of local instance storage, 64-bit platform
+* Extra Large Instance 15 GB of memory, 8 EC2 Compute Units (4 virtual cores with 2 EC2 Compute Units each), 1690 GB of local instance storage, 64-bit platform
+
+=== Micro Instances ===
+* Micro Instance 613 MB of memory, up to 2 ECUs (for short periodic bursts), EBS storage only, 32-bit or 64-bit platform
+
+=== High-Memory Instances ===
+* High-Memory Extra Large Instance 17.1 GB memory, 6.5 ECU (2 virtual cores with 3.25 EC2 Compute Units each), 420 GB of local instance storage, 64-bit platform
+* High-Memory Double Extra Large Instance 34.2 GB of memory, 13 EC2 Compute Units (4 virtual cores with 3.25 EC2 Compute Units each), 850 GB of local instance storage, 64-bit platform
+* High-Memory Quadruple Extra Large Instance 68.4 GB of memory, 26 EC2 Compute Units (8 virtual cores with 3.25 EC2 Compute Units each), 1690 GB of local instance storage, 64-bit platform
+
+=== High-CPU Instances ===
+* High-CPU Medium Instance 1.7 GB of memory, 5 EC2 Compute Units (2 virtual cores with 2.5 EC2 Compute Units each), 350 GB of local instance storage, 32-bit or 64-bit platform
+* High-CPU Extra Large Instance 7 GB of memory, 20 EC2 Compute Units (8 virtual cores with 2.5 EC2 Compute Units each), 1690 GB of local instance storage, 64-bit platform
+
+=== Cluster Compute Instances ===
+* Cluster Compute Quadruple Extra Large 23 GB memory, 33.5 EC2 Compute Units, 1690 GB of local instance storage, 64-bit platform, 10 Gigabit Ethernet
+* Cluster Compute Eight Extra Large 60.5 GB memory, 88 EC2 Compute Units, 3370 GB of local instance storage, 64-bit platform, 10 Gigabit Ethernet
+
+=== Cluster GPU Instances ===
+* Cluster GPU Quadruple Extra Large 22 GB memory, 33.5 EC2 Compute Units, 2 x NVIDIA Tesla “Fermi” M2050 GPUs, 1690 GB of local instance storage, 64-bit platform, 10 Gigabit Ethernet
+
+=== High I/O Instances ===
+* High I/O Quadruple Extra Large 60.5 GB memory, 35 EC2 Compute Units, 2* 1024 GB of SSD-based local instance storage, 64-bit platform, 10 Gigabit Ethernet
+
+== Cloud Administration ==
+hi
+
+=== Types ===
+hi
+
+==== Try ====
+hi
+
+https://eucalyptus.atlassian.net/secure/IssueNavigator.jspa?requestId=12210&mode=hide
+
+https://eucalyptus.atlassian.net/secure/Dashboard.jspa?selectPageId=11900#Filter-Results/12117
+
+ Story 	EUCA-3500 	VM Type Configuration Enhancements 	
+Actions
+EUCA-2845 	Provide more instance types 	
+Actions
+New Feature 	EUCA-442 	Allow unordered vmType specification 	
+Actions
+New Feature 	EUCA-2300 	Request for adding m1.medium instance type 	
+Actions
+New Feature 	EUCA-424 	Ability to specify VM types (more than 5) via a specification/config file 	
+Actions
+New Feature 	EUCA-646 	VMType CRUD from API 	
+Actions
+New Feature 	EUCA-223 	Allow more flexibility for VM types 	
+Actions
+New Feature 	EUCA-595 	Revise default VM Types 	
+Actions
+New Feature 	EUCA-348 	Allow regular user read access to instance type defs 	
+Actions
+New Feature 	EUCA-1719 	Define more than 5 VM types
