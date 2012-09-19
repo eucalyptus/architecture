@@ -1,0 +1,4 @@
+architecture
+============
+
+arch docs
