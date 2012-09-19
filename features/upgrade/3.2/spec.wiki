@@ -1,0 +1,197 @@
+======= 3.2 Upgrade Documents ======
+
+====== Overview ======
+The upgrade of the database is the focus of this document.  
+
+tl;dr version:
+  - Schema change management implementation provides completeness/sanity checking, incremental (and eventually rolling) upgrade.
+  - Devs use new @Upgrade annotations to declare data migration implementations which address all changed schemas (or else).
+  - Built-time checks allow for checking the basic entity correctness, identifying deltas, and mapping changes to migration implementations.
+
+The handling of database upgrades between release versions needs to address:
+  * The current disconnect between upgrade and development both in terms of responsibility and timing.
+  * Verification/Testability of the upgrade process
+
+The primary objectives guiding the the revised approach to the upgrade process are:
+  * Eliminate trivial syntactic errors (e.g., missing @Column annotations)
+  * Proximity of upgrade to developer that authors the related entities (e.g., entity changes can be automatically evaluated for upgrade impact)
+  * Co-location (in source) of the upgrade mechanisms (e.g., vmware upgrade is in vmware module).
+  * Build-time evaluation of upgrade coverage (completeness, not correctness; through static analysis)
+  * Support for UAT through off-line upgrade execution (perhaps call it simulation)
+
+The upgrade process consists of two parts:
+  - Schema Update: alterations/additions to the previous release schema version.
+  - Data Upgrade: migration of existing data to the new schema as needed.
+  
+The verification and testability of upgrade consists of three parts:
+  - Entity Correctness:  static build-time checks for entity definition completeness, convention compliance/consistency
+  - Entity Change Management:  static build-time checks for upgrade impact evaluation (e.g., does new field have data migration code?)
+  - Upgrade Execution:  support for both on-line (e.g., towards rolling) and off-line execution of upgrade data migration
+  
+The described approach combines using existing schema handling in Hibernate (possibly extended) along with two categories of data migration (or default initialization).  The schema change handling will be based around the existing Hibernate support (described further below).  The migration of data will be addressed through the introduction of an @Upgrade annotation which can be used to declare a class as providing an upgrade for some component's database (for more complex/component-database-wide migrations; entity relationship changes) or used to associate an upgrade implementation w/ Entity classes (for simple/table-local changes).  Note that the intention is not that they be mutually exclusive, as discussed further below.
+
+From the perspective of the developer there are two key aspects:
+  - Providing properly @Upgrade annotated data migration code
+  - Performing schema & upgrade validation against changes they made using extensions to the build
+
+From the perspective of QA and testing there are two key aspects:
+  - Build-time completeness checking
+  - Off-line upgrade execution includes validation and produces easy to analyze artifacts
+
+The rest of the document describes the details around handling schema updates, data upgrade, entity correctness & change management, and off-line upgrade execution.
+
+====== Entity Changes ====== 
+Changes to the entity model (and so the database schema & data) fall into 4 categories:
+  - Trivial schema changes
+    - new tables
+    - new columns in existing tables
+      - may involve initializing potentially null data to sane defaults in existing rows
+  - Data migrations
+    - renaming of existing unconstrained columns.  this breaks down as:
+      - addition of new destination column (supported by SchemaUpdate)
+      - migration of data from old column (@Upgrade method)
+    - complete replacement of entity relationship subgraph
+      - addition of new entity tables
+      - migration of data from old tables to new tables (@Upgrade class)
+  - Complex Modifications
+    - The approach here will support but discourage making such changes
+    - e.g., changes which involve needing multi-step data migration such as relationship changes to existing entities
+
+===== Schema Update =====
+Schema update handling derives the differences which need to occur in the data model between a source and destination version.  The purpose of the following is to identify and categorize changes to the schema as one of:
+  - require developer attention (i.e., missing an @Upgrade implementation)
+  - have an implementation (i.e., has an @Upgrade implementation; it might be broken)
+  - are not possible (e.g., invalid schema change)  
+
+==== Versioning ====
+The purpose of schema versioning is two-fold:
+  - identify the correct set of upgrade elements to execute given some initial data set
+  - allow for staged upgrade on a per-database basis with 3 phases:
+    - pre-upgrade (can be backed up and restored)
+    - upgraded (contains disjoint pre & post upgrade data set for debug, review, etc.)
+    - post-upgrade (contains upgraded data)
+    
+The approach here would be embed the version information in the database names.  This should (and can) be done w/in our hibernate configuration management (i.e., not in component/entity specific code).  For example:  when upgrading from 3.1.1 to 3.2, the table metadata_addresses would be
+  - pre-upgrade: eucalyptus_cloud.metadata_addresses containing 3.1.1 data
+  - upgrading: 
+    - start upgrade: copy eucalyptus_cloud to eucalyptus_cloud_3.1.1 and so have eucalyptus_cloud_3.1.1.metadata_addresses
+    - prepare upgrade: add and initialize (possibly copying) eucalyptus_cloud_3.2 and so have eucalyptus_cloud_3.2.metadata_addresses
+    - do upgrade: run @Upgrades
+    - cleanup upgrade: clean up intermediate data
+  - post-upgrade: eucalyptus_cloud.metadata_addresses containing 3.2 data
+Note that this incremental and versioned application of the upgrade (data migration) would support a rolling upgrade scenarion.
+
+==== Computing Deltas ====
+Computing deltas can be done using Hibernate to generate the expected schema update script.
+For example
+<code java>
+Dialect dialect = Dialect.getDialect(props);
+Connection connection = dataSource.getConnection();
+DatabaseMetadata meta = new DatabaseMetadata(connection, dialect);
+String[] createSQL = config.generateSchemaUpdateScript(dialect, meta);
+</code>
+
+==== Schema Changes ====
+Broadly, the default SchemaUpdate has support for the following kinds of changes:
+  - Supported Schema Updates 
+   - Create a new table.
+   - Add a column to an existing table.
+  - Unsupported Schema Updates
+    - Dropping a table
+    - Dropping a column from an existing table
+    - Change a constraint on an existing column
+    - Add a column with a not-null constraint to an existing table
+Many of the unsupported schema update types can be supported by extending the hibernate implementation.
+
+
+===== Data Migration w/ @Upgrade =====
+Data migration occurs when existing entities need to be updated (for new columns) or remapped (for new tables)
+
+For data migration we will need to support three categories of changes:
+  - Column-based changes to existing data types
+    - initialization of new columns w/ values for existing objects
+    - changes to existing columns for existing objects
+  - Table-based changes to move existing entities to newly introduced entities
+  - Changes to existing entity relations
+    - Support for this third category is achievable w/in this scheme, but it cannot be verified automatically
+
+Based on the schema changes a known set of data migrations have to be performed in one of the above categories.  The important distinction between the categories is their scope.  The first class is restricted to w/in an @Entity/table, these can be thought of as one-to-one in their relationship between the pre and post upgrade entities.  The second class covers changes which introduce new entities and some old entities, more specifically one-to-many and many-to-one changes where the pre-upgrade entity set can be removed.  The third class covers complex changes which modifying the entity relationships for existing entities, e.g., potentially requiring temporarily dropping table constraints.
+
+In the end there are three kinds of @Upgrade implementations:
+  - reference a single class (e.g., @Upgrade(MyEntity.class), or are on a method in that entity)
+  - reference an input set and an output set which is either one-to-many or many-to-one (e.g., @Upgrade(source={OldEntity1.class,OldEntity2.class},dest={NewEntity.class})
+  - reference 
+
+Further, some work may be needed prior to application of @Upgrade for a component's database.  To that end a single @PreUpgrade(ComponentId.class) and @PostUpgrade(ComponentId.class) class may be provided per component.
+
+Then, in the above step **do upgrade: run @Upgrades**, this becomes:
+  - for each component
+    - execute @PreUpgrade
+    - compute the relationship graph between all the @Upgrade implementations.  (**NOTE**: this can be statically checked for correctness)
+    - execute @Upgrade implementations according to the dependency graph:  starting w/ @Upgrades having no dependents
+    - execute @PostUpgrade
+
+  - NEIL: add a warning/soft-pedantic mode which reminds the dev of outstanding upgrade stuff
+  - make build produces warning/make check produces error
+
+===== Off-line Upgrade Execution =====
+The upgrade process can easily be run off-line
+Hibernate's SchemaUpdate will serve as the initial basis for handling updates.  It is capable of being run off-line.  The limitation has to do with which types of schema updates are possible.  
+For example
+<code java>
+Ejb3Configuration conf = new Ejb3Configuration().configure("persistence-unit-name", props);
+new SchemaUpdate(conf.getHibernateConfiguration()).execute(true, false);
+</code>
+
+===== Past Upgrade =====
+  - Ensure @Column annotations are present on all members (or @Transient)
+  - In-place data transformation needed (one column needs to have its values transformed to a different thing)
+  - User became account
+  - Certs copied to account
+  - Added volumes/snapshots 
+  - Cross-database upgrade implications are a problem
+    - build order determines the database upgrade order
+    - make the build order explicit somehow?
+  - ensure the case where removing an object is covered by static analysis
+  - amend @Upgrade annotation to include the notion of deprecated types
+  - amend @Upgrade to include ComponentId references for cross module dependencies
+  - what about polymorphism? single table map to multiple entities. @Inheritance -> @DiscriminatorColumn -> @DiscriminatorValue
+  - check on @Configurable implications
+  - recognizing when a change causes a problem
+  - @Column/getter-setter/adders validators
+  - what about the signatures for @Upgrade thingies?
+  - @Embedded handling shows up because you cannot get underlying row by the @Embedded type alone (is that right? @Parent?)
+  - @ElementCollection handling is special in someway?
+
+
+===== Old Notes =====
+  - static @JPA checks
+  - cross-commit entity signature profile
+  - bring upgrade as close to commit/build time as possible
+  - scaffolding upgrade implementations
+  - split apart the existing upgrade impl 
+    - allow for 1-to-1 mapping w/ @Entity types
+  - schema versioning
+  - upgraded system has exactly same schema as freshly installed
+  - ability to directly change the schema 
+    - (e.g., interacting w/ hibernate's schemaupdate)
+
+
+  - three levels of awesome
+    - warned about issue
+    - told where to go and do upgrade code
+    - way to test my upgrade impl is correct
+
+  - testing methods? 
+    - how to do incremental test? 
+    - how get coverages?
+
+  - eucalyptus.conf
+    - useful defaults
+    - every change involves a release note and admin action
+    - fragmented/sectioned configuration files
+    - deprecating of config options
+    - better to document than not
+    - more can automate is good
+
+  

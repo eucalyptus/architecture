@@ -1,0 +1,2 @@
+#!/bin/bash
+java -Djava.awt.headless=true -jar ${PWD}/$(dirname ${0})/../lib/plantuml.jar ${@}

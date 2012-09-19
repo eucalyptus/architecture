@@ -1,0 +1,106 @@
+
+h1. 3.2 Troubleshooting Documents 
+----
+
+h2. Design Docs 
+----
+  * [Backend Troubleshooting |https://wiki.eucalyptus-systems.com/doku.php?id=backend:3.2:troubleshooting]
+  * [Files formats |https://wiki.eucalyptus-systems.com/doku.php?id=arch:3.2:troubleshooting:files ]
+  * [Troubleshooting Feedback |https://wiki.eucalyptus-systems.com/doku.php?id=arch:3.2:troubleshooting:feedback]
+
+
+h2. Feature Overview 
+----
+Troubleshootiness for 3.2  is about enabling cloud administrators to independently troubleshoot and resolve problems w/in the system that would otherwise result in a call/email/ticket to either support or sales engineering.  As a complement to this, the feature speaks to the troubleshootiness of the system while "in-production" where constraints restricts the kinds of actions a support or sales engineer can take in the course of troubleshooting system problems.
+
+There are a number of areas which contribute to the problems w/ troubleshootiness:  installation is not resilient (i.e., must be done linearly and is not resilient to mistakes along the way), log files are inconsistent (partial/inconsistent information, across components, verbosity, signal/noise), documentation is lacking in detail related to specific scenarios and best practices, and, in the end, the system is distributed and only due to that can be difficult troubleshoot.
+
+The objective function for this feature is reducing the number of items which result in either a support ticket/call (or SE call, too). That is, by improving troubleshootiness, we enable customers and non-expert engineerings to identify and resolve problems w/o needing to contact support, etc.
+
+Overall, the system can improve in a number of ways and the three predominant categories are:  quality fault information, installibility/configurability, and centralized problem analysis.  However, the basis of success in the second, third, and any other category will be dominated by the quality of fault information which is currently inadequate. 
+
+h6.  Fault-class logging
+----
+The first step in this area (as success in all the other areas are based on it) is the quality of the fault information:  Quality for an fault message is the result of an administrator's ability to independently resolve a problem which would otherwise result in an SE or support contact.  That is, the administrator can:
+    * find the fault information based on the context information they have about a failure
+    * use the fault information (follow steps) for identifying the cause of the fault (out of many possible causes)
+    * use the fault information remedy the problem
+    * use the fault information to address the consequence of the failure (e.g., terminating partially failed instances; cleaning up the right system state)
+    
+Said another way, quality fault information clearly identifies: who, what, when, why, where, how, and path to resolution.  *Resolution* here is intended to mean the entirety of solving a problem including, but not limited to:  potential cause identification, investigation, remediation, and verification steps for the primary fault and any secondary consequences (e.g., pending instances which will never run that need termination).  
+
+To that end, the fault information improvements are focused on using data from support and sales engineering to prioritize the areas to address.  Based on the data hot-spots can be addressed w/ fault & resolution information.  Then, the support/SE issue list serves as a success metric for the quality
+of the fault information when evaluating progress/completeness.
+
+h6. Production Troubleshooting
+----
+A second prong is to enable people who know how to troubleshoot the system get the needed information out of an in-production system (e.g., w/o restarting services to raise log levels) while unifying format and improving the organization of the log file information across the board (e.g., component specific log files for java based services, deduplication of log messages).
+
+
+
+
+h2. 3.2 Troubleshooting Requirements 
+----
+
+h3. Functional Requirements 
+----
+
+h4. Fault Logging 
+----
+  # Establish special class of fault log messages which are:
+    ## Reserved for "real problems":  There is a condition which will require support/SE contact to resolve or a persistent failure condition requires an action be taken.
+    ## Logged in a dedicated log file which contains /only/ this class of errors
+    ## Logged only once per occurrence (i.e., not repeatedly if the fault is in a periodically executed code path)
+    ## Provide full and uniformly formatted fault messages: who, what, when, why, where, how, resolution, and addressing consequences.
+    ## Uniquely identifiable using a stable identifier (i.e., which could be the key used in an external and durable cross reference)
+  # **NOTE**:  related to AWS compatibility, the consideration for achieving fidelity is explictly limited to using AWS fault codes when reporting fault-class messages back to client-tools, to the exclusion of delivering AWS compatible error semantics w/in the scope of this feature.
+  # Introduce fault logging for issues determined by analyzing data set from support/SE
+    ## This means not all "real problems" will be logged in this fault-class
+  # Evaluation of fault logging will be based on data set from support/SE.
+    ## The standard is that the added fault logging information is sufficient to resolve the issue.
+
+h4. Production Troubleshooting 
+----
+  # Log levels (verbosity, severity thresholds) can be changed at runtime
+  # Logging subsystem identifies and deduplicates redundant/periodic messages associated with recurring errors
+    ## Deduplication here is taken to mean the systematic elimination of duplicate log records for a repeating event, and must not prevent logging of two separate fault events due to some incidental proximity (in time, locality, etc.)
+    ## Note: this does not refer to changing logging in periodic code paths, but might require individual cases be addressed specifically
+    ## Outcome is meant to be much like deduplication in kernel print buffer as can be seen in dmesg.
+  # Logging for java-based components is done to separate component-specific log files 
+  # Provide uniformly formatted logs across components
+    ## Considerations include: msg correlation ids, resource ids.
+    ## Acid test: same filtering expression (grep,awk,perl,whatever) can be used across components
+  # Guidelines for troubleshooting: Which log files, which log messages, what timestamps.
+  # Define developer guidelines for information in output/error logs
+    ## Log-level to severity relationship
+    ## Minimum information included
+    ## Threshold/minimum standards for INFO; what must go to DEBUG or lower
+
+
+
+h3. Architectural Constraints 
+----
+  # Documentation: fault-class information must have a corresponding written description which can be incorporated into documentation including, but not limited to:  unique identifier, related identifiers (AWS fault code), 
+  # Compatibility:  AWS fault codes should be used over fault-class identifiers when a fault-class message must be reported back to client tools (i.e., as a web-services response).  AWS fault codes relationship to internal unique identifiers must be recorded in both fault logs and documentation.
+  # Modifiability:  fault-class log messages can be modified w/o rebuilding the software.  Document how to make changes.
+  # Configurability:  common logging configuration parameters can be altered at runtime following a uniform procedure/method (not component specific!)
+  # Extensibility: account for future need for integration of 3rd-party logging systems (e.g., splunk, syslogd, snmpd)
+  # Testability:  evaluation of approach and end result will include determining level of coverage for issues in the support/SE data set.
+  # Internationalization: support will be needed to allow for future localization requirements.  the scope of this constraint is restricted to only customer/tool facing.
+  # Usability:  guidelines for fault-class and general logging need formulation and specification of an evaluation method for the implementation.
+  # Multiplicity:  the fault-class log information must use well-defined APIs and datatypes.  Delivery of fault-class log events should allow for multiple consumers when appropriate w/in the system (i.e. java services).  The current java logging mechanisms work in a way which is consistent w/ this constraint (vis a vis multiple appenders).  This implies that the involved data types be independent (not specific to the consumer), stable (do not change as a consequence of changes in the consumers), and ubiquitous (can be a build dependency).
+  # Security: log files shall  
+    ## NOT contain any encryption keys unless they are intended for public usage (such as public keys)
+    ## NOT contain any authentication tokens in an unencrypted form (no decryption key in the logs)                                                                 
+    ## NOT be executable      
+    ## NOT be stored in publicly writable directories                                                                                                                                                    
+    ## be protected from tampering by unauthorized parties                                                                                                          
+    ## be protected from viewing by unauthorized parties                                                                                                            
+  # Packaging: fault-class messages can be specialized to account for distro-specific behaviours.
+  # Releasability: Licenses for third-party software should be compatible with GPLv3.
+  # Training: Training plan/troubleshooting guidance for constituents to leverage this feature.
+  # Client-facing error messages shall                                                                                                                                             
+    ## NOT contain any authentication tokens                                                                                                                                        
+    ## NOT contain any encryption keys                                                                                                                                              
+    ## properly escape any special HTML characters in user input before echoing them back to the user                                                                                
+    ## NOT contain server-side stack traces (unless the user is the administrator)

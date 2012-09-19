@@ -1,0 +1,31 @@
+=== IAM IMPLICATION ===
+  - IAM needs updating to reflect the added keys, actions, resource types from this service
+  - autoscaling allocates resources on behalf of the user
+=== EC2 IMPLICATION ===
+  - tagging
+=== ELB IMPLICATION ===
+  - add to scaling group to load balancer (ELBility)
+=== Scope Limitations
+  - vpc out
+  - spot instances out
+=== Scaling Processes ===
+== Health Check ==  
+== Policy ==
+  - load generation tools would be needed for test & dev.
+== Scheduled ==
+Auto Scaling guarantees execution order for scheduled actions within the same group, but not for scheduled actions across groups.
+
+    A scheduled action generally executes within seconds. However, the action may be delayed up to two minutes from the scheduled start time. Because Auto Scaling executes actions within an Auto Scaling group in the order they are specified, scheduled actions with scheduled start times close to each other may take longer to execute.
+
+    You can schedule a scheduled action for up to a month in the future.
+
+    You can create a maximum of 125 scheduled actions per Auto Scaling group. This allows scaling four times a day for a 31-day month for each Auto Scaling group.
+
+    A scheduled action must have a unique time value. If you attempt to schedule an activity at a time when another existing activity is already scheduled, the call will be rejected with an error message noting the conflict.
+    
+=== Shashi Questions ===
+  - workload examples; esp. for testing, user story creation
+  - survival group use case (no dependency)
+  - scheduled scale-out use case (
+  - triggered scale-{out,in} use case (cloud watch, sns maybe?)
+  

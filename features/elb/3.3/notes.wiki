@@ -1,0 +1,34 @@
+  - software f5; software big ip
+  - impl details related to zone coverage
+    - e.g., zone goes down elb can cross zones to continue service
+  - identification of things we need (to change) in existing APIs 
+    - list needed to consider scheduling
+  - versions of protocols we support HTTP,HTTPS,TLSv?,SSLv?
+  - types of session management wrt load balancing 
+    - affinities, stickinesses,
+    - ssl termination (at lb?)
+  - ipv6 - out of scope? guessing yes.
+  - initially a eucalyptus component
+    - software reference implementation
+    - support for hardware future requirement
+  - configuration, esp. compared to what can be configured in AWS (e.g., http connections time outs)
+  - candidates for reference software implementation
+    - ha proxy
+    - nginx
+    - glassfish plugin: probably doesn't work for us
+    - squid
+    - linux virtual server
+    - momentum si?
+  - future hardware support expected:
+    - big ip f5
+  - preconfigured load balancing rules
+
+=== Questions ===
+  - what is the functional spec/use cases 
+    - implications on deployment (e.g., backup power, network hardware/topology)
+  - survey of customer load balancing use cases, infrastructure?
+  - hybrid use case/story? importance?
+  - tightly coupled with autoscaling? is that use case central?
+  - use cases are satisfied by elb?
+    - is there any case which is not satisfiable by ELB?
+  - 

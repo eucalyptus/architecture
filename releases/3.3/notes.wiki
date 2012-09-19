@@ -1,0 +1,55 @@
+== 3.3 Potential Spec List ==
+
+-- aws fidelity enhancements
+  -- SDK
+  -- tags, filters, attributes
+  -- fidelity improvements
+  -- VMTypes
+-- maintenance mode
+  -- vMotion and migration use under Eucalyptus control
+-- netapp vserver
+-- edge networking
+-- ELB + AS + CW
+-- VMWare integration
+  -- vcenter safe
+  
+  
+- R
+  
+- AWS Java SDK
+  - signature version 4
+  - list of supported operations
+    - verify it
+    - incompatibilities in existing operations
+  - missing but essential operations in existing services
+    - missing but unplanned operation in existing services
+  - plan of attack for newly added services (CW,AS,ELB)
+- AWS Compat
+  - 3.3 plan mainly around tagging/filtering/resource attributes
+  - any other low hanging fruit?
+- 3.3 Big Items
+  - Understand compulsory use cases
+  - CloudWatch
+    - Metrics & Dimensions, Custom Metrics, Triggers
+    - Is SNS in here, too?  What is the use case?
+  - ELB
+    - software reference implementation
+    - future path to external integrations
+    - technology constraints: runtime config, ssl termination
+    - multi-tier load balancing?
+      - 
+    - details:
+      - ssl termination
+      - session affinity & cookies
+      - policies
+      - listeners
+    - VPC functionality: out of scope; is OK?
+  - Autoscaling
+    - Health based
+    - Scheduled
+    - Trigger based
+      - I gather this is the key use case?  Can we nail down more details.
+- Other services and their priority:
+  - SQS came up before; what is the critical path here?
+  - SNS came up before; what is the critical path here?
+  - S3 vs. Riak

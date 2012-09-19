@@ -1,0 +1,83 @@
+=== Fault Message Example ===
+== ntpd example ==
+<code>***********************************************************************
+code: EERRUR
+when: YYYY-MM-DDTHH:MM:SS.MMMZ 
+who: eucalyptus 
+what: ntpd is not running
+why: cause unknown
+where: the one you installed
+how: can't find running ntpd process
+resolution: install & run ntpd
+***********************************************************************</code>
+== "running instance failed because libvirt has hung" example ==
+<code>***********************************************************************
+code: EERRUR 
+when: YYYY-MM-DDTHH:MM:SS.MMMZ 
+who: account number & user id 
+what: instance i-%8.8X failed to run
+why: libvirt is hung
+where: attempt to invoke SOMEOPERATION which timed out
+how: SOMEOPERATION timed out
+resolution: 
+ 1. stop libvirt
+ 2. start libvirt
+ 3. confirm 'virsh list' returns w/o error
+ 4. restart nc
+***********************************************************************</code>
+=== Faulty Notes ===
+  - identifying cause:
+  - fixing the problem:
+  - addressing side-effects:
+  - verification:
+=== Troubleshooting Requests ===
+  - ntp issues
+    - fault: ntpd is not running
+    - fault: failed to accept message due to clock skew
+  - NC: libvirt issues when instances are being launched
+    - fault: running instance failed because of error returned by libvirt
+    - fault: running instance failed because libvirt has hung
+  - NC: issues around volume attachment/detachment
+  - Messaging errors in axis2c
+  - NC: libvirt errors/NC errors in case the instance terminated prematurely
+  - DNS setup
+  - system ran out of some resource
+  - traceability of resources (i.e., which CC did request go to, which NC did request go to)
+  - quite a few errors derives from images
+    - having some way to keep track of a certain image boot success could be useful
+    - been able to check that the emi booted successfully on all the NCs
+    - been able to check that the emi booted successfully as all (some) users
+    - it booted well on all NC but X and Y
+    - it did booted but with a different kernel
+    - image/NC size limits 
+  - eucalyptus.conf sanity checks
+  - vmware_conf sanity checks
+  - #2177: Option to euca_conf to automatically sync eucalyptus.conf
+  - #8726: euca_conf --initialize: check to make sure hostname is resolvable
+  - Registration: be more verbose than "RESPONSE true" or "RESPONSE false". how about: "Registration succeeded."
+  - host systems limitations (check and warn for disk size and provide other such hints).
+  - image/cluster/node/hypervisor compatibility
+  - handling of network mode/config changes
+  - NOTREADY state error reporting
+  - Log errors about SELinux/Apparmor related issues
+  - error information about attempted image boot (e.g., partition table, kernel info?)
+  - vmware image import validation
+  - VMFS datastore configuration validation, esp. w/ multiple datastores
+  - esxi node specific error information
+  
+=== General Logging Requests ===
+  - track i-123ABC
+  - IP and EBS operations with i-123ABC
+  - find errors associated with i-123ABC
+  - specific handling of user-facing faults (even in log files)
+  - per component logging
+  - per instance (resource) logging
+  - Installation / configuration / upgrade troubleshootiness 
+    - generating install/config log
+
+=== Other Requests ===
+  - #592: CONFIG: separate config files for front-end and nodes
+  - #339: CONFIG: registration "wizard"
+  - admin can act on any resource
+    - should already be the case -- when is it not?
+  - syslogd impl.
