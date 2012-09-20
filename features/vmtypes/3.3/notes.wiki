@@ -89,6 +89,7 @@ Actions
 New Feature 	EUCA-2300 	Request for adding m1.medium instance type 	
 Actions
 New Feature 	EUCA-424 	Ability to specify VM types (more than 5) via a specification/config file 	
+https://eucalyptus.atlassian.net/browse/Euca-1287
 Actions
 New Feature 	EUCA-646 	VMType CRUD from API 	
 Actions

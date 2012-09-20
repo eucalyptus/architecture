@@ -1,12 +1,51 @@
-===== Overview =====
+= Overview =
+This repository is for handling the architectural documents related to specification and design of Eucalyptus features.
 
-Specs and design docs go here.
+Notably, it is **not** the source for requirements:  those are in JIRA.
+Relatedly, the contents here will be reflected in JIRA.
 
-==== Organization ====
+== Important Note ==
+Please read these primary cautions before committing to this repository.
+=== Generated Files ===
+* A number of files in this repo are automatically generated **DO NOT EDIT THEM DIRECTLY**
+** features/FEATURE_NAME/spec.wiki
+** features/FEATURE_NAME/stories.wiki
+** Any binary file is auto-generated.
+=== Binary Files ===
+* Only text based files are editable.
+* No binary source files are allowed.
+* Binary files may be committed in the cases that:
+** A binary output format (e.g., images) is needed:  In this case, it has to be compilable from a text-based and versioned file.
+** A reference document or tool is included:  These belong in specific places noted below.
 
+
+== Organization ==
 This thing is organized.
 
 === Directory Structure ===
+==== Overview ====
+{|
+    ! features/
+    | this is where **all** content goes
+    |-
+    ! releases/
+    | auto-generated cross-index of feature documents keyed on release number
+    |-
+    ! bin/
+    | various helper scripts
+    |-
+    ! lib/
+    | supporting libraries
+|}
+
+
+
+
+=== Build ===
+* pediapress tools: https://github.com/pediapress
+* mw-render: http://mwlib.readthedocs.org/en/latest/installation.html
+* python-jira: https://bitbucket.org/bspeakmon_atlassian/jira-python.git
+* dot/graphviz: 
 
 ==== Documents ====
 
