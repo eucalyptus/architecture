@@ -1,1 +1,14 @@
 multiple host maintenance
+
+
+- terminate/run mode for instance store is out; no loss of in memory state
+- admin command for quarantine through CLC
+- RHEV & VMware seem to be the low hanging fruit functionally
+- KVM, Xen reliability are a major question
+- is there a way to pause the vm
+- vm maintenance mode
+  - compromised 
+  - what are the benefits?
+  - controlling workload schedule
+- slow down the system
+- live migration with attached volumes
