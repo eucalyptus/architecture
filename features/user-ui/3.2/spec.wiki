@@ -1,12 +1,12 @@
-======= 3.2 UI Documents ======
-====== Design Docs ======
+= 3.2 UI Documents =
+== Design Docs ==
   - [[https://docs.google.com/a/eucalyptus.com/document/d/1I5KUD34I_bSJSqh3OGWzeyFQpf8WC_UwBOQRFG6Fn40/edit#heading=h.xsrz1zc0idzk|Design Doc (Google)]]
   - [[https://docs.google.com/a/eucalyptus.com/document/d/1esOOYlDwFkhQZWuEuSQw2W2Z0IOxLR63-A9xLlu_wM0/edit|User Stories (Google)]]
   - [[https://docs.google.com/a/eucalyptus.com/spreadsheet/ccc?key=0AgajFa1Gi0KIdHFQNUJYaW5zRGNiaWMtNzcyNDV4cXc|UI tech and packaging (Google)]]
 
-====== Feature Overview ======
+== Feature Overview ==
 
-====== 3.2 Euca User UI Requirements ======
+== 3.2 Euca User UI Requirements ==
 The goal of User App is to facilitate the consumption of services exposed by Eucalyptus 3 platform to end users. 
 Eucalyptus User App will be open sourced to help customers modify and suit their needs.
 User App does not provide user management or cloud infrastructure administration functionality.  Wrt user administration operations (including password, key, certs), users will need to continue using the existing UI/CLI methods and is not addressed here.
@@ -15,7 +15,7 @@ Requirements are broken into two categories:
   - Functional Requirements:  the functionality which is needed by an implementation of this feature.
   - Architectural Constraints:  the (architectural) quality attributes an implementation of this feature must fall within.
 
-===== Functional Requirements =====
+=== Functional Requirements ===
 These are broken into two categories: characteristics of the UI and Eucalyptus operations available through the UI (in terms of their CLI counterpart). 
 
 ==== UI Requirements ====
@@ -131,7 +131,7 @@ These are broken into two categories: characteristics of the UI and Eucalyptus o
   - Should have the ability to add bucket policies in the future.
   - SHASHI: flat view is OK!
 
-===== Architectural Constraints =====
+=== Architectural Constraints ===
 ==== Scalability, Availability & Statelessness ====
   - supports 150 of concurrent users, capacity can be increased
   - supports both the transfer and display of large number of resources for display: 1.5k images, 100k volumes/snapshots, 15k instances.

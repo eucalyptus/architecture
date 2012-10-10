@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+require 'gollum'
+wiki = Gollum::Wiki.new("/git/architecture")
+p = wiki.page("README")
+print p.formatted_data

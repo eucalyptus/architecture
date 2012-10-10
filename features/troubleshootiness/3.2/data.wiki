@@ -1,4 +1,4 @@
-=== Fault Message Example ===
+= Fault Message Example =
 == ntpd example ==
 <code>***********************************************************************
 code: EERRUR
@@ -25,12 +25,12 @@ resolution:
  3. confirm 'virsh list' returns w/o error
  4. restart nc
 ***********************************************************************</code>
-=== Faulty Notes ===
+= Faulty Notes =
   - identifying cause:
   - fixing the problem:
   - addressing side-effects:
   - verification:
-=== Troubleshooting Requests ===
+= Troubleshooting Requests =
   - ntp issues
     - fault: ntpd is not running
     - fault: failed to accept message due to clock skew
@@ -65,7 +65,7 @@ resolution:
   - VMFS datastore configuration validation, esp. w/ multiple datastores
   - esxi node specific error information
   
-=== General Logging Requests ===
+= General Logging Requests =
   - track i-123ABC
   - IP and EBS operations with i-123ABC
   - find errors associated with i-123ABC
@@ -75,7 +75,7 @@ resolution:
   - Installation / configuration / upgrade troubleshootiness 
     - generating install/config log
 
-=== Other Requests ===
+= Other Requests =
   - #592: CONFIG: separate config files for front-end and nodes
   - #339: CONFIG: registration "wizard"
   - admin can act on any resource

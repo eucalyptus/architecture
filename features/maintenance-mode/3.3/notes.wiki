@@ -1,6 +1,4 @@
 multiple host maintenance
-
-
 - terminate/run mode for instance store is out; no loss of in memory state
 - admin command for quarantine through CLC
 - RHEV & VMware seem to be the low hanging fruit functionally

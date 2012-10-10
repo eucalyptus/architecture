@@ -25,17 +25,8 @@ This thing is organized.
 === Directory Structure ===
 ==== Overview ====
 {|
-    ! features/
-    | this is where **all** content goes
-    |-
-    ! releases/
-    | auto-generated cross-index of feature documents keyed on release number
-    |-
-    ! bin/
-    | various helper scripts
-    |-
-    ! lib/
-    | supporting libraries
+! features/
+| this is where **all** content goes
 |}
 
 

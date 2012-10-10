@@ -1,10 +1,10 @@
-===== Overview =====
+= Overview =
   - SNS?
   - SQS?
   - Which Metrics? Basic vs. "Advanced"
   - Custom Metrics?
   
-==== Metrics ====
+== Metrics ==
   - A metric is the fundamental concept for CloudWatch and represents a time-ordered set of data points. 
   - Metrics are uniquely defined by a name, a namespace, and one or more dimensions. 
   - Each data point has a time stamp, and (optionally) a unit of measure. 
@@ -15,7 +15,7 @@
   - CloudWatch stores your metric data for two weeks. 
   - You can request statistics on metric data points that occur within a specified time window.
 
-==== Namespaces ====
+== Namespaces ==
   - CloudWatch namespaces are conceptual containers for metrics. 
   - Metrics in different namespaces are isolated from each other, so that metrics from different applications are not mistakenly aggregated into the same statistics.
   - Namespace names are strings you define when you create a metric. 
@@ -24,7 +24,7 @@
   - Namespace names must be fewer than 256 characters in length.
   - There is no default namespace. You must specify a namespace for each data element you put into CloudWatch.
 
-==== Dimensions ====
+== Dimensions ==
   - A dimension is a name/value pair that helps you to uniquely identify a metric. 
   - Because dimensions are part of the unique identifier for a metric, whenever you add a unique name/value pair to one of your metrics, you are creating a new metric.
   - You specify dimensions when you create a metric with the PutMetricData action (or its command line equivalent mon-put-data). 
@@ -33,20 +33,20 @@
   - You can assign up to ten dimensions to a metric.
   - CloudWatch treats each unique combination of dimensions as a separate metric. 
 
-==== Time stamps ====
+== Time stamps ==
   - each metric data point must be marked with a time stamp. 
   - The time stamp can be up to two weeks in the past and up to one day in the future. 
   - If you do not provide a time stamp, CloudWatch creates a time stamp for you based on the time the data element was received.
   - The time stamp you use in the request must be a dateTime object, with the complete date plus hours, minutes, and seconds (for more information, go to http://www.w3.org/TR/xmlschema-2/#dateTime). 
   
-==== Units ====
+== Units ==
   - Units represent your statistic's unit of measure. 
   - You can also specify a unit when you create a custom metric. 
   - When you publish data without specifying a unit, CloudWatch associates it with the None unit. 
   - When you get statistics without specifying a unit, CloudWatch aggregates all data points of the same unit together. 
   - If you have two otherwise identical metrics with different units, two separate data streams will be returned, one for each unit.
   
-==== Statistics ====
+== Statistics ==
   - Statistics are metric data aggregations over specified periods of time. 
   - CloudWatch provides statistics based on the metric data points you or AWS products have provided to CloudWatch. 
   - Aggregations are made using the namespace, metric name, dimensions, and the data point unit of measure, within the time period you specify. 
@@ -63,7 +63,7 @@
   - Instead of data point values, you specify values for SampleCount, Minimum, Maximum, and Sum (CloudWatch calculates the average for you). 
   - The values you add in this way are aggregated with any other values associated with the matching metric.
 
-==== Periods ====
+== Periods ==
   - A period is the length of time associated with a specific CloudWatch statistic. 
   - Each statistic represents an aggregation of the metrics data collected for a specified period of time. 
   - You can adjust how the data is aggregated by varying the length of the period. 
@@ -74,7 +74,7 @@
   - The values you select for the StartTime and EndTime parameters determine how many periods GetMetricStatistics will return. 
 Periods are also an important part of the CloudWatch Alarms feature. When you create an alarm to monitor a specific metric, you are asking CloudWatch to compare that metric to the threshold value that you supplied. You have extensive control over how CloudWatch makes that comparison. Not only can you specify the period over which the comparison is made, but you can also specify how many consecutive periods the threshold must be breached before you are notified. For more information on Alarms, see Alarms.
 
-==== Aggregation ====
+== Aggregation ==
   - You can publish as many data points as you want with the same or similar time stamps. 
   - You can publish data points for a metric that share not only the same time stamp, but also the same namespace and dimensions. Subsequent calls to GetMetricStatistics will return aggregated statistics about those data points. You can even do this in one PutMetricData request. 
   - CloudWatch accepts multiple data points in the same PutMetricData call with the same time stamp. 
@@ -89,7 +89,7 @@ Periods are also an important part of the CloudWatch Alarms feature. When you cr
   - CloudWatch doesn't differentiate the source of a metric. 
   - If you publish a metric with the same namespace and dimensions from different sources, CloudWatch treats this as a single metric. 
   
-==== Alarms ====
+== Alarms ==
   - CloudWatch is especially useful because it helps you make decisions and take immediate, automatic actions based on your metric data. 
   - Alarms can automatically initiate actions on your behalf, based on parameters you specify. 
   - An alarm watches a single metric over a time period you specify, and performs one or more actions based on the value of the metric relative to a given threshold over a number of time periods. 
@@ -97,9 +97,9 @@ Periods are also an important part of the CloudWatch Alarms feature. When you cr
   - Alarms invoke actions for sustained state changes only. 
   - CloudWatch alarms will not invoke actions simply because they are in a particular state, the state must have changed and been maintained for a specified number of periods.
 
-===== API Details =====
+= API Details =
 
-==== Operations ====
+== Operations ==
 - DeleteAlarms
 - DescribeAlarmHistory
 - DescribeAlarms
@@ -112,7 +112,7 @@ Periods are also an important part of the CloudWatch Alarms feature. When you cr
 - PutMetricData
 - SetAlarmState 
 
-==== Data Types ====
+== Data Types ==
 -  AlarmHistoryItem
 - Datapoint
 - DescribeAlarmHistoryResult
@@ -127,7 +127,7 @@ Periods are also an important part of the CloudWatch Alarms feature. When you cr
 - MetricDatum
 - StatisticSet 
 
-===== Metrics & Dimensions =====
+= Metrics & Dimensions =
 http://docs.amazonwebservices.com/AmazonCloudWatch/latest/DeveloperGuide/CW_Support_For_AWS.html#aws-namespaces
 
 
