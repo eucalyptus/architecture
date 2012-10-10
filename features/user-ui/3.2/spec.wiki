@@ -1,8 +1,8 @@
 = 3.2 UI Documents =
 == Design Docs ==
-  - [[https://docs.google.com/a/eucalyptus.com/document/d/1I5KUD34I_bSJSqh3OGWzeyFQpf8WC_UwBOQRFG6Fn40/edit#heading=h.xsrz1zc0idzk|Design Doc (Google)]]
-  - [[https://docs.google.com/a/eucalyptus.com/document/d/1esOOYlDwFkhQZWuEuSQw2W2Z0IOxLR63-A9xLlu_wM0/edit|User Stories (Google)]]
-  - [[https://docs.google.com/a/eucalyptus.com/spreadsheet/ccc?key=0AgajFa1Gi0KIdHFQNUJYaW5zRGNiaWMtNzcyNDV4cXc|UI tech and packaging (Google)]]
+- [[https://docs.google.com/a/eucalyptus.com/document/d/1I5KUD34I_bSJSqh3OGWzeyFQpf8WC_UwBOQRFG6Fn40/edit#heading=h.xsrz1zc0idzk|Design Doc (Google)]]
+- [[https://docs.google.com/a/eucalyptus.com/document/d/1esOOYlDwFkhQZWuEuSQw2W2Z0IOxLR63-A9xLlu_wM0/edit|User Stories (Google)]]
+- [[https://docs.google.com/a/eucalyptus.com/spreadsheet/ccc?key=0AgajFa1Gi0KIdHFQNUJYaW5zRGNiaWMtNzcyNDV4cXc|UI tech and packaging (Google)]]
 
 == Feature Overview ==
 
@@ -12,52 +12,52 @@ Eucalyptus User App will be open sourced to help customers modify and suit their
 User App does not provide user management or cloud infrastructure administration functionality.  Wrt user administration operations (including password, key, certs), users will need to continue using the existing UI/CLI methods and is not addressed here.
 
 Requirements are broken into two categories:
-  - Functional Requirements:  the functionality which is needed by an implementation of this feature.
-  - Architectural Constraints:  the (architectural) quality attributes an implementation of this feature must fall within.
+- Functional Requirements:  the functionality which is needed by an implementation of this feature.
+- Architectural Constraints:  the (architectural) quality attributes an implementation of this feature must fall within.
 
 === Functional Requirements ===
 These are broken into two categories: characteristics of the UI and Eucalyptus operations available through the UI (in terms of their CLI counterpart). 
 
 ==== UI Requirements ====
 === Server ===
-  - access app using https as default (can accommodate deployments using only http in the future)
-  - ssl certificate can be configured (but configuration is /not/ required; has sane default behaviour)
-  - access app using a single endpoint (even when multiple server instances are deployed for HA)
+- access app using https as default (can accommodate deployments using only http in the future)
+- ssl certificate can be configured (but configuration is /not/ required; has sane default behaviour)
+- access app using a single endpoint (even when multiple server instances are deployed for HA)
 === UI ===
-  - ui will be a rich client application (e.g., ajax) -- workflows can be implemented w/o page reloads
-    - each ui operation/workflow will have a specified presentation mode: e.g., modal dialog, panel, menu item, etc.  These will be present in a separate GUI specification.
-    - application style guide will define the look & feel for the ui.
-    - ui elements should change in the display without requiring refresh and re-draw of the entire page. e.g. if selecting one option in a widget causes additional widgets to display, the entire page should not need to re-load to display them.
-  - the target display resolution for the ui will be 1024x768; additional specification for small-form factor browsers will be elaborated in the GUI specification.
-  - compatible with html5 browsers: 
-    - Tested/Guaranteed browser: Firefox
-    - Tested/Best-effort browsers: IE 9, Google Chrome, Safari
-    - Support for tablets/phones: mobile browser user-agent detection and rendering for html5 capable devices
-      - even if this becomes out of scope, the ability to support this in the future is required of the UI
-  - authentication shall be done using Eucalyptus created user and password
-  - ui will poll resource state to allow for discovery of async state changes
-  - ui will display errors resulting from synchronous operations (i.e., not discover async errors) and report the underlying error message 
+- ui will be a rich client application (e.g., ajax) -- workflows can be implemented w/o page reloads
+-- each ui operation/workflow will have a specified presentation mode: e.g., modal dialog, panel, menu item, etc.  These will be present in a separate GUI specification.
+-- application style guide will define the look & feel for the ui.
+-- ui elements should change in the display without requiring refresh and re-draw of the entire page. e.g. if selecting one option in a widget causes additional widgets to display, the entire page should not need to re-load to display them.
+- the target display resolution for the ui will be 1024x768; additional specification for small-form factor browsers will be elaborated in the GUI specification.
+- compatible with html5 browsers: 
+-- Tested/Guaranteed browser: Firefox
+-- Tested/Best-effort browsers: IE 9, Google Chrome, Safari
+-- Support for tablets/phones: mobile browser user-agent detection and rendering for html5 capable devices
+--- even if this becomes out of scope, the ability to support this in the future is required of the UI
+- authentication shall be done using Eucalyptus created user and password
+- ui will poll resource state to allow for discovery of async state changes
+- ui will display errors resulting from synchronous operations (i.e., not discover async errors) and report the underlying error message 
   
-  - ui filtering lists of presented resources, esp. for /really large/ resource lists (s4)
-  - ui will be capable of receiving large datasets of resource information (s4)
+- ui filtering lists of presented resources, esp. for /really large/ resource lists (s4)
+- ui will be capable of receiving large datasets of resource information (s4)
 
-  - ui will distinguish between summary (at-a-glance) properties and detail properties where:
-    - summary properties will be available when resources are viewed w/o focus, drilling down
-    - detailed properties will be available by expanding/drilling down into a specific resource
-    - summary properties will be determined and specified in the GUI specification
-    - detailed properties will include all properties as reported by Eucalyptus backend services
-    - detailed properties will include relationship information (e.g., attached volumes, associated addresses, etc.) (s4)
+- ui will distinguish between summary (at-a-glance) properties and detail properties where:
+-- summary properties will be available when resources are viewed w/o focus, drilling down
+-- detailed properties will be available by expanding/drilling down into a specific resource
+-- summary properties will be determined and specified in the GUI specification
+-- detailed properties will include all properties as reported by Eucalyptus backend services
+-- detailed properties will include relationship information (e.g., attached volumes, associated addresses, etc.) (s4)
 === General Operations Requirements ===
-  - ui will not allow for user management, including password reset.  to allow for password reset the admin ui must be used and the user ui will make a clear separation (e.g., visit this other site to administer user information) exists when needing to initiate this operation.
-  - provides a summary overview of ec2 resource allocation quantities: instances, keypairs, addresses, volumes, snapshots, security groups, images.  used for understand quota and capacity planning. (s4)
-    - CHRIS: elaborate on quota information discovery
-  - launch configuration cloning: user can take an existing instance and use its configuration to prepopulate the run-instance workflow (this excludes addresses and volumes) (s3)
-  - snapshot permissions for sharing w/ others (s4)
-    - CHRIS: cross accounts?
-  - instance access: initiate ssh and RDP sessions (s4, SHASHI: desired, may become a requirement)
-  - security groups: rule creation/modification suggests common rules (ssh+rdp)
-  - keypairs: key usage is intended primarily for use outside of UI (i.e., not like rightscale)
-  -	image actions: launch instance from image (doesn't need API, would just take the user to launch instance panel with image pre-selected)
+- ui will not allow for user management, including password reset.  to allow for password reset the admin ui must be used and the user ui will make a clear separation (e.g., visit this other site to administer user information) exists when needing to initiate this operation.
+- provides a summary overview of ec2 resource allocation quantities: instances, keypairs, addresses, volumes, snapshots, security groups, images.  used for understand quota and capacity planning. (s4)
+-- CHRIS: elaborate on quota information discovery
+- launch configuration cloning: user can take an existing instance and use its configuration to prepopulate the run-instance workflow (this excludes addresses and volumes) (s3)
+- snapshot permissions for sharing w/ others (s4)
+-- CHRIS: cross accounts?
+- instance access: initiate ssh and RDP sessions (s4, SHASHI: desired, may become a requirement)
+- security groups: rule creation/modification suggests common rules (ssh+rdp)
+- keypairs: key usage is intended primarily for use outside of UI (i.e., not like rightscale)
+-	image actions: launch instance from image (doesn't need API, would just take the user to launch instance panel with image pre-selected)
 
 ==== Eucalyptus Operations Requirements ====
 
@@ -125,81 +125,81 @@ These are broken into two categories: characteristics of the UI and Eucalyptus o
 ^ other           | euca-version                   | no | - |
 
 ==== Walrus Operations Requirements ====
-  - Basic operations on service: List buckets
-  - Basic operations on buckets: Create, Delete, List contents, Change Permissions (ACLs).
-  - Basic operations on keys: Upload, List, Delete, Download, Versioning.
-  - Should have the ability to add bucket policies in the future.
-  - SHASHI: flat view is OK!
+- Basic operations on service: List buckets
+- Basic operations on buckets: Create, Delete, List contents, Change Permissions (ACLs).
+- Basic operations on keys: Upload, List, Delete, Download, Versioning.
+- Should have the ability to add bucket policies in the future.
+- SHASHI: flat view is OK!
 
 === Architectural Constraints ===
 ==== Scalability, Availability & Statelessness ====
-  - supports 150 of concurrent users, capacity can be increased
-  - supports both the transfer and display of large number of resources for display: 1.5k images, 100k volumes/snapshots, 15k instances.
-  - the server providing UI access should acts as a stateless proxy intermediating access between the end UI and underlying Eucalyptus service operations
-  - the ui server shall be highly available: that is, it can be instantiated multiple times and deployed in a way that allows for transparent redundancy of the service.
-  - statelessness: 
-    - the server providing UI access should be stateless.  
-    - A stateless service is one where the data needed to process a service request is discarded after completing the service request.  
-    - In other words, it must not matter whether a subsequent service request is performed against the same or another instance of the web ui service.  
-    - Also, and conversely, this does not mean that the service has no state or does not modify data, just that the state local to the wen ui service has the same lifecycle as the web ui service (e.g., is not specific to a service request) and that data changes are made in the backend Eucalyptus services.
+- supports 150 of concurrent users, capacity can be increased
+- supports both the transfer and display of large number of resources for display: 1.5k images, 100k volumes/snapshots, 15k instances.
+- the server providing UI access should acts as a stateless proxy intermediating access between the end UI and underlying Eucalyptus service operations
+- the ui server shall be highly available: that is, it can be instantiated multiple times and deployed in a way that allows for transparent redundancy of the service.
+- statelessness: 
+-- the server providing UI access should be stateless.  
+-- A stateless service is one where the data needed to process a service request is discarded after completing the service request.  
+-- In other words, it must not matter whether a subsequent service request is performed against the same or another instance of the web ui service.  
+-- Also, and conversely, this does not mean that the service has no state or does not modify data, just that the state local to the wen ui service has the same lifecycle as the web ui service (e.g., is not specific to a service request) and that data changes are made in the backend Eucalyptus services.
 ==== Performance ====
-  - state changes should be reflected w/in the UI w/o user action w/in a timebound that is configurable (not user configurable).
-  - responsiveness and load times for the UI & UI actions are compatible w/ google apps.
+- state changes should be reflected w/in the UI w/o user action w/in a timebound that is configurable (not user configurable).
+- responsiveness and load times for the UI & UI actions are compatible w/ google apps.
 ==== Interoperability, Modifiability, Extensibility & Customizability ====
-  - future expansion of functionality:  the service's interaction with backend Eucalyptus services has the notion of a single API version is being used and can be upgrade to account for expanded/improved backend functionality.
-  - modularization and implementation of the UI and proxy server must be constrained to accomodate the need for future additions and modifications:
-    - cohesion: should be modularized according to functional cohesion.
-    - coupling: functionality corresponding to service operations must be modularized and implemented such that stamp-coupling (data-structure coupling) is an upper bound.
-    - coupling: implementation should prefer to avoid stamp-coupling except for inherently coupled functionality (e.g., in the domain model -- run instances exhibits this characteristic)
-    - ui, data, and functional cohesion/binding: service operations and their corresponding implementation elements for ui, data, and function are bound to ui display at run time (e.g., populating menu items dynamically)
-  - Parity: a path to feature-parity for the UI and CLI for the corresponding functionality needs to be determined to allow for future co-development of UI, CLI, and service implementation.
-  - Customizability - The ability for customers to change the theme / color scheme / logo / name / labels / prompt messages (login, error, etc.) needed
-    - note this does not apply to error messages which are generated by back-end service requests
-  - i18n support:  strings and images in the UI should support localization
-  - 508-compliance: we should not preclude our ability to be 508-compliant in the future
-  - Future multi-cloud support: the UI should support a path to expanding support to include control over multiple clouds, but is explicitly excluding a 'switch between clouds' approach.
+- future expansion of functionality:  the service's interaction with backend Eucalyptus services has the notion of a single API version is being used and can be upgrade to account for expanded/improved backend functionality.
+- modularization and implementation of the UI and proxy server must be constrained to accomodate the need for future additions and modifications:
+-- cohesion: should be modularized according to functional cohesion.
+-- coupling: functionality corresponding to service operations must be modularized and implemented such that stamp-coupling (data-structure coupling) is an upper bound.
+-- coupling: implementation should prefer to avoid stamp-coupling except for inherently coupled functionality (e.g., in the domain model -- run instances exhibits this characteristic)
+-- ui, data, and functional cohesion/binding: service operations and their corresponding implementation elements for ui, data, and function are bound to ui display at run time (e.g., populating menu items dynamically)
+- Parity: a path to feature-parity for the UI and CLI for the corresponding functionality needs to be determined to allow for future co-development of UI, CLI, and service implementation.
+- Customizability - The ability for customers to change the theme / color scheme / logo / name / labels / prompt messages (login, error, etc.) needed
+-- note this does not apply to error messages which are generated by back-end service requests
+- i18n support:  strings and images in the UI should support localization
+- 508-compliance: we should not preclude our ability to be 508-compliant in the future
+- Future multi-cloud support: the UI should support a path to expanding support to include control over multiple clouds, but is explicitly excluding a 'switch between clouds' approach.
 ==== Testability ====
-  - it must be possible to create automated tests for functionality in the ui.  
-  - the implementation part which communicates with backend Eucalyptus services can be tested independently.
-  - the implementation part which communicates with backend Eucalyptus services can mocked to allow for synthetic ui testing.
-  - for features which do not change across versions of the ui tests should not require modification (e.g., separate builds preserve identifiers in the DOM)
+- it must be possible to create automated tests for functionality in the ui.  
+- the implementation part which communicates with backend Eucalyptus services can be tested independently.
+- the implementation part which communicates with backend Eucalyptus services can mocked to allow for synthetic ui testing.
+- for features which do not change across versions of the ui tests should not require modification (e.g., separate builds preserve identifiers in the DOM)
 ==== Security ====
-  - The application shall verify the identity of all of its users before allowing them to use its capabilities (SCOPE: potentially global, except S3 anonymous request?)
-  - The application shall allow each user to obtain access to information iff they have sufficient authorization.
-  - Web UI proxy must canonicalize all user input
-    - This implies all datatypes used by interfaces exposed to users have a well-defined canonical form.
-    - For canonicalization to be useful it must be done before any use of the data is made by the application.
-  - The application shall NOT store permanently any credentials or authentication tokens that it generates/uses/proxies.
-  - The application shall automatically expire an authenticated user session:
-    - no later than 24hrs after its creation (i.e., maximum session length is 24hrs).
-    - the expiration period can be configurable
-    - sessions should be logged out after a period of inactivity (implying revocation of the session credentials)
-    - support revocation of the authentication token at anytime (i.e., including before the 24hr period)
-  - The application shall terminate/invalidate an authenticated user session on events such as logout (for example, if we support password change this also applies)
-  - The application shall protect from unauthorized access any user authentication tokens managed by the client and server providing web UI access
-    - on the server-side
-    - on the client-side
-  - The application shall ensure that all valid requests from the client to the web UI server cannot be forged by a malicious party
-    - the server shall NOT accept requests that the user did not intent to send
-    - the server shall NOT accept requests that were tampered in transit (this one it probably too strong if https is not a requirement)
-  - The application shall NOT allow for replay of messages between the web UI client and server
-  - The application shall validate/sanitize any input data (i.e. data originated/coming from the outside of the processing component) before it's used in a security-sensitive operation (such as, database access, echoing back to the user, DOM access on the  client, etc.)
+- The application shall verify the identity of all of its users before allowing them to use its capabilities (SCOPE: potentially global, except S3 anonymous request?)
+- The application shall allow each user to obtain access to information iff they have sufficient authorization.
+- Web UI proxy must canonicalize all user input
+-- This implies all datatypes used by interfaces exposed to users have a well-defined canonical form.
+-- For canonicalization to be useful it must be done before any use of the data is made by the application.
+- The application shall NOT store permanently any credentials or authentication tokens that it generates/uses/proxies.
+- The application shall automatically expire an authenticated user session:
+-- no later than 24hrs after its creation (i.e., maximum session length is 24hrs).
+-- the expiration period can be configurable
+-- sessions should be logged out after a period of inactivity (implying revocation of the session credentials)
+-- support revocation of the authentication token at anytime (i.e., including before the 24hr period)
+- The application shall terminate/invalidate an authenticated user session on events such as logout (for example, if we support password change this also applies)
+- The application shall protect from unauthorized access any user authentication tokens managed by the client and server providing web UI access
+-- on the server-side
+-- on the client-side
+- The application shall ensure that all valid requests from the client to the web UI server cannot be forged by a malicious party
+-- the server shall NOT accept requests that the user did not intent to send
+-- the server shall NOT accept requests that were tampered in transit (this one it probably too strong if https is not a requirement)
+- The application shall NOT allow for replay of messages between the web UI client and server
+- The application shall validate/sanitize any input data (i.e. data originated/coming from the outside of the processing component) before it's used in a security-sensitive operation (such as, database access, echoing back to the user, DOM access on the  client, etc.)
 ==== Portability, Distributability, and Installation ====
-  - it must be that the UI installs and deploys as part of a Eucalyptus installation and deployment (i.e. it
+- it must be that the UI installs and deploys as part of a Eucalyptus installation and deployment (i.e. it
 does not require a separate installation and deployment process).  
-  - it should also be compatible (in terms of dependencies) with the distros supported by Eucalyptus.  
-    - one shouldn't need to run a specific distro or limited set of distros for the UI only.  
-    - the UI should work with what ever distro Eucalyptus is using in a specific installation.
+- it should also be compatible (in terms of dependencies) with the distros supported by Eucalyptus.  
+-- one shouldn't need to run a specific distro or limited set of distros for the UI only.  
+-- the UI should work with what ever distro Eucalyptus is using in a specific installation.
 ==== Packaging/deployment/updates/sustainability ====
-  - Packaging: the ui will be treated like a distinct component and packaged separately while following the guidelines for packaging and distribution as applied to all other open-source components.  			
-    - it is not part of another component			
-    - so, it is packaged and distributed separately (own package)			
-    - it is open source so binary deps, proprietary stuff, etc. are unacceptable			
-    - the constraints that everything else has to satisfy in terms of distro inclusion, licensing, build from source, etc must also be complied with
-    - Dependency choices for the UI implementation/design must be compatible with the releaseable dependencies of eucalyptus
-  - PENDING: Same versioning scheme as Eucalyptus, i.e., not a separate product.
-  - updating the ui installation can be done independent of the rest of Eucalyptus
-    - it cannot require an upgrade to other system components
-    - it cannot require a service restart of other system components
-  - Licenses for third-party software should be compatible with GPLv3.
-  - Training plan for new technology/third party frameworks.
+- Packaging: the ui will be treated like a distinct component and packaged separately while following the guidelines for packaging and distribution as applied to all other open-source components.  			
+-- it is not part of another component			
+-- so, it is packaged and distributed separately (own package)			
+-- it is open source so binary deps, proprietary stuff, etc. are unacceptable			
+-- the constraints that everything else has to satisfy in terms of distro inclusion, licensing, build from source, etc must also be complied with
+-- Dependency choices for the UI implementation/design must be compatible with the releaseable dependencies of eucalyptus
+- PENDING: Same versioning scheme as Eucalyptus, i.e., not a separate product.
+- updating the ui installation can be done independent of the rest of Eucalyptus
+-- it cannot require an upgrade to other system components
+-- it cannot require a service restart of other system components
+- Licenses for third-party software should be compatible with GPLv3.
+- Training plan for new technology/third party frameworks.

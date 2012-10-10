@@ -1,6 +1,6 @@
 ======= 3.2 SAN Adapters Documents ======
-  - EMC: [[https://eucalyptus.atlassian.net/browse/EUCA-2134]]
-  - Netapp: [[https://eucalyptus.atlassian.net/browse/EUCA-2122]]
-  - [[:3.2_storage_dev|3.2 Storage Dev]]
-  - [[:emc_vnx_design|3.2 EMC VNX]]
-  - [[:multipathing_design|3.2 Multipathing]]
+- EMC: [[https://eucalyptus.atlassian.net/browse/EUCA-2134]]
+- Netapp: [[https://eucalyptus.atlassian.net/browse/EUCA-2122]]
+- [[:3.2_storage_dev|3.2 Storage Dev]]
+- [[:emc_vnx_design|3.2 EMC VNX]]
+- [[:multipathing_design|3.2 Multipathing]]

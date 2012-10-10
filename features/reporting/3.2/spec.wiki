@@ -1,17 +1,17 @@
 =  3.2 Reporting Documents  =
 ==  Design Docs  ==
 
-  - [Backend Reporting Doc |https://wiki.eucalyptus-systems.com/doku.php?id=backend:3.2:reporting]
-  - [Reporting Design Doc |https://docs.google.com/a/eucalyptus.com/document/d/1fdTet46EIBAc8VEFnUOFTcrK4T79aK_tolzMVGbkKL8/edit]
-  - [HLD Component Diagram |https://wiki.eucalyptus-systems.com/lib/exe/fetch.php?cache=&w=900&h=534&media=arch:3.2:reporting-hld.png]
+- [Backend Reporting Doc |https://wiki.eucalyptus-systems.com/doku.php?id=backend:3.2:reporting]
+- [Reporting Design Doc |https://docs.google.com/a/eucalyptus.com/document/d/1fdTet46EIBAc8VEFnUOFTcrK4T79aK_tolzMVGbkKL8/edit]
+- [HLD Component Diagram |https://wiki.eucalyptus-systems.com/lib/exe/fetch.php?cache=&w=900&h=534&media=arch:3.2:reporting-hld.png]
 
   
 ==  Feature Overview  ==
 
 The goal of reporting in 3.2 is three-fold:  
-  - increase the number of metrics the system gathers and includes in reports
-  - allow for the export and warehousing of reporting data (outside of Eucalyptus)
-  - formalize command line support for report generation
+- increase the number of metrics the system gathers and includes in reports
+- allow for the export and warehousing of reporting data (outside of Eucalyptus)
+- formalize command line support for report generation
 
 =====  Metrics  =====
 
@@ -28,173 +28,173 @@ Current customers depend upon an intermediate solution for command-line report g
 ===  3.2 Feature Scope  ===
 
 The warehousing and CLI report generation features can have many possible manifestations, but for 3.2 the scope is:
-  - service for supporting data export
-  - definition and implementation of a single reference implementation of a Eucalyptus controlled data warehouse
-  - support for importing data to the reference data warehouse
-  - support for CLI report against Eucalyptus and the reference data warehouse
+- service for supporting data export
+- definition and implementation of a single reference implementation of a Eucalyptus controlled data warehouse
+- support for importing data to the reference data warehouse
+- support for CLI report against Eucalyptus and the reference data warehouse
 This limitation excludes support (but not design accommodation) for:
-  - supporting export/import to external data warehouses (i.e., it wont be tested for)
-  - supporting report generation against external databases
-  - modification or introduction of new functionality in the existing admin ui except as related to the addition of new reports.
+- supporting export/import to external data warehouses (i.e., it wont be tested for)
+- supporting report generation against external databases
+- modification or introduction of new functionality in the existing admin ui except as related to the addition of new reports.
 
 ==  3.2 Reporting Requirements  ==
 
-  - Changes to the admin ui related to this feature should be limited to: modifying existing report presentation as needed to add new metrics, addition of new reports for access via admin ui as needed by new metrics.  This is to the exclusion of other improvements which are not w/in the scope of this feature.
+- Changes to the admin ui related to this feature should be limited to: modifying existing report presentation as needed to add new metrics, addition of new reports for access via admin ui as needed by new metrics.  This is to the exclusion of other improvements which are not w/in the scope of this feature.
 
 ===  Functional Requirements  ===
 
 
 ====  New Metrics  ====
 
-  - Metrics listed below are in priority order
-  - A metric is implemented when it is accurately reflected in the appropriate reports
+- Metrics listed below are in priority order
+- A metric is implemented when it is accurately reflected in the appropriate reports
 
 h5. Report types 
 
-  - existing reports: instances, ebs, s3
-  - new billing-style/per-resource reports
-    - consider handling this as a drill down option
-  - new capacity planning report
-  - new report/columns/data for elastic ips
-  - new put/get counting for S3
+- existing reports: instances, ebs, s3
+- new billing-style/per-resource reports
+-- consider handling this as a drill down option
+- new capacity planning report
+- new report/columns/data for elastic ips
+- new put/get counting for S3
   
 h5. Required 
 
-  - Report on Total and Available compute (VM types / cores / memory / ephemeral, for example), storage (EBS and Walrus), and network (IPs, for example) capacity. (AZ level and cloud level)
-  - Total # of instances per user, type of instances, per availability zone with instance IDs
-  - Total # of hours a user has used per instance ID / instance type per availability zone
-  - Total # of elastic IPs used per user, for how long the IPs were used.  This would eventually include both allocation and association times.  Allocation is required, association is desired.
-  - Total # of EBS volumes, size in GiB per user per availability zone, duration used. (volume level granularity)
-  - Total # and size of snapshots in GiB per user. (with snapshot-id level granularity)
-  - Total size of Walrus storage in GiB per user. (with bucket level granularity)
-  - Per user # of PUT/GET requests, bytes In and bytes out of S3. (with bucket level granularity)
-  - Total network data transferred out per instance in # of bytes per user. (within AZ, across AZs, on the public IP)
-  - Total network data transferred in per instance in # of bytes per user. (within AZ, across AZs, on the public IP)
+- Report on Total and Available compute (VM types / cores / memory / ephemeral, for example), storage (EBS and Walrus), and network (IPs, for example) capacity. (AZ level and cloud level)
+- Total # of instances per user, type of instances, per availability zone with instance IDs
+- Total # of hours a user has used per instance ID / instance type per availability zone
+- Total # of elastic IPs used per user, for how long the IPs were used.  This would eventually include both allocation and association times.  Allocation is required, association is desired.
+- Total # of EBS volumes, size in GiB per user per availability zone, duration used. (volume level granularity)
+- Total # and size of snapshots in GiB per user. (with snapshot-id level granularity)
+- Total size of Walrus storage in GiB per user. (with bucket level granularity)
+- Per user # of PUT/GET requests, bytes In and bytes out of S3. (with bucket level granularity)
+- Total network data transferred out per instance in # of bytes per user. (within AZ, across AZs, on the public IP)
+- Total network data transferred in per instance in # of bytes per user. (within AZ, across AZs, on the public IP)
 
 h5. Desired 
 
-  - % CPU per instance per user (CHRIS: this is a time series.  graphs?)
-  - Total #of Disk Read and Write Ops per instance (CHRIS: why don't these have "per disk"?)
-  - Total #of Disk Read/Write Ops of all instances per user (CHRIS: this might be nonesense?)
-  - Total storage data read in bytes per disk per instance per user with disk type ephemeral/EBS
-  - Total storage data written in bytes per disk per instance per user with disk type ephemeral/EBS
-  - Total amount of time spent in seconds reading disks per instance per user with disk type ephemeral/EBS
-  - Total amount of time spent in seconds writing to disks per instance per user with disk type ephemeral/EBS
-  - Per user at volume level granularity – number of IO requests
+- % CPU per instance per user (CHRIS: this is a time series.  graphs?)
+- Total #of Disk Read and Write Ops per instance (CHRIS: why don't these have "per disk"?)
+- Total #of Disk Read/Write Ops of all instances per user (CHRIS: this might be nonesense?)
+- Total storage data read in bytes per disk per instance per user with disk type ephemeral/EBS
+- Total storage data written in bytes per disk per instance per user with disk type ephemeral/EBS
+- Total amount of time spent in seconds reading disks per instance per user with disk type ephemeral/EBS
+- Total amount of time spent in seconds writing to disks per instance per user with disk type ephemeral/EBS
+- Per user at volume level granularity – number of IO requests
 
 ====  Data Export & Warehousing  ====
 
-  - Define an export format for reporting data
-    - exported data has a well-defined format:
-      - includes a structure, type, bounds, and representation definition for data
-      - provides a mechanism for performing context-insenstive validation of data
-    - schema definition is handled separately from internal database (but may correspond)
-    - schema must be version (unlike internal schema, which is implicitly version and never externalized)
-    - data representation can be extended
-    - validation mechanism is present
-    - exported data is versioned for management outside the system
-    - transformation from database schema to export data is reversible
-  - Provide reporting web-services interface for extracting reporting data in the defined export format
-    - corresponding functionality for obtaining exported and transforming data is present in CLI
-  - Only cloud-admin is allowed to use the export web service (in 3.2)
-  - Only reporting data is exportable using the export web service (ever)
-  - Web-services API allows for:
-    - wholesale data export producing a complete data set (leaving data intact)
-    - incremental/buffered data export producing a complete data set since last export and removing data set after such an export
-    - interval data export producing a partial data set which is time bounded
-  - Ability to interact with the service is made possible through a command line tool supporting all export modes and producing an importable data file
-  - Export data file shall be well-defined (that is, treated as a specified and versioned API) allowing transformation and import to external datawarehouses (outside eucalyptus control)
-    - use of data imported to such an external datawarehouse is not supported by report generation
-  - Provide a reference implementation datawarehousing approach
-    - access to the datawarehouse implies authorization to access all the data
-    - datawarehouse is used only for and accessed only by Eucalyptus reporting data & tools
-    - is a Eucalyptus controlled datawarehouse (which is distinct from and unconnected to the internal Eucalytpus database)
-    - complies with installation/upgrade/release constraints as applied to all other Eucalyptus components
-    - configuration is automatically prepared for use as a reporting data warehouse
-    - data and service lifecycle management is handled by report generation command line tools on demand for the purposes of data import and generation of reports
-    - provides mechanism/procedure for automatic scheduled update of reporting data using the export web service
-    - configuration of Eucalyptus can be used to disable Eucalyptus-local report generation web UI  
-  - Provide tunable parameters so administrators can control the granularity of information stored (for example, daily rather than every 30 mins). 
-    - the default is a high level of granularity.
-    - document impact of parameter on data growth for reporting db
-  - Best practices guidelines for data lifecycle management
+- Define an export format for reporting data
+-- exported data has a well-defined format:
+--- includes a structure, type, bounds, and representation definition for data
+--- provides a mechanism for performing context-insenstive validation of data
+-- schema definition is handled separately from internal database (but may correspond)
+-- schema must be version (unlike internal schema, which is implicitly version and never externalized)
+-- data representation can be extended
+-- validation mechanism is present
+-- exported data is versioned for management outside the system
+-- transformation from database schema to export data is reversible
+- Provide reporting web-services interface for extracting reporting data in the defined export format
+-- corresponding functionality for obtaining exported and transforming data is present in CLI
+- Only cloud-admin is allowed to use the export web service (in 3.2)
+- Only reporting data is exportable using the export web service (ever)
+- Web-services API allows for:
+-- wholesale data export producing a complete data set (leaving data intact)
+-- incremental/buffered data export producing a complete data set since last export and removing data set after such an export
+-- interval data export producing a partial data set which is time bounded
+- Ability to interact with the service is made possible through a command line tool supporting all export modes and producing an importable data file
+- Export data file shall be well-defined (that is, treated as a specified and versioned API) allowing transformation and import to external datawarehouses (outside eucalyptus control)
+-- use of data imported to such an external datawarehouse is not supported by report generation
+- Provide a reference implementation datawarehousing approach
+-- access to the datawarehouse implies authorization to access all the data
+-- datawarehouse is used only for and accessed only by Eucalyptus reporting data & tools
+-- is a Eucalyptus controlled datawarehouse (which is distinct from and unconnected to the internal Eucalytpus database)
+-- complies with installation/upgrade/release constraints as applied to all other Eucalyptus components
+-- configuration is automatically prepared for use as a reporting data warehouse
+-- data and service lifecycle management is handled by report generation command line tools on demand for the purposes of data import and generation of reports
+-- provides mechanism/procedure for automatic scheduled update of reporting data using the export web service
+-- configuration of Eucalyptus can be used to disable Eucalyptus-local report generation web UI  
+- Provide tunable parameters so administrators can control the granularity of information stored (for example, daily rather than every 30 mins). 
+-- the default is a high level of granularity.
+-- document impact of parameter on data growth for reporting db
+- Best practices guidelines for data lifecycle management
 
 ====  CLI Report Generation  ====
 
-  - CLI report generation must be capable of running on hosts outside of the corresponding Eucalyptus deployment
-  - CLI must use the web-services API (export service specified above) to obtain needed reporting data from the Eucalyptus reporting service
-    - CLI cannot assume access to the Eucalyptus database (violates performance isolation requirement, internal database boundary constraint)
-  - CLI is intended for use only by the cloud admin (for 3.2)
-    - Cloud admin is the only one that can export the reporting data
-    - The data access privileges assumed by the report generation tool are total access to reporting data
-    - Reports for any other roles/account/user can be generated by the cloud admin (and not by that user)
-  - CLI tools support report generation directly against the reference datawarehouse
-    - Consideration is given to future support for report generation against an externally managed warehouse database
-  - support all report formats in the admin ui as of 3.0. (SHASHI: removing PDF is not acceptable)
-  - generated reports or exported report data must have a means of specifying destination file name or default name must contain creation timestamp and text indicating type of report.
+- CLI report generation must be capable of running on hosts outside of the corresponding Eucalyptus deployment
+- CLI must use the web-services API (export service specified above) to obtain needed reporting data from the Eucalyptus reporting service
+-- CLI cannot assume access to the Eucalyptus database (violates performance isolation requirement, internal database boundary constraint)
+- CLI is intended for use only by the cloud admin (for 3.2)
+-- Cloud admin is the only one that can export the reporting data
+-- The data access privileges assumed by the report generation tool are total access to reporting data
+-- Reports for any other roles/account/user can be generated by the cloud admin (and not by that user)
+- CLI tools support report generation directly against the reference datawarehouse
+-- Consideration is given to future support for report generation against an externally managed warehouse database
+- support all report formats in the admin ui as of 3.0. (SHASHI: removing PDF is not acceptable)
+- generated reports or exported report data must have a means of specifying destination file name or default name must contain creation timestamp and text indicating type of report.
 
 ===  Architectural Constraints  ===
 
 =====  Continuity/Parity  =====
 
-  - the presentation of data in reports must be the same whether generated in the GUI or using the CLI tool.
-  - the availability of report types must be the same for the GUI and CLI.
-  - the outcome (for both content and presentation thereof) of report generation against a fixed data set must be the same when the CLI report generation tool is used against the existing internal reporting database or the same data in the external reference datawarehouse.
+- the presentation of data in reports must be the same whether generated in the GUI or using the CLI tool.
+- the availability of report types must be the same for the GUI and CLI.
+- the outcome (for both content and presentation thereof) of report generation against a fixed data set must be the same when the CLI report generation tool is used against the existing internal reporting database or the same data in the external reference datawarehouse.
 =====  Coherence & Coupling  =====
 
-  - the export web service involved must be w/in the existing web-services stack (i.e., does not involve a new server, port, etc.)
-    - Message exchange pattern: web services are document/literal, authenticated, sessionless, validated
-  - Multiplicity/Well-defined:  the sensor/monitor implementation 
-    - the sensor/monitor implementation of the new metrics must deliver data using well-defined APIs and datatypes.  
-    - the sensor/monitor delivery mechanism must allow for multiple consumers.  
-      - The current reporting metrics delivered via EventListeners do so in a way which is consistent w/ this constraint.    
-    - This implies that the involved data types be:
-      - independent: not specific to the consumer use-case (i.e., reporting) 
-      - ubiquitous: can be a build dependency (i.e., for cloudwatch)
-      - stable: (do not change as a consequence of changes in the consumers)
-    - In light of the existing design, this constraint must be validated retroactively
+- the export web service involved must be w/in the existing web-services stack (i.e., does not involve a new server, port, etc.)
+-- Message exchange pattern: web services are document/literal, authenticated, sessionless, validated
+- Multiplicity/Well-defined:  the sensor/monitor implementation 
+-- the sensor/monitor implementation of the new metrics must deliver data using well-defined APIs and datatypes.  
+-- the sensor/monitor delivery mechanism must allow for multiple consumers.  
+--- The current reporting metrics delivered via EventListeners do so in a way which is consistent w/ this constraint.    
+-- This implies that the involved data types be:
+--- independent: not specific to the consumer use-case (i.e., reporting) 
+--- ubiquitous: can be a build dependency (i.e., for cloudwatch)
+--- stable: (do not change as a consequence of changes in the consumers)
+-- In light of the existing design, this constraint must be validated retroactively
 =====  Performance  =====
 
-  - performance isolation expectations need to be met
-    - using the warehousing/CLI report generation can have no impact on general service availability. 
-    - PENDING: customer info to make these next two testable.
-    - export of reporting data export must not result in service interruption.
-    - generation of exportable file must not adversely impact the system's proper function (e.g., where a system slowdown is noticeable by a user).
+- performance isolation expectations need to be met
+-- using the warehousing/CLI report generation can have no impact on general service availability. 
+-- PENDING: customer info to make these next two testable.
+-- export of reporting data export must not result in service interruption.
+-- generation of exportable file must not adversely impact the system's proper function (e.g., where a system slowdown is noticeable by a user).
 =====  Upgrade, Extension, and Modification-ility  =====
 
-  - data export model, CLI tools, and warehousing must account for schema changes across versions
-  - data export model, CLI tools, and warehousing must be upgradeable -- account for gaps in old data and enforce version parity for service and tool interactions.
-  - additions to/extensions of data export model, report, and warehousing must be addressed by a define procedures/mechanisms and their interactions outlined (e.g., new metrics need presentation in reports)
-  - export/warehousing tools and services account for future multiplicity and could be extended & configured to support other warehousing databases.
-  - data export model defines procedure for adding metrics 
-  - it must be that the metric gathering and the corresponding report implementation can be implemented concurrently
-    - there must be only a data type dependency between them
-    - the data type dependency is well-defined and stable
-    - there cannot be a functional dependency
+- data export model, CLI tools, and warehousing must account for schema changes across versions
+- data export model, CLI tools, and warehousing must be upgradeable -- account for gaps in old data and enforce version parity for service and tool interactions.
+- additions to/extensions of data export model, report, and warehousing must be addressed by a define procedures/mechanisms and their interactions outlined (e.g., new metrics need presentation in reports)
+- export/warehousing tools and services account for future multiplicity and could be extended & configured to support other warehousing databases.
+- data export model defines procedure for adding metrics 
+- it must be that the metric gathering and the corresponding report implementation can be implemented concurrently
+-- there must be only a data type dependency between them
+-- the data type dependency is well-defined and stable
+-- there cannot be a functional dependency
 =====  Testability  =====
 
-  - report events can be tested independently (e.g., to populate data for unfinished metric/decouple from report gen. side)
-  - report generation can be tested independently (e.g., trace data can be used to populate reporting database)
-  - data export can be tested independently (e.g., schema validation, apply reversible transform and compare to original data)
-  - metric implementation can be evaluated w/o corresponding report (e.g., ... need a test strategy here)
+- report events can be tested independently (e.g., to populate data for unfinished metric/decouple from report gen. side)
+- report generation can be tested independently (e.g., trace data can be used to populate reporting database)
+- data export can be tested independently (e.g., schema validation, apply reversible transform and compare to original data)
+- metric implementation can be evaluated w/o corresponding report (e.g., ... need a test strategy here)
 =====  Releasability  =====
 
-  - all of the export service, export data, warehousing schema and CLI tools need to be versioned and validated 
-  - Datawarehouse reference implementation is versioned using the same scheme as Eucalyptus, i.e., not a separate product. 
-  - The datawarehouse reference implementation service will be treated like a distinct component and packaged separately while following the guidelines for packaging and distribution as applied to all other open-source components.  			
-    - it is not part of another component			
-    - so, it is packaged and distributed separately (own package)			
-    - it is open source so binary deps, proprietary stuff, etc. are unacceptable			
-    - the constraints that everything else has to satisfy in terms of distro inclusion, licensing, build from source, etc must also be complied with
-  - updating the datawarehouse reference implementation installation can be done without disrupting service for the corresponding Eucalyptus deployment
-  - Licenses for third-party software should be compatible with GPLv3.
-  - Training plan for new technology/third party frameworks.
+- all of the export service, export data, warehousing schema and CLI tools need to be versioned and validated 
+- Datawarehouse reference implementation is versioned using the same scheme as Eucalyptus, i.e., not a separate product. 
+- The datawarehouse reference implementation service will be treated like a distinct component and packaged separately while following the guidelines for packaging and distribution as applied to all other open-source components.  			
+-- it is not part of another component			
+-- so, it is packaged and distributed separately (own package)			
+-- it is open source so binary deps, proprietary stuff, etc. are unacceptable			
+-- the constraints that everything else has to satisfy in terms of distro inclusion, licensing, build from source, etc must also be complied with
+- updating the datawarehouse reference implementation installation can be done without disrupting service for the corresponding Eucalyptus deployment
+- Licenses for third-party software should be compatible with GPLv3.
+- Training plan for new technology/third party frameworks.
 =====  Security  =====
 
-  - The datastore used by the warehouse service shall be protected from unauthorized access         
+- The datastore used by the warehouse service shall be protected from unauthorized access         
 =====  Usability  =====
 
-  - PENDING: usability reqs for reports (both existing UI and forthcoming CLI)
+- PENDING: usability reqs for reports (both existing UI and forthcoming CLI)
 
                                                                                
 

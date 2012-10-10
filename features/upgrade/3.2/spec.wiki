@@ -43,14 +43,14 @@ Changes to the entity model (and so the database schema & data) fall into 4 cate
 - Trivial schema changes
 -- new tables
 -- new columns in existing tables
-  -- may involve initializing potentially null data to sane defaults in existing rows
+-- may involve initializing potentially null data to sane defaults in existing rows
 - Data migrations
 -- renaming of existing unconstrained columns.  this breaks down as:
-  -- addition of new destination column (supported by SchemaUpdate)
-  -- migration of data from old column (@Upgrade method)
+-- addition of new destination column (supported by SchemaUpdate)
+-- migration of data from old column (@Upgrade method)
 -- complete replacement of entity relationship subgraph
-  -- addition of new entity tables
-  -- migration of data from old tables to new tables (@Upgrade class)
+-- addition of new entity tables
+-- migration of data from old tables to new tables (@Upgrade class)
 - Complex Modifications
 -- The approach here will support but discourage making such changes
 -- e.g., changes which involve needing multi-step data migration such as relationship changes to existing entities

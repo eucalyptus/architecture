@@ -1,36 +1,36 @@
 = Service Level Support =
 - supported AWS services in AWS SDK for Java & Eucalyptus
-  - S3:  Simple Storage Service
-  - EC2
-  - IAM:  Identity and Access Management
-  - STS:  Simple Token Service
+- S3:  Simple Storage Service
+- EC2
+- IAM:  Identity and Access Management
+- STS:  Simple Token Service
 
 - forthcoming AWS service support in Eucalyptus
-  - ELB:  Elastic Load Balancing
-  - CloudWatch
-  - Autoscaling
+- ELB:  Elastic Load Balancing
+- CloudWatch
+- Autoscaling
 
 - AWS services unsupported in Eucalyptus
-  - Dynamo
-  - SimpleDB
-  - SQS:  Simple Queueing Service
-  - SNS:  Simple Notification Service
-  - RDS:  Relational Database Service
-  - Route 53
-  - SWS:  Simple Workflow Service
-  - Elastic MapReduce
-  - SES:  Simple Email Service
-  - CloudSearch
-  - CloudFront
-  - CloudFormation
-  - Elastic Beanstalk
-  - Import/Export
-  - SGS:  Storage Gateway Service
-  - ElastiCache
+- Dynamo
+- SimpleDB
+- SQS:  Simple Queueing Service
+- SNS:  Simple Notification Service
+- RDS:  Relational Database Service
+- Route 53
+- SWS:  Simple Workflow Service
+- Elastic MapReduce
+- SES:  Simple Email Service
+- CloudSearch
+- CloudFront
+- CloudFormation
+- Elastic Beanstalk
+- Import/Export
+- SGS:  Storage Gateway Service
+- ElastiCache
   
 = Request Protocols =
 - Request Protocols
-  - Authorization Protocols
+- Authorization Protocols
   
   
 = EC2 =

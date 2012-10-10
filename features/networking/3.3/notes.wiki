@@ -1,12 +1,12 @@
 https://eucalyptus.atlassian.net/secure/IssueNavigator.jspa?requestId=12211&mode=hide
 
 - true edge networking
-  - turn node controller into the router
+- turn node controller into the router
 - split CC into CC and NS
-  - extensibility ==> SDN
+- extensibility ==> SDN
 - ipsets/ebtables  ==> ovs
 - NC/edge networking ==> customer delight
-  - convolution w/ network architecture
+- convolution w/ network architecture
 - cloudstack virtual router situation
 - even fewer network configuration dependencies to get full AWS functionality
 - refactorization analysis

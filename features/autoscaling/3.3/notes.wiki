@@ -1,17 +1,17 @@
 = IAM IMPLICATION =
-  - IAM needs updating to reflect the added keys, actions, resource types from this service
-  - autoscaling allocates resources on behalf of the user
+- IAM needs updating to reflect the added keys, actions, resource types from this service
+- autoscaling allocates resources on behalf of the user
 = EC2 IMPLICATION =
-  - tagging
+- tagging
 = ELB IMPLICATION =
-  - add to scaling group to load balancer (ELBility)
+- add to scaling group to load balancer (ELBility)
 = Scope Limitations
-  - vpc out
-  - spot instances out
+- vpc out
+- spot instances out
 = Scaling Processes =
 == Health Check ==  
 == Policy ==
-  - load generation tools would be needed for test & dev.
+- load generation tools would be needed for test & dev.
 == Scheduled ==
 Auto Scaling guarantees execution order for scheduled actions within the same group, but not for scheduled actions across groups.
 
@@ -24,8 +24,8 @@ Auto Scaling guarantees execution order for scheduled actions within the same gr
     A scheduled action must have a unique time value. If you attempt to schedule an activity at a time when another existing activity is already scheduled, the call will be rejected with an error message noting the conflict.
     
 = Questions =
-  - workload examples; esp. for testing, user story creation
-  - survival group use case (no dependency)
-  - scheduled scale-out use case (
-  - triggered scale-{out,in} use case (cloud watch, sns maybe?)
+- workload examples; esp. for testing, user story creation
+- survival group use case (no dependency)
+- scheduled scale-out use case (
+- triggered scale-{out,in} use case (cloud watch, sns maybe?)
   

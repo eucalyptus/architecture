@@ -5,8 +5,8 @@ multiple host maintenance
 - KVM, Xen reliability are a major question
 - is there a way to pause the vm
 - vm maintenance mode
-  - compromised 
-  - what are the benefits?
-  - controlling workload schedule
+- compromised 
+- what are the benefits?
+- controlling workload schedule
 - slow down the system
 - live migration with attached volumes

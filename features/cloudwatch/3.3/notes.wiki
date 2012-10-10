@@ -1,101 +1,101 @@
 = Overview =
-  - SNS?
-  - SQS?
-  - Which Metrics? Basic vs. "Advanced"
-  - Custom Metrics?
+- SNS?
+- SQS?
+- Which Metrics? Basic vs. "Advanced"
+- Custom Metrics?
   
 == Metrics ==
-  - A metric is the fundamental concept for CloudWatch and represents a time-ordered set of data points. 
-  - Metrics are uniquely defined by a name, a namespace, and one or more dimensions. 
-  - Each data point has a time stamp, and (optionally) a unit of measure. 
-  - When you request statistics, the returned data stream is identified by namespace, metric name, dimension, and (optionally) the unit.
-  - You can use the PutMetricData API (or the mon-put-data command) to create a custom metric and publish data points for it. 
-  - You can add the data points in any order, and at any rate you choose. 
-  - CloudWatch aggregates data points that are fully identical (duplicate values, time stamps, and units) when you request statistics on them.
-  - CloudWatch stores your metric data for two weeks. 
-  - You can request statistics on metric data points that occur within a specified time window.
+- A metric is the fundamental concept for CloudWatch and represents a time-ordered set of data points. 
+- Metrics are uniquely defined by a name, a namespace, and one or more dimensions. 
+- Each data point has a time stamp, and (optionally) a unit of measure. 
+- When you request statistics, the returned data stream is identified by namespace, metric name, dimension, and (optionally) the unit.
+- You can use the PutMetricData API (or the mon-put-data command) to create a custom metric and publish data points for it. 
+- You can add the data points in any order, and at any rate you choose. 
+- CloudWatch aggregates data points that are fully identical (duplicate values, time stamps, and units) when you request statistics on them.
+- CloudWatch stores your metric data for two weeks. 
+- You can request statistics on metric data points that occur within a specified time window.
 
 == Namespaces ==
-  - CloudWatch namespaces are conceptual containers for metrics. 
-  - Metrics in different namespaces are isolated from each other, so that metrics from different applications are not mistakenly aggregated into the same statistics.
-  - Namespace names are strings you define when you create a metric. 
-  - The names must be valid XML characters, typically containing the alphanumeric characters "0-9A-Za-z" plus "."(period), "-" (hyphen), "_" (underscore), "/" (slash), "#" (hash), and ":" (colon). 
-  - namespaces all follow the convention AWS/<service>, such as AWS/EC2 and AWS/ELB.
-  - Namespace names must be fewer than 256 characters in length.
-  - There is no default namespace. You must specify a namespace for each data element you put into CloudWatch.
+- CloudWatch namespaces are conceptual containers for metrics. 
+- Metrics in different namespaces are isolated from each other, so that metrics from different applications are not mistakenly aggregated into the same statistics.
+- Namespace names are strings you define when you create a metric. 
+- The names must be valid XML characters, typically containing the alphanumeric characters "0-9A-Za-z" plus "."(period), "-" (hyphen), "_" (underscore), "/" (slash), "#" (hash), and ":" (colon). 
+- namespaces all follow the convention AWS/<service>, such as AWS/EC2 and AWS/ELB.
+- Namespace names must be fewer than 256 characters in length.
+- There is no default namespace. You must specify a namespace for each data element you put into CloudWatch.
 
 == Dimensions ==
-  - A dimension is a name/value pair that helps you to uniquely identify a metric. 
-  - Because dimensions are part of the unique identifier for a metric, whenever you add a unique name/value pair to one of your metrics, you are creating a new metric.
-  - You specify dimensions when you create a metric with the PutMetricData action (or its command line equivalent mon-put-data). 
-  - internal services that feed data to CloudWatch also attach dimensions to each metric. You can use dimensions to filter result sets that CloudWatch queries return.
-  - For metrics produced by certain AWS products such as Amazon EC2, CloudWatch can aggregate data across dimensions. 
-  - You can assign up to ten dimensions to a metric.
-  - CloudWatch treats each unique combination of dimensions as a separate metric. 
+- A dimension is a name/value pair that helps you to uniquely identify a metric. 
+- Because dimensions are part of the unique identifier for a metric, whenever you add a unique name/value pair to one of your metrics, you are creating a new metric.
+- You specify dimensions when you create a metric with the PutMetricData action (or its command line equivalent mon-put-data). 
+- internal services that feed data to CloudWatch also attach dimensions to each metric. You can use dimensions to filter result sets that CloudWatch queries return.
+- For metrics produced by certain AWS products such as Amazon EC2, CloudWatch can aggregate data across dimensions. 
+- You can assign up to ten dimensions to a metric.
+- CloudWatch treats each unique combination of dimensions as a separate metric. 
 
 == Time stamps ==
-  - each metric data point must be marked with a time stamp. 
-  - The time stamp can be up to two weeks in the past and up to one day in the future. 
-  - If you do not provide a time stamp, CloudWatch creates a time stamp for you based on the time the data element was received.
-  - The time stamp you use in the request must be a dateTime object, with the complete date plus hours, minutes, and seconds (for more information, go to http://www.w3.org/TR/xmlschema-2/#dateTime). 
+- each metric data point must be marked with a time stamp. 
+- The time stamp can be up to two weeks in the past and up to one day in the future. 
+- If you do not provide a time stamp, CloudWatch creates a time stamp for you based on the time the data element was received.
+- The time stamp you use in the request must be a dateTime object, with the complete date plus hours, minutes, and seconds (for more information, go to http://www.w3.org/TR/xmlschema-2/#dateTime). 
   
 == Units ==
-  - Units represent your statistic's unit of measure. 
-  - You can also specify a unit when you create a custom metric. 
-  - When you publish data without specifying a unit, CloudWatch associates it with the None unit. 
-  - When you get statistics without specifying a unit, CloudWatch aggregates all data points of the same unit together. 
-  - If you have two otherwise identical metrics with different units, two separate data streams will be returned, one for each unit.
+- Units represent your statistic's unit of measure. 
+- You can also specify a unit when you create a custom metric. 
+- When you publish data without specifying a unit, CloudWatch associates it with the None unit. 
+- When you get statistics without specifying a unit, CloudWatch aggregates all data points of the same unit together. 
+- If you have two otherwise identical metrics with different units, two separate data streams will be returned, one for each unit.
   
 == Statistics ==
-  - Statistics are metric data aggregations over specified periods of time. 
-  - CloudWatch provides statistics based on the metric data points you or AWS products have provided to CloudWatch. 
-  - Aggregations are made using the namespace, metric name, dimensions, and the data point unit of measure, within the time period you specify. 
-  - Available statistics:
-    - Minimum:  The lowest value observed during the specified period. You can use this value to determine low volumes of activity for your application.
-    - Maximum: The highest value observed during the specified period. You can use this value to determine high volumes of activity for your application.
-    - Sum:  All values submitted for the matching metric added together. This statistic can be useful for determining the total volume of a metric.
-    - Average: The value of Sum / SampleCount during the specified period. By comparing this statistic with the Minimum and Maximum, you can determine the full scope of a metric and how close the average use is to the Minimum and Maximum. This comparison helps you to know when to increase or decrease your resources as needed.
-    - SampleCount: The count (number) of data points used for the statistical calculation.
-  - You use the GetMetricStatistics API (mon-get-stats) to retrieve statistics, specifying the same values used for the namespace, metric name, and dimension parameters used when the metric values were created. 
-  - You also specify the encompassing period, or start and end times that CloudWatch will use for the aggregation. 
-  - The starting and ending points can be as close together as 60 seconds, and as far apart as two weeks.
-  - CloudWatch allows you to add pre-calculated statistics using the PutMetricData API (mon-put-data command) using the StatisticValues (statistic-values) parameter. 
-  - Instead of data point values, you specify values for SampleCount, Minimum, Maximum, and Sum (CloudWatch calculates the average for you). 
-  - The values you add in this way are aggregated with any other values associated with the matching metric.
+- Statistics are metric data aggregations over specified periods of time. 
+- CloudWatch provides statistics based on the metric data points you or AWS products have provided to CloudWatch. 
+- Aggregations are made using the namespace, metric name, dimensions, and the data point unit of measure, within the time period you specify. 
+- Available statistics:
+-- Minimum:  The lowest value observed during the specified period. You can use this value to determine low volumes of activity for your application.
+-- Maximum: The highest value observed during the specified period. You can use this value to determine high volumes of activity for your application.
+-- Sum:  All values submitted for the matching metric added together. This statistic can be useful for determining the total volume of a metric.
+-- Average: The value of Sum / SampleCount during the specified period. By comparing this statistic with the Minimum and Maximum, you can determine the full scope of a metric and how close the average use is to the Minimum and Maximum. This comparison helps you to know when to increase or decrease your resources as needed.
+-- SampleCount: The count (number) of data points used for the statistical calculation.
+- You use the GetMetricStatistics API (mon-get-stats) to retrieve statistics, specifying the same values used for the namespace, metric name, and dimension parameters used when the metric values were created. 
+- You also specify the encompassing period, or start and end times that CloudWatch will use for the aggregation. 
+- The starting and ending points can be as close together as 60 seconds, and as far apart as two weeks.
+- CloudWatch allows you to add pre-calculated statistics using the PutMetricData API (mon-put-data command) using the StatisticValues (statistic-values) parameter. 
+- Instead of data point values, you specify values for SampleCount, Minimum, Maximum, and Sum (CloudWatch calculates the average for you). 
+- The values you add in this way are aggregated with any other values associated with the matching metric.
 
 == Periods ==
-  - A period is the length of time associated with a specific CloudWatch statistic. 
-  - Each statistic represents an aggregation of the metrics data collected for a specified period of time. 
-  - You can adjust how the data is aggregated by varying the length of the period. 
-  - A period can be as short as one minute (60 seconds) or as long as two weeks (1,209,600 seconds).
-  - Although periods are expressed in seconds, the minimum granularity for a period is one minute. Accordingly, you specify period values as multiples of 60. For example, to specify a period of six minutes, you would use the value 360.
-  - When you call GetMetricStatistics, you can specify the period length with the Period parameter. Two related parameters, StartTime and EndTime, determine the overall length of time associated with the statistics. 
-  - The default value for the Period parameter is 60 seconds, whereas the default values for StartTime and EndTime give you the last hour's worth of statistics.
-  - The values you select for the StartTime and EndTime parameters determine how many periods GetMetricStatistics will return. 
+- A period is the length of time associated with a specific CloudWatch statistic. 
+- Each statistic represents an aggregation of the metrics data collected for a specified period of time. 
+- You can adjust how the data is aggregated by varying the length of the period. 
+- A period can be as short as one minute (60 seconds) or as long as two weeks (1,209,600 seconds).
+- Although periods are expressed in seconds, the minimum granularity for a period is one minute. Accordingly, you specify period values as multiples of 60. For example, to specify a period of six minutes, you would use the value 360.
+- When you call GetMetricStatistics, you can specify the period length with the Period parameter. Two related parameters, StartTime and EndTime, determine the overall length of time associated with the statistics. 
+- The default value for the Period parameter is 60 seconds, whereas the default values for StartTime and EndTime give you the last hour's worth of statistics.
+- The values you select for the StartTime and EndTime parameters determine how many periods GetMetricStatistics will return. 
 Periods are also an important part of the CloudWatch Alarms feature. When you create an alarm to monitor a specific metric, you are asking CloudWatch to compare that metric to the threshold value that you supplied. You have extensive control over how CloudWatch makes that comparison. Not only can you specify the period over which the comparison is made, but you can also specify how many consecutive periods the threshold must be breached before you are notified. For more information on Alarms, see Alarms.
 
 == Aggregation ==
-  - You can publish as many data points as you want with the same or similar time stamps. 
-  - You can publish data points for a metric that share not only the same time stamp, but also the same namespace and dimensions. Subsequent calls to GetMetricStatistics will return aggregated statistics about those data points. You can even do this in one PutMetricData request. 
-  - CloudWatch accepts multiple data points in the same PutMetricData call with the same time stamp. 
-  - You can also publish multiple data points for the same or different metrics, with any time stamp. 
-  - The size of a PutMetricData request, however, is limited to 8KB for HTTP GET requests and 40KB for HTTP POST requests. 
-  - You can include a maximum of 20 data points in one PutMetricData request.
-  - For large data sets that would make the use of PutMetricData impractical, CloudWatch allows for the insertion of a pre-aggregated data set called a StatisticSet. 
-  - With StatisticSets you give CloudWatch the Min, Max, Sum, and SampleCount of a number of datapoints. 
-  - A common use case for StatisticSets is when you are collecting data many times in a minute. For example, let’s say you have a metric for the request latency of a web page. 
-  - It doesn’t make sense to do a PutMetricData request with every web page hit. 
-  - We suggest you collect the latency of all hits to that web page, aggregate them together once a minute and send that StatisticSet to CloudWatch.
-  - CloudWatch doesn't differentiate the source of a metric. 
-  - If you publish a metric with the same namespace and dimensions from different sources, CloudWatch treats this as a single metric. 
+- You can publish as many data points as you want with the same or similar time stamps. 
+- You can publish data points for a metric that share not only the same time stamp, but also the same namespace and dimensions. Subsequent calls to GetMetricStatistics will return aggregated statistics about those data points. You can even do this in one PutMetricData request. 
+- CloudWatch accepts multiple data points in the same PutMetricData call with the same time stamp. 
+- You can also publish multiple data points for the same or different metrics, with any time stamp. 
+- The size of a PutMetricData request, however, is limited to 8KB for HTTP GET requests and 40KB for HTTP POST requests. 
+- You can include a maximum of 20 data points in one PutMetricData request.
+- For large data sets that would make the use of PutMetricData impractical, CloudWatch allows for the insertion of a pre-aggregated data set called a StatisticSet. 
+- With StatisticSets you give CloudWatch the Min, Max, Sum, and SampleCount of a number of datapoints. 
+- A common use case for StatisticSets is when you are collecting data many times in a minute. For example, let’s say you have a metric for the request latency of a web page. 
+- It doesn’t make sense to do a PutMetricData request with every web page hit. 
+- We suggest you collect the latency of all hits to that web page, aggregate them together once a minute and send that StatisticSet to CloudWatch.
+- CloudWatch doesn't differentiate the source of a metric. 
+- If you publish a metric with the same namespace and dimensions from different sources, CloudWatch treats this as a single metric. 
   
 == Alarms ==
-  - CloudWatch is especially useful because it helps you make decisions and take immediate, automatic actions based on your metric data. 
-  - Alarms can automatically initiate actions on your behalf, based on parameters you specify. 
-  - An alarm watches a single metric over a time period you specify, and performs one or more actions based on the value of the metric relative to a given threshold over a number of time periods. 
-  - The action is a notification sent to an Amazon SNS topic or Auto Scaling policy. 
-  - Alarms invoke actions for sustained state changes only. 
-  - CloudWatch alarms will not invoke actions simply because they are in a particular state, the state must have changed and been maintained for a specified number of periods.
+- CloudWatch is especially useful because it helps you make decisions and take immediate, automatic actions based on your metric data. 
+- Alarms can automatically initiate actions on your behalf, based on parameters you specify. 
+- An alarm watches a single metric over a time period you specify, and performs one or more actions based on the value of the metric relative to a given threshold over a number of time periods. 
+- The action is a notification sent to an Amazon SNS topic or Auto Scaling policy. 
+- Alarms invoke actions for sustained state changes only. 
+- CloudWatch alarms will not invoke actions simply because they are in a particular state, the state must have changed and been maintained for a specified number of periods.
 
 = API Details =
 
@@ -132,16 +132,16 @@ http://docs.amazonwebservices.com/AmazonCloudWatch/latest/DeveloperGuide/CW_Supp
 
 
 === Key Use Cases ===
-  - filtering metrics
-  - metrics from spec: http://docs.amazonwebservices.com/AmazonCloudWatch/latest/DeveloperGuide/CW_Support_For_AWS.html- - EBS is missing: VolumeIdleTime, VolumeQueueLength- - EC2 is missing dimension: AutoScalingGroupName
-  - performance impact should be bounded
-  - storage of the metrics
-  - sending alarms => SNS is a dependency, also AutoScale depends on this
-  - statistics gathering
+- filtering metrics
+- metrics from spec: http://docs.amazonwebservices.com/AmazonCloudWatch/latest/DeveloperGuide/CW_Support_For_AWS.html- - EBS is missing: VolumeIdleTime, VolumeQueueLength- - EC2 is missing dimension: AutoScalingGroupName
+- performance impact should be bounded
+- storage of the metrics
+- sending alarms => SNS is a dependency, also AutoScale depends on this
+- statistics gathering
 
 === From Spec ===
-  - Monitor AWS resources automatically, without installing additional software:-   - Basic Monitoring for Amazon EC2 instances: seven pre-selected metrics at five-minute frequency, free of charge.-   - Detailed Monitoring for Amazon EC2 instances: seven pre-selected metrics at one-minute frequency, for an additional charge.-   - Amazon EBS volumes: eight pre-selected metrics at five-minute frequency, free of charge.-   - Elastic Load Balancers: ten pre-selected metrics at one-minute frequency, free of charge.-   - OUT: Amazon RDS DB instances: thirteen pre-selected metrics at one-minute frequency, free of charge.-   - OUT: Amazon SQS queues: eight pre-selected metrics at five-minute frequency, free of charge.-   - OUT: Amazon SNS topics: four pre-selected metrics at five-minute frequency, free of charge.-   - OUT: Amazon ElastiCache nodes: twenty-nine pre-selected metrics at one-minute frequency, free of charge.-   - OUT: Amazon DynamoDB tables: seven pre-selected metrics at five-minute frequency, free of charge.-   - OUT: AWS Storage Gateways: eleven pre-selected gateway metrics and five pre-selected storage volume metrics at five-minute frequency, free of charge.-   - OUT: Amazon Elastic MapReduce job flows: twenty-three pre-selected metrics at five-minute frequency, free of charge.-   - Auto Scaling groups: seven pre-selected metrics at one-minute frequency, optional and charged at standard pricing.-   - Estimated charges on your AWS bill: you can also choose to enable metrics to monitor your AWS charges. The number of metrics depends on the AWS products and services that you use, and these metrics are free of charge. Learn more about this option.
-  - Submit Custom Metrics generated by your own applications (or by AWS resources not mentioned above) and have them monitored by CloudWatch. You can submit these metrics to CloudWatch via a simple Put API request.
-  - Set alarms on any of your metrics to receive notifications or take other automated actions when your metric crosses your specified threshold.
-  - OUT: View graphs and statistics for any of your metrics, and get a quick overview of all your alarms and monitored AWS resources in one location on the CloudWatch dashboard.
-  - Use Auto Scaling to add or remove Amazon EC2 instances dynamically based on your CloudWatch metrics.
+- Monitor AWS resources automatically, without installing additional software:-   - Basic Monitoring for Amazon EC2 instances: seven pre-selected metrics at five-minute frequency, free of charge.-   - Detailed Monitoring for Amazon EC2 instances: seven pre-selected metrics at one-minute frequency, for an additional charge.-   - Amazon EBS volumes: eight pre-selected metrics at five-minute frequency, free of charge.-   - Elastic Load Balancers: ten pre-selected metrics at one-minute frequency, free of charge.-   - OUT: Amazon RDS DB instances: thirteen pre-selected metrics at one-minute frequency, free of charge.-   - OUT: Amazon SQS queues: eight pre-selected metrics at five-minute frequency, free of charge.-   - OUT: Amazon SNS topics: four pre-selected metrics at five-minute frequency, free of charge.-   - OUT: Amazon ElastiCache nodes: twenty-nine pre-selected metrics at one-minute frequency, free of charge.-   - OUT: Amazon DynamoDB tables: seven pre-selected metrics at five-minute frequency, free of charge.-   - OUT: AWS Storage Gateways: eleven pre-selected gateway metrics and five pre-selected storage volume metrics at five-minute frequency, free of charge.-   - OUT: Amazon Elastic MapReduce job flows: twenty-three pre-selected metrics at five-minute frequency, free of charge.-   - Auto Scaling groups: seven pre-selected metrics at one-minute frequency, optional and charged at standard pricing.-   - Estimated charges on your AWS bill: you can also choose to enable metrics to monitor your AWS charges. The number of metrics depends on the AWS products and services that you use, and these metrics are free of charge. Learn more about this option.
+- Submit Custom Metrics generated by your own applications (or by AWS resources not mentioned above) and have them monitored by CloudWatch. You can submit these metrics to CloudWatch via a simple Put API request.
+- Set alarms on any of your metrics to receive notifications or take other automated actions when your metric crosses your specified threshold.
+- OUT: View graphs and statistics for any of your metrics, and get a quick overview of all your alarms and monitored AWS resources in one location on the CloudWatch dashboard.
+- Use Auto Scaling to add or remove Amazon EC2 instances dynamically based on your CloudWatch metrics.
