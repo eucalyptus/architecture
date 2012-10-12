@@ -3,8 +3,8 @@
 
 VM Type support in Eucalyptus has two disjoint aspects:
 
-1. AWS compatibility as determined by published VM type names (but not necessarily characteristics).
-1. Private cloud administrator control over vm type definitions.
+# AWS compatibility as determined by published VM type names (but not necessarily characteristics).
+# Private cloud administrator control over vm type definitions.
 
 
 == AWS compatibility ==

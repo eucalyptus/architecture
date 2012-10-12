@@ -26,21 +26,21 @@ The following cannot be tagged:
 You can tag public or shared resources, but the tags you assign are available only to your AWS account and not to the other accounts sharing the resource.
 
 == Operations ==
-- CreateTag
-- DeleteTag
-- DescribeTags
-- NOTE: also supports filtering by:
--- resource-type (e.g., volume, instance)
--- resource-id (e.g., i-XXXXXXXX which is associated w/ the tag)
--- key
--- value
+* CreateTag
+* DeleteTag
+* DescribeTags
+* NOTE: also supports filtering by:
+** resource-type (e.g., volume, instance)
+** resource-id (e.g., i-XXXXXXXX which is associated w/ the tag)
+** key
+** value
     
 = Filtering =
 You can search and filter resources based on the above described tags (e.g., --filter tag:Owner=TeamA)
-- tag-key
--- The key of a tag assigned to the resource. This filter is independent of the tag-value filter. For example, if you use both the filter tag-key=Purpose and the filter tag-value=X, you get any resources assigned both the tag key Purpose (regardless of what the tag's value is), and the tag value X (regardless of what the tag's key is). If you want to list only resources where Purpose=X, see the tag:key filter later in this table. Type: String
-- tag-value
--- The value of a tag assigned to the resource. This filter is independent of the tag-key filter. Type: String
+* tag-key
+** The key of a tag assigned to the resource. This filter is independent of the tag-value filter. For example, if you use both the filter tag-key=Purpose and the filter tag-value=X, you get any resources assigned both the tag key Purpose (regardless of what the tag's value is), and the tag value X (regardless of what the tag's key is). If you want to list only resources where Purpose=X, see the tag:key filter later in this table. Type: String
+* tag-value
+** The value of a tag assigned to the resource. This filter is independent of the tag-key filter. Type: String
         tag:key
         Filters the results based on a specific tag/value combination.
         Example: To list just the resources assigned tag Purpose=X, then specify:
@@ -53,197 +53,197 @@ You can search and filter resources based on the above described tags (e.g., --f
 
 == Available Filters by Operation ==
 === Supported Operations ===
-- DescribeAvailabilityZone 
-- DescribeAddresses 
-- DescribeBundleTasks 
-- DescribeImages 
-- DescribeInstances 
-- DescribeKeyPairs 
-- DescribeRegions 
-- DescribeSecurityGroups 
-- DescribeSnapshots 
-- DescribeTags 
-- DescribeVolumes
+* DescribeAvailabilityZone 
+* DescribeAddresses 
+* DescribeBundleTasks 
+* DescribeImages 
+* DescribeInstances 
+* DescribeKeyPairs 
+* DescribeRegions 
+* DescribeSecurityGroups 
+* DescribeSnapshots 
+* DescribeTags 
+* DescribeVolumes
 === DescribeAvailabilityZone ===
-- message: Information about the Availability Zone. Type: String
-- region-name: The Region the Availablity Zone is in (for example, us-east-1). Type: String
-- state: The state of the Availability Zone. Type: String; Valid values: available
-- zone-name: The name of the zone. Type: String
+* message: Information about the Availability Zone. Type: String
+* region-name: The Region the Availablity Zone is in (for example, us-east-1). Type: String
+* state: The state of the Availability Zone. Type: String; Valid values: available
+* zone-name: The name of the zone. Type: String
   
 === DescribeAddresses ===
-- domain: Indicates whether the address is a EC2 address, or a VPC address. Type: String; Valid values: standard | vpc
-- instance-id:  The instance the address is associated with (if any). Type: String
-- public-ip: The Elastic IP address. Type: String
-- allocation-id: The allocation ID for the address (VPC addresses only). Type: String
-- association-id: The association ID for the address (VPC addresses only). Type: String
-- network-interface-id: The network interface (if any) that the address is associated with. (for VPC addresses only). Type: String
-- network-interface-owner-id: The owner IID.
-- private-ip-address: The private IP address associated with the Elastic IP address (for VPC addresses only). Type: String
+* domain: Indicates whether the address is a EC2 address, or a VPC address. Type: String; Valid values: standard | vpc
+* instance-id:  The instance the address is associated with (if any). Type: String
+* public-ip: The Elastic IP address. Type: String
+* allocation-id: The allocation ID for the address (VPC addresses only). Type: String
+* association-id: The association ID for the address (VPC addresses only). Type: String
+* network-interface-id: The network interface (if any) that the address is associated with. (for VPC addresses only). Type: String
+* network-interface-owner-id: The owner IID.
+* private-ip-address: The private IP address associated with the Elastic IP address (for VPC addresses only). Type: String
   
 === DescribeBundleTasks ===
-- bundle-id: The ID of the bundle task. Type: String
-- error-code: If the task failed, the error code returned. Type: String
-- error-message: If the task failed, the error message returned. Type: String
-- instance-id: The ID of the instance that was bundled. Type: String
-- progress: The level of task completion, as a percentage (for example, 20%). Type: String
-- s3-bucket: The Amazon S3 bucket to store the AMI. Type: String
-- s3-prefix: The beginning of the AMI name. Type: String
-- start-time: The time the task started (for example, 2008-09-15T17:15:20.000Z). Type: DateTime
-- state: The state of the task. Type: String; Valid values: pending | waiting-for-shutdown | bundling | storing | cancelling | complete | failed
-- update-time: The time of the most recent update for the task (for example, 2008-09-15T17:15:20.000Z). Type: DateTime
+* bundle-id: The ID of the bundle task. Type: String
+* error-code: If the task failed, the error code returned. Type: String
+* error-message: If the task failed, the error message returned. Type: String
+* instance-id: The ID of the instance that was bundled. Type: String
+* progress: The level of task completion, as a percentage (for example, 20%). Type: String
+* s3-bucket: The Amazon S3 bucket to store the AMI. Type: String
+* s3-prefix: The beginning of the AMI name. Type: String
+* start-time: The time the task started (for example, 2008-09-15T17:15:20.000Z). Type: DateTime
+* state: The state of the task. Type: String; Valid values: pending | waiting-for-shutdown | bundling | storing | cancelling | complete | failed
+* update-time: The time of the most recent update for the task (for example, 2008-09-15T17:15:20.000Z). Type: DateTime
 
 === DescribeImages ===
-- architecture: The image architecture. Type: String; Valid values: i386 | x86_64
-- block-device-mapping.delete-on-termination: Whether the Amazon EBS volume is deleted on instance termination. Type: Boolean
-- block-device-mapping.device-name: The device name (for example, /dev/sdh) for the Amazon EBS volume. Type: String
-- block-device-mapping.snapshot-id: The ID of the snapshot used for the Amazon EBS volume. Type: String
-- block-device-mapping.volume-size: The volume size of the Amazon EBS volume, in GiB. Type: Integer
-- block-device-mapping.volume-type: The volume type of the Amazon EBS volume. Type: String; Valid values: standard | io1
-- description: The description of the image (provided during image creation). Type: String
-- image-id: The ID of the image. Type: String
-- image-type: The image type. Type: String; Valid values: machine | kernel | ramdisk
-- is-public: Whether the image is public. Type: Boolean
-- kernel-id: The kernel ID. Type: String
-- manifest-location: The location of the image manifest. Type: String
-- name: The name of the AMI (provided during image creation). Type: String
-- owner-alias: The AWS account alias (for example, amazon). Type: String
-- owner-id: The AWS account ID of the image owner. Type: String
-- platform: The platform. To only list Windows-based AMIs, use windows. Otherwise, leave blank. Type: String; Valid value: windows
-- product-code: The product code. Type: String
-- product-code.type: The type of the product code. Type: String; Valid values: devpay | marketplace
-- ramdisk-id: The RAM disk ID. Type: String
-- root-device-name: The name of the root device volume (for example, /dev/sda1). Type: String
-- root-device-type: The type of the root device volume. Type: String; Valid values: ebs | instance-store
-- state: The state of the image. Type: String; Valid values: available | pending | failed
-- state-reason-code: The reason code for the state change. Type: String; 
-- state-reason-message: The message for the state change. Type: String
-- virtualization-type: The virtualization type. Type: String; Valid values: paravirtual | hvm
-- hypervisor: The hypervisor type. Type: String; Valid values: ovm | xen
+* architecture: The image architecture. Type: String; Valid values: i386 | x86_64
+* block-device-mapping.delete-on-termination: Whether the Amazon EBS volume is deleted on instance termination. Type: Boolean
+* block-device-mapping.device-name: The device name (for example, /dev/sdh) for the Amazon EBS volume. Type: String
+* block-device-mapping.snapshot-id: The ID of the snapshot used for the Amazon EBS volume. Type: String
+* block-device-mapping.volume-size: The volume size of the Amazon EBS volume, in GiB. Type: Integer
+* block-device-mapping.volume-type: The volume type of the Amazon EBS volume. Type: String; Valid values: standard | io1
+* description: The description of the image (provided during image creation). Type: String
+* image-id: The ID of the image. Type: String
+* image-type: The image type. Type: String; Valid values: machine | kernel | ramdisk
+* is-public: Whether the image is public. Type: Boolean
+* kernel-id: The kernel ID. Type: String
+* manifest-location: The location of the image manifest. Type: String
+* name: The name of the AMI (provided during image creation). Type: String
+* owner-alias: The AWS account alias (for example, amazon). Type: String
+* owner-id: The AWS account ID of the image owner. Type: String
+* platform: The platform. To only list Windows-based AMIs, use windows. Otherwise, leave blank. Type: String; Valid value: windows
+* product-code: The product code. Type: String
+* product-code.type: The type of the product code. Type: String; Valid values: devpay | marketplace
+* ramdisk-id: The RAM disk ID. Type: String
+* root-device-name: The name of the root device volume (for example, /dev/sda1). Type: String
+* root-device-type: The type of the root device volume. Type: String; Valid values: ebs | instance-store
+* state: The state of the image. Type: String; Valid values: available | pending | failed
+* state-reason-code: The reason code for the state change. Type: String; 
+* state-reason-message: The message for the state change. Type: String
+* virtualization-type: The virtualization type. Type: String; Valid values: paravirtual | hvm
+* hypervisor: The hypervisor type. Type: String; Valid values: ovm | xen
 
 === DescribeInstances ===
-- architecture: The instance architecture. Type: String; Valid values: i386 | x86_64: 
-- availability-zone: The Availability Zone of the instance. Type: String: 
-- block-device-mapping.attach-time: The attach time for an Amazon EBS volume mapped to the instance (for example, 2010-09-15T17:15:20.000Z). Type: DateTime: 
-- block-device-mapping.delete-on-termination: Whether the Amazon EBS volume is deleted on instance termination. Type: Boolean: 
-- block-device-mapping.device-name: The device name (for example, /dev/sdh) for the Amazon EBS volume. Type: String: 
-- block-device-mapping.status: The status for the Amazon EBS volume. Type: String; Valid values: attaching | attached | detaching | detached
-- block-device-mapping.volume-id: The volume ID of the Amazon EBS volume. Type: String
-- dns-name: The public DNS name of the instance. Type: String
-- group-id: The ID of a EC2 security group the instance is in. This filter does not work for VPC security groups (instead, use instance.group-id). Type: String
-- group-name: The name of a EC2 security group the instance is in. This filter does not work for VPC security groups (instead, use instance.group-name). Type: String
-- image-id: The ID of the image used to launch the instance. Type: String
-- instance-id: The ID of the instance. Type: String
-- instance-lifecycle: Indicates whether this is a Spot Instance. Type: String; Valid values: spot
-- instance-state-code: A code representing the state of the instance. The high byte is an opaque internal value and should be ignored. The low byte is set based on the state represented Type: Integer (16-bit unsigned integer)
+* architecture: The instance architecture. Type: String; Valid values: i386 | x86_64: 
+* availability-zone: The Availability Zone of the instance. Type: String: 
+* block-device-mapping.attach-time: The attach time for an Amazon EBS volume mapped to the instance (for example, 2010-09-15T17:15:20.000Z). Type: DateTime: 
+* block-device-mapping.delete-on-termination: Whether the Amazon EBS volume is deleted on instance termination. Type: Boolean: 
+* block-device-mapping.device-name: The device name (for example, /dev/sdh) for the Amazon EBS volume. Type: String: 
+* block-device-mapping.status: The status for the Amazon EBS volume. Type: String; Valid values: attaching | attached | detaching | detached
+* block-device-mapping.volume-id: The volume ID of the Amazon EBS volume. Type: String
+* dns-name: The public DNS name of the instance. Type: String
+* group-id: The ID of a EC2 security group the instance is in. This filter does not work for VPC security groups (instead, use instance.group-id). Type: String
+* group-name: The name of a EC2 security group the instance is in. This filter does not work for VPC security groups (instead, use instance.group-name). Type: String
+* image-id: The ID of the image used to launch the instance. Type: String
+* instance-id: The ID of the instance. Type: String
+* instance-lifecycle: Indicates whether this is a Spot Instance. Type: String; Valid values: spot
+* instance-state-code: A code representing the state of the instance. The high byte is an opaque internal value and should be ignored. The low byte is set based on the state represented Type: Integer (16-bit unsigned integer)
 ; Valid values: 0 (pending) | 16 (running) | 32 (shutting-down) | 48 (terminated) | 64 (stopping) | 80 (stopped)
-- instance-state-name: The state of the instance. Type: String; Valid values: pending | running | shutting-down | terminated | stopping | stopped
-- instance-type: The type of instance (for example, m1.small). Type: String
-- instance.group-id: The ID of a VPC security group the instance is in. This filter does not work for EC2 security groups (instead, use group-id). Type: String
-- instance.group-name: The name of a VPC security group the instance is in. This filter does not work for EC2 security groups (instead, use group-name). Type: String
-- ip-address: The public IP address of the instance. Type: String
-- kernel-id: The kernel ID. Type: String
-- key-name: The name of the key pair used when the instance was launched. Type: String
-- launch-index: When launching multiple instances, this is the index for the instance in the launch group (for example, 0, 1, 2, and so on). Type: String
-- launch-time: The time the instance was launched (for example, 2010-08-07T11:54:42.000Z). Type: DateTime
-- monitoring-state: Indicates whether monitoring is enabled for the instance. Type: String
+* instance-state-name: The state of the instance. Type: String; Valid values: pending | running | shutting-down | terminated | stopping | stopped
+* instance-type: The type of instance (for example, m1.small). Type: String
+* instance.group-id: The ID of a VPC security group the instance is in. This filter does not work for EC2 security groups (instead, use group-id). Type: String
+* instance.group-name: The name of a VPC security group the instance is in. This filter does not work for EC2 security groups (instead, use group-name). Type: String
+* ip-address: The public IP address of the instance. Type: String
+* kernel-id: The kernel ID. Type: String
+* key-name: The name of the key pair used when the instance was launched. Type: String
+* launch-index: When launching multiple instances, this is the index for the instance in the launch group (for example, 0, 1, 2, and so on). Type: String
+* launch-time: The time the instance was launched (for example, 2010-08-07T11:54:42.000Z). Type: DateTime
+* monitoring-state: Indicates whether monitoring is enabled for the instance. Type: String
 ; Valid values: disabled | enabled
-- owner-id: The AWS account ID of the instance owner. Type: String
-- platform: The platform. Use windows if you have Windows based instances; otherwise, leave blank. Type: String
+* owner-id: The AWS account ID of the instance owner. Type: String
+* platform: The platform. Use windows if you have Windows based instances; otherwise, leave blank. Type: String
 ; Valid value: windows
-- private-dns-name: The private DNS name of the instance. Type: String
-- private-ip-address: The private IP address of the instance. Type: String
-- product-code: The product code associated with the AMI used to launch the instance. Type: String
-- product-code.type: The type of product code. Type: String
+* private-dns-name: The private DNS name of the instance. Type: String
+* private-ip-address: The private IP address of the instance. Type: String
+* product-code: The product code associated with the AMI used to launch the instance. Type: String
+* product-code.type: The type of product code. Type: String
 ; Valid values: devpay | marketplace
-- ramdisk-id: The RAM disk ID. Type: String
-- reason: The reason for the current state of the instance (for example, shows "User Initiated [date]" when you stop or terminate the instance). Similar to the state-reason-code filter. Type: String
-- requester-id: The ID of the entity that launched the instance on your behalf (for example, AWS Management Console, Auto Scaling, and so on) Type: String
-- reservation-id: The ID of the instance's reservation. A reservation ID is created any time you launch an instance. A reservation ID has a one-to-one relationship with an instance launch request, but can be associated with more than one instance if you launch multiple instances using the same launch request. For example, if you launch one instance, you’ll get one reservation ID. If you launch ten instances using the same launch request, you’ll also get one reservation ID. Type: String
-- root-device-name: The name of the root device for the instance (for example, /dev/sda1). Type: String
-- root-device-type: The type of root device the instance uses. Type: String; Valid values: ebs | instance-store
-- state-reason-code: The reason code for the state change. Type: String
-- state-reason-message: A message that describes the state change. Type: String
-- virtualization-type: The virtualization type of the instance. Type: String; Valid values: paravirtual | hvm
-- association.public-ip: The address of the Elastic IP address bound to the network interface (available only in Amazon Virtual Private Cloud). Type: String
-- association.ip-owner-id: The owner of the Elastic IP address associated with the network interface (available only in Amazon Virtual Private Cloud). Type: String
-- association.allocation-id: The allocation ID that AWS returned when you allocated the Elastic IP address for your network interface (available only in Amazon Virtual Private Cloud). Type: String
-- association.association-id: The association ID returned when the network interface was associated with an IP address (available only in Amazon Virtual Private Cloud). Type: String
+* ramdisk-id: The RAM disk ID. Type: String
+* reason: The reason for the current state of the instance (for example, shows "User Initiated [date]" when you stop or terminate the instance). Similar to the state-reason-code filter. Type: String
+* requester-id: The ID of the entity that launched the instance on your behalf (for example, AWS Management Console, Auto Scaling, and so on) Type: String
+* reservation-id: The ID of the instance's reservation. A reservation ID is created any time you launch an instance. A reservation ID has a one-to-one relationship with an instance launch request, but can be associated with more than one instance if you launch multiple instances using the same launch request. For example, if you launch one instance, you’ll get one reservation ID. If you launch ten instances using the same launch request, you’ll also get one reservation ID. Type: String
+* root-device-name: The name of the root device for the instance (for example, /dev/sda1). Type: String
+* root-device-type: The type of root device the instance uses. Type: String; Valid values: ebs | instance-store
+* state-reason-code: The reason code for the state change. Type: String
+* state-reason-message: A message that describes the state change. Type: String
+* virtualization-type: The virtualization type of the instance. Type: String; Valid values: paravirtual | hvm
+* association.public-ip: The address of the Elastic IP address bound to the network interface (available only in Amazon Virtual Private Cloud). Type: String
+* association.ip-owner-id: The owner of the Elastic IP address associated with the network interface (available only in Amazon Virtual Private Cloud). Type: String
+* association.allocation-id: The allocation ID that AWS returned when you allocated the Elastic IP address for your network interface (available only in Amazon Virtual Private Cloud). Type: String
+* association.association-id: The association ID returned when the network interface was associated with an IP address (available only in Amazon Virtual Private Cloud). Type: String
 == unsupported filters ==
-- vpc-id: The ID of the VPC the instance is in (if using Amazon Virtual Private Cloud). Type: String
-- subnet-id: The ID of the subnet the instance is in (if using Amazon Virtual Private Cloud). Type: String
-- spot-instance-request-id: The ID of the Spot Instance request. Type: String
-- source-dest-check: Indicates whether the instance performs source/destination checking. A value of true means checking is enabled, and false means checking is disabled. The value must be false for the instance to perform Network Address Translation (NAT) in your VPC. Type: Boolean
-- placement-group-name: The name of the placement group the instance is in. Type: String
-- client-token: The idempotency token you provided when you launched the instance. Type: String
-- hypervisor: The hypervisor type of the instance. Type: String; Valid values: ovm | xen
+* vpc-id: The ID of the VPC the instance is in (if using Amazon Virtual Private Cloud). Type: String
+* subnet-id: The ID of the subnet the instance is in (if using Amazon Virtual Private Cloud). Type: String
+* spot-instance-request-id: The ID of the Spot Instance request. Type: String
+* source-dest-check: Indicates whether the instance performs source/destination checking. A value of true means checking is enabled, and false means checking is disabled. The value must be false for the instance to perform Network Address Translation (NAT) in your VPC. Type: Boolean
+* placement-group-name: The name of the placement group the instance is in. Type: String
+* client-token: The idempotency token you provided when you launched the instance. Type: String
+* hypervisor: The hypervisor type of the instance. Type: String; Valid values: ovm | xen
 
 === DescribeKeyPairs ===
-- fingerprint: The fingerprint of the key pair. Type: String; 
-- key-name: The name of the key pair. Type: String
+* fingerprint: The fingerprint of the key pair. Type: String; 
+* key-name: The name of the key pair. Type: String
 
 === DescribeRegions ===
-- endpoint: The endpoint of the Region (for example, ec2.us-east-1.amazonaws.com). Type: String
-- region-name: The name of the Region. Type: String
+* endpoint: The endpoint of the Region (for example, ec2.us-east-1.amazonaws.com). Type: String
+* region-name: The name of the Region. Type: String
   
 === DescribeSecurityGroups ===
-- description: The description of the security group. Type: String
-- group-id: The ID of the security group. Type: String
-- group-name: The name of the security group. Type: String
-- ip-permission.cidr: The CIDR range that has been granted the permission. Type: String
-- ip-permission.from-port: The start of port range for the TCP and UDP protocols, or an ICMP type number. Type: String
-- ip-permission.group-name: The name of security group that has been granted the permission. Type: String
-- ip-permission.protocol: The IP protocol for the permission. Type: String; Valid values: tcp | udp | icmp or a protocol number
-- ip-permission.to-port: The end of port range for the TCP and UDP protocols, or an ICMP code. Type: String
-- ip-permission.user-id: The ID of an AWS account that has been granted the permission. Type: String
-- owner-id: The AWS account ID of the owner of the security group. Type: String
+* description: The description of the security group. Type: String
+* group-id: The ID of the security group. Type: String
+* group-name: The name of the security group. Type: String
+* ip-permission.cidr: The CIDR range that has been granted the permission. Type: String
+* ip-permission.from-port: The start of port range for the TCP and UDP protocols, or an ICMP type number. Type: String
+* ip-permission.group-name: The name of security group that has been granted the permission. Type: String
+* ip-permission.protocol: The IP protocol for the permission. Type: String; Valid values: tcp | udp | icmp or a protocol number
+* ip-permission.to-port: The end of port range for the TCP and UDP protocols, or an ICMP code. Type: String
+* ip-permission.user-id: The ID of an AWS account that has been granted the permission. Type: String
+* owner-id: The AWS account ID of the owner of the security group. Type: String
 
 === DescribeSnapshots ===
-- description: A description of the snapshot. Type: String
-- owner-alias: The AWS account alias (for example, amazon) that owns the snapshot. Type: String
-- owner-id: The ID of the AWS account that owns the snapshot. Type: String
-- progress: The progress of the snapshot, as a percentage (for example, 80%). Type: String
-- snapshot-id: The snapshot ID. Type: String
-- start-time: The time stamp when the snapshot was initiated. Type: DateTime
-- status: The status of the snapshot. Type: String; Valid values: pending | completed | error
-- volume-id: The ID of the volume the snapshot is for. Type: String
-- volume-size: The size of the volume, in GiB (for example, 20). Type: String
+* description: A description of the snapshot. Type: String
+* owner-alias: The AWS account alias (for example, amazon) that owns the snapshot. Type: String
+* owner-id: The ID of the AWS account that owns the snapshot. Type: String
+* progress: The progress of the snapshot, as a percentage (for example, 80%). Type: String
+* snapshot-id: The snapshot ID. Type: String
+* start-time: The time stamp when the snapshot was initiated. Type: DateTime
+* status: The status of the snapshot. Type: String; Valid values: pending | completed | error
+* volume-id: The ID of the volume the snapshot is for. Type: String
+* volume-size: The size of the volume, in GiB (for example, 20). Type: String
 
 === DescribeTags ===
-- key: The tag key. Type: String
-- resource-id: The resource ID. Type: String
-- resource-type: The resource type. Type: String; Valid values: customer-gateway | dhcp-options | image | instance | internet-gateway | network-acl | reserved-instances | route-table | security-group | snapshot | spot-instances-request | subnet | volume | vpc | vpn-connection | vpn-gateway
-- value: The tag value. Type: String
+* key: The tag key. Type: String
+* resource-id: The resource ID. Type: String
+* resource-type: The resource type. Type: String; Valid values: customer-gateway | dhcp-options | image | instance | internet-gateway | network-acl | reserved-instances | route-table | security-group | snapshot | spot-instances-request | subnet | volume | vpc | vpn-connection | vpn-gateway
+* value: The tag value. Type: String
 
 === DescribeVolumes === 
-- attachment.attach-time: The time stamp when the attachment initiated. Type: DateTime
-- attachment.delete-on-termination: Whether the volume is deleted on instance termination. Type: Boolean
-- attachment.device: The device name that is exposed to the instance (for example, /dev/sda1). Type: String
-- attachment.instance-id: The ID of the instance the volume is attached to. Type: String
-- attachment.status: The attachment state. Type: String; Valid values: attaching | attached | detaching | detached
-- availability-zone: The Availability Zone in which the volume was created. Type: String
-- create-time: The time stamp when the volume was created. Type: DateTime
-- size: The size of the volume, in GiB (for example, 20). Type: String
-- snapshot-id: The snapshot from which the volume was created. Type: String
-- status: The status of the volume. Type: String; Valid values: creating | available | in-use | deleting | deleted | error
-- volume-id: The volume ID. Type: String
-- volume-type: The Amazon EBS volume type. If the volume is an io1 volume, the response includes the IOPS as well. Type: String; Valid values: standard | io1
+* attachment.attach-time: The time stamp when the attachment initiated. Type: DateTime
+* attachment.delete-on-termination: Whether the volume is deleted on instance termination. Type: Boolean
+* attachment.device: The device name that is exposed to the instance (for example, /dev/sda1). Type: String
+* attachment.instance-id: The ID of the instance the volume is attached to. Type: String
+* attachment.status: The attachment state. Type: String; Valid values: attaching | attached | detaching | detached
+* availability-zone: The Availability Zone in which the volume was created. Type: String
+* create-time: The time stamp when the volume was created. Type: DateTime
+* size: The size of the volume, in GiB (for example, 20). Type: String
+* snapshot-id: The snapshot from which the volume was created. Type: String
+* status: The status of the volume. Type: String; Valid values: creating | available | in-use | deleting | deleted | error
+* volume-id: The volume ID. Type: String
+* volume-type: The Amazon EBS volume type. If the volume is an io1 volume, the response includes the IOPS as well. Type: String; Valid values: standard | io1
 
 == Unsupported Filterable Operations ==
-- DescribeCustomerGateways 
-- DescribeDhcpOptions 
-- DescribeVolumeStatus 
-- DescribeNetworkInterfaces 
-- DescribeInstanceStatus 
-- DescribeInternetGateways 
-- DescribeNetworkAcls 
-- DescribePlacementGroups 
-- DescribeReservedInstancesOfferings
-- DescribeRouteTables 
-- DescribeSpotDatafeedSubscription
-- DescribeSpotInstanceRequests
-- DescribeSubnets
-- DescribeConversionTasks
-- DescribeExportTasks
-- DescribeVpcs
-- DescribeVpnConnections
-- DescribeVpnGateways
+* DescribeCustomerGateways 
+* DescribeDhcpOptions 
+* DescribeVolumeStatus 
+* DescribeNetworkInterfaces 
+* DescribeInstanceStatus 
+* DescribeInternetGateways 
+* DescribeNetworkAcls 
+* DescribePlacementGroups 
+* DescribeReservedInstancesOfferings
+* DescribeRouteTables 
+* DescribeSpotDatafeedSubscription
+* DescribeSpotInstanceRequests
+* DescribeSubnets
+* DescribeConversionTasks
+* DescribeExportTasks
+* DescribeVpcs
+* DescribeVpnConnections
+* DescribeVpnGateways
