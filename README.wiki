@@ -83,14 +83,14 @@ The following table describes the organization of the top-level of the repositor
 
 {| style="width=90%"
 |+ '''Top-level Directory Structure'''
-| <code>bin/</code>, <code>lib/</code>
-| Ignore these. Contain helpers and their libraries
-|-
 | <code>features/</code>
 | this is where '''all''' content goes
 |-
+| <code>bin/</code>, <code>lib/</code>
+| ''Ignore these. '' Contain helpers and their libraries
+|-
 | <code>releases/</code>
-| auto-generated xref of features to releases
+| ''Ignore these. '' Contain auto-generated xref of features to releases
 |}
 
 == Feature Directory ==
