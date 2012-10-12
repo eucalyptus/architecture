@@ -91,7 +91,7 @@ Two approaches to configuring the sensors have been identified:
 * New logic for polling lower-level components and merging their sensor data on CC and CLC
 * New logic for marshalling sensor data into Reporting events on CLC
 
-{{:backend:3.2:reporting-metrics-hld.png|}}
+[[reporting-metrics-hld.png]]
 
 ==== Information ====
 # Describes the way that the system stores, manipulates, manages, and distributes information

@@ -5,9 +5,6 @@
 ==Design Docs==
 
 
-* [Troubleshooting Feedback |https://wiki.eucalyptus-systems.com/doku.php?id=arch:3.2:troubleshooting:feedback]
-
-
 ==Feature Overview==
 
 Troubleshootiness for 3.2is about enabling cloud administrators to independently troubleshoot and resolve problems w/in the system that would otherwise result in a call/email/ticket to either support or sales engineering.As a complement to this, the feature speaks to the troubleshootiness of the system while "in-production" where constraints restricts the kinds of actions a support or sales engineer can take in the course of troubleshooting system problems.

@@ -61,7 +61,7 @@ The primary development efforts and impacts will be:
 == Detailed Feature Design ==
 Overall view of the multipathing datapath between a SAN and the instance:
 
-[[nc_san_data_path.png]]
+[[:multipathing:3.2:nc_san_data_path.png]]
 
 The overall design is to add support to pass the necessary endpoint information from the SAN->SC->NC to allow the NC to construct the proper multipath device and expose it to the instance VM.
 
@@ -70,10 +70,10 @@ Specifically, we will support ALUA mode for volumes/luns exposed to instances.
 === ALUA ===
 At a high-level, ALUA (Asymmetric Logical Unit Access) is an active/active setup where one path is 'optimized' and the other is not. A LUN is typically "owned" by a single storage processor but is accessible from multiple simultaneously but non-owning paths incur a performance penalty.
 
-[[alua-diagram.png]]
+[[:multipathing:3.2:alua-diagram.png]]
 
 === Logical Design ===
-[[nc_iscsi_configuration_sequence.png]]
+[[:multipathing:3.2:nc_iscsi_configuration_sequence.png]]
 
 ==== Functional ====
 # Storage Controller
