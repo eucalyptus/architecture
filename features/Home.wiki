@@ -121,10 +121,7 @@ Each feature is contained in its own directory.  The organization of the <code>f
 | colspan="2" | High level architecture document
 |-
 | <code>/diagrams</code>
-| colspan="2" | Source materials for generated documents (images)
-|-
-| <code>/img</code>
-| colspan="2" | Generated images
+| colspan="2" | Source materials for diagrams and their generated documents (images)
 |- 
 | <code>/X.Y</code> 
 | Documents specific to the work done (or going on during) the X.Y release. 
@@ -145,14 +142,6 @@ Each feature is contained in its own directory.  The organization of the <code>f
 |
 | <code>/xref</code> 
 | xref's to the JIRA epic for the current release
-|-
-|
-| <code>/diagrams</code> 
-| Source materials for generated documents (images)
-|-
-|
-| <code>/img</code> 
-| Source materials for generated documents (images)
 |}
 
 = See Also =
