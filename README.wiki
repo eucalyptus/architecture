@@ -118,23 +118,27 @@ Each feature is contained in its own directory.  The organization of the <code>f
 | For example <code>features/${feature}/3.3/</code> contains documents for the 3.3 release.
 |-
 |
-| <code>/X.Y/spec.wiki</code>
+| <code>/overview.wiki</code>
+| Overview document aggregating all the release specific feature information
+|-
+|
+| <code>/spec.wiki</code>
 | Release specific feature specification
 |-
 |
-| <code>/X.Y/design</code>
+| <code>/design</code>
 | Release specific design documents
 |-
 |
-| <code>/X.Y/xref</code> 
+| <code>/xref</code> 
 | xref's to the JIRA epic for the current release
 |-
 |
-| <code>/X.Y/diagrams</code> 
+| <code>/diagrams</code> 
 | Source materials for generated documents (images)
 |-
 |
-| <code>/X.Y/img</code> 
+| <code>/img</code> 
 | Source materials for generated documents (images)
 |}
 
