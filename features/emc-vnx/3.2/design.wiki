@@ -76,7 +76,7 @@ The essential goal of this feature is to implement the common SANProvider interf
   ### Good: cloned LUN is a normal LUN; no performance cost after cloning
   ### Bad: slow; space cost; performance hit during cloning
   ### State Diagram:
-[[:emc-vnx:3.2:design:vnx_clone_state_diagram.png]]
+[[emc-vnx-3.2-vnx_clone_state_diagram.png]]
 ### VNX snapshot (another option is clone does not work as we expect):
   ### Good: fast; minimal space cost
   ### Bad: snapshot is not a normal LUN, can not be used directly (must attached to SC to create volume from); performance hit as long as the snapshot is live

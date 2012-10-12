@@ -88,7 +88,7 @@
 
 '''File format'''
 
-Various [[:arch:3.2:troubleshooting:files|options]] for formatting the fault registry file were considered. At the end, XML format was selected (with JSON a close second) due to libraries for parsing already being dependencies for Java and C components. Properties file was considered limiting given translation considerations and the need for at least one multi-line entry (Resolution).
+Various [[arch-3.2-troubleshooting-files|options]] for formatting the fault registry file were considered. At the end, XML format was selected (with JSON a close second) due to libraries for parsing already being dependencies for Java and C components. Properties file was considered limiting given translation considerations and the need for at least one multi-line entry (Resolution).
 
 Strings common to all faults, such as prefix names, are to be formatted as follows:
 
