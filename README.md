@@ -1,1 +1,1 @@
-Go to the [wiki](architecture/wiki).
+Go to the [wiki](/eucalyptus/architecture/wiki).
