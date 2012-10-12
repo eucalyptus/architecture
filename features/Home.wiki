@@ -3,11 +3,14 @@ This repository is for handling the architectural documents related to specifica
 
 The organization of the repository reflects the long-lived nature of a features true specification.  That is, the specification and design work related to a feature's implementation for a particular release often corresponds with only a portion of the entire feature's implementation.  Moreover, feature's specification evolves over time as the requirements, architecture, and upstream specifications evolve.
 
-We have three classes of documents which contribute to the definition of the system:
-# '''Specification Documents''' are overarching definitions of a feature.
+We have four classes of documents which contribute to the definition of the system:
+# '''Requirements Documents''' <ref name="Eucalyptus JIRA">https://eucalyptus.atlassian.net/secure/Dashboard.jspa</ref>detail the functionality as drawn from various stakeholders.
+# '''Specification Documents''' are overarching definitions of a feature's architecture and functionality.
 # '''Generational Documents''' specific to the context and determined by the constraints of a particular release.
-# '''Architectural documents'''<ref>https://github.com/eucalyptus/architecture-docs</ref> are the final documents describing the architecture of the system combining the intensional and emergent characteristics.
-#: For more documents see the '[[/eucalyptus/architecture-docs|separate architecture docs repository]].
+# '''Architectural documents'''<ref name="Eucalyptus Architecture Docs Repository">https://github.com/eucalyptus/architecture-docs</ref> describe the overall realized design and architecture of the system as released.
+#: For more documents see the:
+#:: '[[/eucalyptus/architecture-docs|Architecture Docs repository]].
+#:: '[[https://eucalyptus.atlassian.net/secure/Dashboard.jspa|JIRA bug tracker]].
 
 
 
