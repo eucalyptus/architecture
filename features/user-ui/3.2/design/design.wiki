@@ -2,7 +2,7 @@
 The Eucalyptus UI (EUI) is a new component that offers an extensible user console for Eucalyptus.
 
 = Design Overview =
-[[hld.png]]
+[[:user-ui:3.2:design:hld.png]]
 The design can be broken down into two main components, the client user interface (in the browser) and a UI Proxy that will be installed on 1 or more servers (and could be co-located with the CLC for POC). The UI toolkit will be jQuery (http://jqueryui.com/) which provides a rich set of user interface components and supporting code for AJAX calls. The user will authenticate in the browser with the same username and password as they use for the Eucalyptus admin interface (on the CLC). The UI Proxy will be a separate component that is a light-weight proxy between the user interface and the CLC. The proxy will handle session management and provide a set of rest interfaces that the UI will use to get information from the CLC via API calls (EC2, S3, etc). The only state held in the proxy will be some access credentials for the API calls stored in the session. Those will be discarded when the session expires. Specific details of the design will be addressed in the sections below.
 
 = Scalability, Availability & Statelessness =

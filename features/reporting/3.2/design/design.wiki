@@ -41,9 +41,9 @@ The CLI tool for data export/import takes an xml document from the web service f
 In all cases, reporting data flows in one direction throughout the system, starting from events fired by eucalyptus components and ending in a visual report displayed to the user. The data flow is as follows:
 
 == Interfaces between components == 
-[[features:reporting:3.2:design:img:hld.png]]
+[[:reporting:3.2:design:hld.png]]
 
-[[features:reporting:3.2:design:img:hld-2.png]]
+[[:reporting:3.2:design:hld-2.png]]
 
 
 Each of the above numbered arrows represents an interface between components. Each of those interfaces will be specified in this design document, whereas the internal design of those components will be deferred until some later time.
@@ -51,14 +51,14 @@ Each of the above numbered arrows represents an interface between components. Ea
 === Interface #1: between event senders/receivers and the Report Generation component ===
 The "interface" for interaction between event receivers and report generation will be a database schema/entity model. Eucalyptus components will send events based upon usage, and event receivers will populate the database based upon those events as they arrive. Then, the report generation will read that data from the database to generate a report.
 Here is the ERD for the database schema:
-[[features:reporting:3.2:design:img:erd.png]]
+[[:reporting:3.2:design:erd.png]]
 
 === Interface #2: between the report generator and the renderers ===
 The report generator reads data from the reporting database. Then it performs a series of calculations upon that data, like summations, averages, interpolations, and so on. Then it outputs a tree structure which is an abstract representation of a report. The tree consists of nodes, each of which has a type (a String, not a Java type), a name, a collection of attributes as name-value pairs, and a set of children nodes. For example:
 Each node for every user, account, group, availability zone, and report, will contain "usage total" nodes as children. Those "usage total" nodes will contain the aggregate statistics for all instances, volumes, snapshots, etc, for that entity. For example, an account node in a report of instances and volumes would contain an "instances total" child and a "volumes total" child, which contain the aggregate instance and volume usage information for all users of that account.
 
 The renderers will take such a tree and will transform it into either an HTML document or a CSV document. An HTML document would contain a table which might look something like the following:
-[[features:reporting:3.2:design:img:art.png]]
+[[:reporting:3.2:design:art.png]]
 
 
 

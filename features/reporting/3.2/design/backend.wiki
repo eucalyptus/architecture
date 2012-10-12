@@ -91,13 +91,13 @@ Two approaches to configuring the sensors have been identified:
 * New logic for polling lower-level components and merging their sensor data on CC and CLC
 * New logic for marshalling sensor data into Reporting events on CLC
 
-[[reporting-metrics-hld.png]]
+[[:reporting:3.2:design:reporting-metrics-hld.png]]
 
 ==== Information ====
 # Describes the way that the system stores, manipulates, manages, and distributes information
 # Concerns: Information structure and content; information flow; data ownership; timeliness, latency, and age; references and mappings; transaction management and recovery; data quality; data volumes.
 
-The metrics relevant to the back end are described by the following table, in which the first column refers to (R)required and (D)esired metrics by their number in the [[arch:3.2:reporting|requirements doc]].
+The metrics relevant to the back end are described by the following table, in which the first column refers to (R)required and (D)esired metrics by their number in the [[:reporting:3.2:spec|requirements doc]].
 
 ^ Req       ^ Metric Names       ^ type ^ dimensions ^ units ^ Xen ^ KVM ^ VMware ^
 | R9 & R10  | NetworkIn\\ NetworkOut  | summation | 'total' and 'internal' ((when possible, we will differentiate traffic to/from another Eucalyptus instance and report it as 'internal', while 'total' instance traffic will always be reported)) | bytes [long] | y | y | partial ((with VMware, only 'total' will be reported when in SYSTEM and STATIC network modes)) |
