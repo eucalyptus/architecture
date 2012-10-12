@@ -1,8 +1,4 @@
 =  3.2 Reporting Documents  =
-
-- [Reporting Design Doc |https://docs.google.com/a/eucalyptus.com/document/d/1fdTet46EIBAc8VEFnUOFTcrK4T79aK_tolzMVGbkKL8/edit]
-- [HLD Component Diagram |https://wiki.eucalyptus-systems.com/lib/exe/fetch.php?cache=&w=900&h=534&media=arch:3.2:reporting-hld.png]
-
   
 ==  Feature Overview  ==
 
