@@ -3,9 +3,6 @@
 - Confluence page rendering
 - Generated references
 - Spec document generation
-- Feature doc layout description
-- JIRA label tracking
-- Functional spec rendering
 - Figure out diagram + design handling details
 - Mark generated files as readonly
-- Figure out feature xrefs
+- Figure out feature xref

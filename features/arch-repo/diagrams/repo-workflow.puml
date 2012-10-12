@@ -1,4 +1,4 @@
-@startuml repo-workflow.png
+@startuml workflow.png
 skinparam monochrome true
 (*) -down-> "Fork Repository" as pullfork
 pullfork -down-> "Change Fork" as pullchanges
@@ -22,12 +22,12 @@ pubmerged -down-> ===UPDATE===
 ===UPDATE=== --> "Update Confluence" 
 --> ===ENDUPDATE===
 
-===ENDUPDATE=== -right-> "Updated Documents" as updated
+===ENDUPDATE=== -down-> "Updated Documents" as updated
 
-updated -left-> (*)
+updated -down-> (*)
 @enduml
 
-@startuml repo-components.png
+@startuml components.png
 skinparam monochrome true
 component "eucalyptus/architecture\n(github)" as archrepo
 component "eucalyptus/architecture.wiki\n(github)" as archwiki
