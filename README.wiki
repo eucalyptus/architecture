@@ -12,20 +12,18 @@ We have three classes of documents which contribute to the definition of the sys
 __TOC__
 = Documents =
 
-'''Specification Documents''' 
-----
+== Specification Documents ==
 These documents are intentional and intensional<ref name="Intensional Statement">http://en.wikipedia.org/wiki/Intensional_statement</ref>:
 * are "''timeless''" in that they are overarching and meant to be definitive of the feature overall.
 * evolve over time independent of the features current implementation status.
 * reflect our current understanding of the features definition in the broadest sense.
 
-; Specification documents consist of:
-;* Specification:  overall technical specification of the functional and architectural/quality characteristics.
-;* High level design/Architecture:  definition of fundamental components, interfaces, behaviours including information, control, and concurrency models.
-;* Supporting Documents: API/Service specifications, client tool chains, WSDLs, TCKs.
+Specification documents consist of:
+* Specification:  overall technical specification of the functional and architectural/quality characteristics.
+* High level design/Architecture:  definition of fundamental components, interfaces, behaviours including information, control, and concurrency models.
+* Supporting Documents: API/Service specifications, client tool chains, WSDLs, TCKs.
 
-'''Generational Documents'''
-----
+== Generational Documents ==
 These documents are specific to a release and meant to serve the tasks surrounding the planning, design, implementation, and delivery of a feature.
 * support the scoping, design, and implementation effort of the feature during that release.
 * defining the design and implementation objectives and details for a particular version of a feature.
@@ -37,8 +35,9 @@ Generational documents consist of:
 * Specification:  release-specific technical interpretation of functional requirements 
 
 = Links =
-* [[TODO]] items
-* [[features]] directory
+
+* [[TODO|TODO items]] 
+* [[features|Feature directory]]
 
 = Contributing =
 The contents of this repository are reviewed and, to that end, all changes should be submitted as a pull request: [https://help.github.com/articles/fork-a-repo Fork & Pull].
