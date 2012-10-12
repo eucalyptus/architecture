@@ -39,8 +39,8 @@ Generational documents consist of:
 '''Formats'''
 ----
 * '''Text''':  must be renderable through the github interface 
-** [[/github/gollum|gollum]]
-** [[/github/markup|github-markup]]
+** [[https://github.com/github/gollum|gollum]]
+** [[https://github.com/github/markup|github-markup]]
 * '''Graphics''':  must be text-based so a compile step is not only acceptable, but required.  
 ** [[PlantUML]]
 
