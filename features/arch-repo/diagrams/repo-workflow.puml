@@ -1,0 +1,41 @@
+@startuml repo-workflow.png
+skinparam monochrome true
+(*) -down-> "Fork Repository" as pullfork
+pullfork -down-> "Change Fork" as pullchanges
+pullchanges -down-> "Submit Pull Request" as pullsubmit
+pullsubmit -down-> "Pull Request Merged" as pullmerged
+pullmerged -down-> "Pull Received" as pubpull
+pubpull -right-> "Content Review" as pubreview
+pubreview -down-> "New Content Merged" as pubmerged
+pubreview -up-> pullchanges
+
+pubmerged -down-> ===UPDATE=== 
+===UPDATE=== --> "Update release xref" 
+--> ===ENDUPDATE===
+
+===UPDATE=== --> "Update wiki" 
+--> ===ENDUPDATE===
+
+===UPDATE=== --> "Update JIRA xref" 
+--> ===ENDUPDATE===
+
+===UPDATE=== --> "Update Confluence" 
+--> ===ENDUPDATE===
+
+===ENDUPDATE=== -right-> "Updated Documents" as updated
+
+updated -left-> (*)
+@enduml
+
+@startuml repo-components.png
+skinparam monochrome true
+component "eucalyptus/architecture\n(github)" as archrepo
+component "eucalyptus/architecture.wiki\n(github)" as archwiki
+component "Epics/Stories\n(JIRA)" as archjira
+component "Product Managmeent\n(Confluence)" as archconfluence
+
+archrepo -right-> archwiki : publishes documents
+archrepo -down-> archjira : references requirements
+archrepo --> archconfluence : pushes documents
+
+@enduml
