@@ -1,1 +1,1 @@
-Go to the [wiki](wiki).
+Go to the [wiki](architecture/wiki).
