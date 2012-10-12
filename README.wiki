@@ -114,7 +114,8 @@ Each feature is contained in its own directory.  The organization of the <code>f
 | colspan="2" | Generated images
 |- 
 | <code>/X.Y</code> 
-| colspan="2" | Documents specific to the work done (or going on during) the X.Y release. For example <code>features/${feature}/3.3/</code> contains documents for the 3.3 release.
+| Documents specific to the work done (or going on during) the X.Y release. 
+| For example <code>features/${feature}/3.3/</code> contains documents for the 3.3 release.
 |-
 | colspan="2" | <code>/X.Y/spec.wiki</code>
 | Release specific feature specification
