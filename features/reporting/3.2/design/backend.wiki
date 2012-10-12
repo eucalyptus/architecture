@@ -1,60 +1,61 @@
-===== 3.2 Back-end Reporting Feature Design =====
+= 3.2 Back-end Reporting Feature Design =
 
-The following design is supposed to satisfy the [[:arch:3.2:reporting|Reporting Feature specification]].
-==== Requirements & Constraints ====
+== Requirements & Constraints ==
 === Identifying Concerns ===
 
 The following concerns have been discussed:
 
-  * Whether data for the requested metrics can be collected by all hypervisors (see table below)
-  * How availability of components, especially HA components, and potential message loss affects the   reported numbers (cumulative stats are by nature resilient to message loss, periodic stats can be made more resilient with longer history)
-  * Upstream reporting data consumers (Reporting module, and eventually CloudWatch) must agree with back-end / storage developers on
-    * communication model (e.g., a new DescribeStats request/reply pair for CC, perhaps with ConfigStats to set parameters for sensors)
-    * syntax for request parameters, if any (e.g., instance(s), specific list of sensors, their parameters [sampling period, reporting period, sample history size])
-    * syntax for replies 
+* Whether data for the requested metrics can be collected by all hypervisors (see table below)
+* How availability of components, especially HA components, and potential message loss affects the   reported numbers (cumulative stats are by nature resilient to message loss, periodic stats can be made more resilient with longer history)
+* Upstream reporting data consumers (Reporting module, and eventually CloudWatch) must agree with back-end / storage developers on
+** communication model (e.g., a new DescribeStats request/reply pair for CC, perhaps with ConfigStats to set parameters for sensors)
+** syntax for request parameters, if any (e.g., instance(s), specific list of sensors, their parameters [sampling period, reporting period, sample history size])
+** syntax for replies 
 
 === Elaboration & Conflicts ===
 
 The following topics in the spec needed further elaboration from folks who defined the specification:
 
-  * **[[arch:3.2:reporting#required|Required 9 & 10]]:** net traffic
-    * what is the difference between inter- and intra-AZ and public are? what is the use case?
-  * **[[arch:3.2:reporting#desired|Desired 1]]:** ”% CPU per instance [per user]”
-    * needed clarification: allocation or % of physical core used? time series or sample? what interval? what is the use case?
-  * **[[arch:3.2:reporting#desired|Desired 6 & 7]]:** “Total amount of time spent in seconds reading/writing disks...”
-    * needed clarification: time at what level in the I/O stack? what is the use case?
+* '''[[#required|Required 9 & 10]]:''' net traffic
+** what is the difference between inter- and intra-AZ and public are? what is the use case?
+* '''[[#desired|Desired 1]]:''' ”% CPU per instance [per user]”
+** needed clarification: allocation or % of physical core used? time series or sample? what interval? what is the use case?
+* '''[[#desired|Desired 6 & 7]]:''' “Total amount of time spent in seconds reading/writing disks...”
+** needed clarification: time at what level in the I/O stack? what is the use case?
 
 === Assumptions & Interpretations ===
 
-  * We are assuming that all metrics except for the ones in the table below are provided by other subsystems (storage and CLC)
-  * **[[arch:3.2:reporting#required|Required 9 & 10]]:** net traffic
-    * **warning:** only will do inter- and intra-Eucalyptus
-    * **warning:** with VMware we can only do total in/out traffic and not inter/intra breakdown when in SYSTEM and STATIC modes since VMware counters are not IP-route-specific and stat collection will need to be performed on the CC host
-  * **[[arch:3.2:reporting#desired|Desired 4-7]]:** ”% CPU per instance [per user]”
-    * **warning:** our ability to accurate report disk bytes and latencies depends on how VMware computes the 'average' values that it makes available through performance counter API. (If their average is mathematically accurate, then our sensors will be, too. But if sampling is involved in calculating the averages, then our value can be either an over- or an underestimation of true values for bytes and latency.)
-  * We are assuming that Desired 2, 3, 4, 5, and 8 can be satisfied by the following data:<code>
+* We are assuming that all metrics except for the ones in the table below are provided by other subsystems (storage and CLC)
+* '''[[#required|Required 9 & 10]]:''' net traffic
+** '''warning:''' only will do inter- and intra-Eucalyptus
+** '''warning:''' with VMware we can only do total in/out traffic and not inter/intra breakdown when in SYSTEM and STATIC modes since VMware counters are not IP-route-specific and stat collection will need to be performed on the CC host
+* '''[[#desired|Desired 4-7]]:''' ”% CPU per instance [per user]”
+** '''warning:''' our ability to accurate report disk bytes and latencies depends on how VMware computes the 'average' values that it makes available through performance counter API. (If their average is mathematically accurate, then our sensors will be, too. But if sampling is involved in calculating the averages, then our value can be either an over- or an underestimation of true values for bytes and latency.)
+* We are assuming that Desired 2, 3, 4, 5, and 8 can be satisfied by the following data:<code>
 disk { ops | bytes } 
    x { read | written } 
   on { all local disks summed, each volume } per instance</code>
-  * We are assuming that it is worth spending the effort **now** to design a reporting subsystem that can be queried. This may not be a strict requirement for reporting (to which sensor data can be delivered via nightly log-file collection), but it will be for CloudWatch and other subsystems.
-  * We are assuming that using existing Web Services messaging mechanisms in Eucalyptus will result in a solution sooner and is sufficient
-==== High-Level Feature Design ====
+* We are assuming that it is worth spending the effort '''now''' to design a reporting subsystem that can be queried. This may not be a strict requirement for reporting (to which sensor data can be delivered via nightly log-file collection), but it will be for CloudWatch and other subsystems.
+* We are assuming that using existing Web Services messaging mechanisms in Eucalyptus will result in a solution sooner and is sufficient
+
+== High-Level Feature Design ==
 === External View ===
-  - the external facing elements of the feature
-    * new types of sensor data available from NC, CC, and VB, as described by the metrics
-      * not all sensors may be available on all hypervisors, so 
-    * potentially a way to configure some parameters of the sensors (e.g., interval length and history size, perhaps only for time-series data)
-  - their responsibilities, boundaries, interfaces, and interactions
-    * the reporting subsystem on the back-end is responsible for collecting disk, network, and CPU utilization stats for each instance
-    * the subsystem is accessible via one or more reporting-specific API calls (to be introduced in this version) accessible using the Web Services entry points used throughout the system
-      * call for retrieving statistics
-      * maybe a call for configuring/resetting the sensors
-    * the subsystem can be invoked by any higher-level component to retrieve instance stats
-==== Detailed Feature Design ====
+# the external facing elements of the feature
+** new types of sensor data available from NC, CC, and VB, as described by the metrics
+*** not all sensors may be available on all hypervisors, so 
+** potentially a way to configure some parameters of the sensors (e.g., interval length and history size, perhaps only for time-series data)
+# their responsibilities, boundaries, interfaces, and interactions
+** the reporting subsystem on the back-end is responsible for collecting disk, network, and CPU utilization stats for each instance
+** the subsystem is accessible via one or more reporting-specific API calls (to be introduced in this version) accessible using the Web Services entry points used throughout the system
+*** call for retrieving statistics
+*** maybe a call for configuring/resetting the sensors
+** the subsystem can be invoked by any higher-level component to retrieve instance stats
+
+== Detailed Feature Design ==
 === Logical Design ===
-== Functional ==
-  - Describes the system’s runtime functional elements and their responsibilities, interfaces, and primary interactions
-  - Concerns: Functional capabilities, external interfaces, internal structure, faults, and design implications
+==== Functional ====
+# Describes the system’s runtime functional elements and their responsibilities, interfaces, and primary interactions
+# Concerns: Functional capabilities, external interfaces, internal structure, faults, and design implications
 
 Reporting subsystem on the back-end exports an API for retrieving a set of CPU, disk, and network statistics for a set of instances. This API will be implemented by the CC, NC, and VB components. Each CC will serve as a proxy for the statistics from all NCs under its control.
 
@@ -62,39 +63,39 @@ Reporting subsystem on the back-end exports an API for retrieving a set of CPU, 
 DescribeSensors ([<instance IDs>, ...], [<sensor names>, ...])
 </code>
 
-  * if the set of instance IDs is empty, then all instances known by the component are reported on
-  * if the set of sensor names is empty, then all sensors implemented by the component are reported on
-  * in addition to ''<sensor names>'' we can pass configuration for a sensor (described next) in this request, too
+* if the set of instance IDs is empty, then all instances known by the component are reported on
+* if the set of sensor names is empty, then all sensors implemented by the component are reported on
+* in addition to ''<sensor names>'' we can pass configuration for a sensor (described next) in this request, too
 
-**Sensor Configuration**
+'''Sensor Configuration'''
 
 Two configuration parameters have been identified as useful for each sensor:
 
-  - **collection_interval** is the length of period, in milliseconds, for which measurements are aggregated. For 'average' measurements this is the period over which a quantity is averaged. For 'summation' measurements this is the frequency at which a new data point is generated. The minimum practicable value will be dictated by the capabilities of the sensor. If the requested interval is shorter than the sensor can accommodate, values at greater intervals will be returned (and the interval will be part of the response).
-  - **history_size** prescribes the largest size for the set of values returned in a query (and thus the maximum size of history that the sensor must maintain). 
+# '''collection_interval''' is the length of period, in milliseconds, for which measurements are aggregated. For 'average' measurements this is the period over which a quantity is averaged. For 'summation' measurements this is the frequency at which a new data point is generated. The minimum practicable value will be dictated by the capabilities of the sensor. If the requested interval is shorter than the sensor can accommodate, values at greater intervals will be returned (and the interval will be part of the response).
+# '''history_size''' prescribes the largest size for the set of values returned in a query (and thus the maximum size of history that the sensor must maintain). 
 
 Two approaches to configuring the sensors have been identified:
 
-  - Component-local configuration (e.g., via eucalyptus.conf for C and the component's properties for Java)
-    * will be difficult to configure, though if defaults are unlikely to change then that may be adequate
-    * no need to handle changes in configuration dynamically
-  - Cloud-level configuration that is communicated to back-end sensor subsystem in one of two ways:
-    - via a dedicated API call (e.g., ConfigSensor())
-      * the configuration will need to be persistent if a component restarts/fails over
-    - included with each query API call (DescribeSensors())
-      * consumer may have to deal with adjustments in sensor behavior (changing collection interval)
-      * bigger request size 
+# Component-local configuration (e.g., via eucalyptus.conf for C and the component's properties for Java)
+** will be difficult to configure, though if defaults are unlikely to change then that may be adequate
+** no need to handle changes in configuration dynamically
+# Cloud-level configuration that is communicated to back-end sensor subsystem in one of two ways:
+## via a dedicated API call (e.g., ConfigSensor())
+*** the configuration will need to be persistent if a component restarts/fails over
+## included with each query API call (DescribeSensors())
+*** consumer may have to deal with adjustments in sensor behavior (changing collection interval)
+*** bigger request size 
 
-**New components**
-  * New {sensors, history management, config, reporting} on NC, VB, CC
-  * New logic for polling lower-level components and merging their sensor data on CC and CLC
-  * New logic for marshalling sensor data into Reporting events on CLC
+'''New components'''
+* New {sensors, history management, config, reporting} on NC, VB, CC
+* New logic for polling lower-level components and merging their sensor data on CC and CLC
+* New logic for marshalling sensor data into Reporting events on CLC
 
 {{:backend:3.2:reporting-metrics-hld.png|}}
 
-== Information ==
-  - Describes the way that the system stores, manipulates, manages, and distributes information
-  - Concerns: Information structure and content; information flow; data ownership; timeliness, latency, and age; references and mappings; transaction management and recovery; data quality; data volumes.
+==== Information ====
+# Describes the way that the system stores, manipulates, manages, and distributes information
+# Concerns: Information structure and content; information flow; data ownership; timeliness, latency, and age; references and mappings; transaction management and recovery; data quality; data volumes.
 
 The metrics relevant to the back end are described by the following table, in which the first column refers to (R)required and (D)esired metrics by their number in the [[arch:3.2:reporting|requirements doc]].
 
@@ -105,9 +106,9 @@ The metrics relevant to the back end are described by the following table, in wh
 | D4 & D5   | DiskReadBytes\\ DiskWriteBytes | summation | root, [ephemeral0, ..., vol-XXX, ...] | bytes [long] | y | y | y ((disk read/write per second average X by interval)) |
 | D6 & D7   | VolumeTotalReadTime\\ VolumeTotalWriteTime | summation | root, [ephemeral0, ..., vol-XXX, ...] | seconds [float?] | y | y | y ((total[Read|Write]Latency X number of [Read|Write] operations)) |
 
-  * **type** - can be "summation" (since beginning of instance lifetime) or "average" over a sample period
-  * **dimensions** - if specified, refer to the different types of values to be reported with each sample
-  * **units** - duh
+* '''type''' - can be "summation" (since beginning of instance lifetime) or "average" over a sample period
+* '''dimensions''' - if specified, refer to the different types of values to be reported with each sample
+* '''units''' - duh
 
 The results will be available in a response formatted in XML, like all other Web-service responses in the system. Logically, that XML document will have the following structure:
 
@@ -136,90 +137,90 @@ sensor_resource_types:
 </code>
 
 
-== Concurrency == 
-  - Describes the concurrency structure of the system, mapping functional elements to concurrency units to clearly identify the parts of the system that can execute concurrently, and shows how this is coordinated and controlled
-  - Concerns: Task structure, mapping of functional elements to tasks, interprocess communication, state management, synchronization and integrity, startup and shutdown, task failure, and reentrancy
+==== Concurrency  ====
+# Describes the concurrency structure of the system, mapping functional elements to concurrency units to clearly identify the parts of the system that can execute concurrently, and shows how this is coordinated and controlled
+# Concerns: Task structure, mapping of functional elements to tasks, interprocess communication, state management, synchronization and integrity, startup and shutdown, task failure, and reentrancy
 
 Sensor data must be collected concurrently with other operations of a component (servicing incoming requests, preparing and launching VMs, setting up network state, etc.). Frequency of collections should be configurable and thus potentially different from other state polling performed by a component. Synchronization of sensor polling task(s) with other tasks on the component will be performed with locks over the instance object/struct (whole or partial).
 
 Two approaches are possible to the problem of maintaining sensor state across component restarts and failover:
 
-  - Sensors **do not** have persistent state and thus get 'reset' when a component is restarted or failed over. This means summation/cumulative counters are reset back to zeros and history of values is purged. The reset event will be apparent to the consumers of sensor data. It will be up to consumers to handle the resets so as to maintain continuity, e.g., of summation values. Besides added complexity in the consuming logic, this approach is also more prone to gaps in data (both summation and averages) due to message loss. Gaps for summation statistics imply underreporting resource use.
-  - Sensors **do** save state persistently thus maintaining summation/cumulative counters and a window into historical values across component restarts and failovers. The disadvantage is added complexity on the sensor side (with a component-specific approach to persistence) and potential performance implications (more disk operations for C components and database writes for Java components).
+# Sensors '''do not''' have persistent state and thus get 'reset' when a component is restarted or failed over. This means summation/cumulative counters are reset back to zeros and history of values is purged. The reset event will be apparent to the consumers of sensor data. It will be up to consumers to handle the resets so as to maintain continuity, e.g., of summation values. Besides added complexity in the consuming logic, this approach is also more prone to gaps in data (both summation and averages) due to message loss. Gaps for summation statistics imply underreporting resource use.
+# Sensors '''do''' save state persistently thus maintaining summation/cumulative counters and a window into historical values across component restarts and failovers. The disadvantage is added complexity on the sensor side (with a component-specific approach to persistence) and potential performance implications (more disk operations for C components and database writes for Java components).
 
 
 === Physical Design ===
-== Development ==
-  - Describes the architecture that supports the software development process
-  - Concerns: Module organization, common processing, standardization of testing, instrumentation, and codeline organization
+==== Development ====
+# Describes the architecture that supports the software development process
+# Concerns: Module organization, common processing, standardization of testing, instrumentation, and codeline organization
 
 We anticipate considerable overlap in code needed on CC and NC for 
-  * sensor configuration
-  * sensor state management (including sets of historical sensor data)
-  * sensor API handling (parsing and validation of parameters, construction of replies)
-  * sensor API WSDL (to be shared by NC, CC, VB)
-  * implementation of network-related sensor code (iptables controls), which may run on both CC and NC
+* sensor configuration
+* sensor state management (including sets of historical sensor data)
+* sensor API handling (parsing and validation of parameters, construction of replies)
+* sensor API WSDL (to be shared by NC, CC, VB)
+* implementation of network-related sensor code (iptables controls), which may run on both CC and NC
 
 Testing sensors for accuracy is challenging. Given the lack of control over the large software stack involved in VMs and hypervisors, achieving byte-level and millisecond-level accuracy verification is not feasible. But we should be able to achieve high level of confidence that the sensors are reporting accurate data by ensuring that numbers reported are correct over multiple test iterations at the granularity of megabytes and minutes. The approach would be as follows:
-  * For each {metric, dimension, hypervisor} combination,
-    * record a base value prior to inducing load, using the DescribeStats() API and, when possible, using a 3rd party API (e.g., parse out the /proc value)
-    * induce a known amount of load on the VM (CPU load, disk I/O, network I/O), e.g., by running utilities inside the VM, for the amount of time longer than the collection interval
-    * check how much the sensor statistic has changed, both according to DescribeStats() API and according to the 3rd party API, where available - the changes should "make sense"
-    * repeat this process for several iterations
+* For each {metric, dimension, hypervisor} combination,
+** record a base value prior to inducing load, using the DescribeStats() API and, when possible, using a 3rd party API (e.g., parse out the /proc value)
+** induce a known amount of load on the VM (CPU load, disk I/O, network I/O), e.g., by running utilities inside the VM, for the amount of time longer than the collection interval
+** check how much the sensor statistic has changed, both according to DescribeStats() API and according to the 3rd party API, where available - the changes should "make sense"
+** repeat this process for several iterations
 
 Corner conditions, such as data consumer's (CC or CLC) handling of the following conditions should be tested:
-  * sensor not available on hypervisor
-  * sensor dimension not available on hypervisor
-  * sensor data temporarily not available
+* sensor not available on hypervisor
+* sensor dimension not available on hypervisor
+* sensor data temporarily not available
 
 Negative testing would include
-  * invalid sensor response (decreasing 'summation' values, negative values, invalid sensor names, etc)
-  * invalid sensor configurations (intervals and history sizes that are too small or too large)
+* invalid sensor response (decreasing 'summation' values, negative values, invalid sensor names, etc)
+* invalid sensor configurations (intervals and history sizes that are too small or too large)
 
-== Deployment ==
-  - Describes the environment into which the system will be deployed, including the dependencies the system has on its runtime environment
-  - Concerns: Types of hardware required, specification, multiplicity wrt logical elements, and quantity of hardware required, third-party software requirements, technology compatibility.
+==== Deployment ====
+# Describes the environment into which the system will be deployed, including the dependencies the system has on its runtime environment
+# Concerns: Types of hardware required, specification, multiplicity wrt logical elements, and quantity of hardware required, third-party software requirements, technology compatibility.
 
 There may be minimum version requirements for 3-rd party software that sensors will rely on. Not all versions of 'libvirt' and 'vSphere API' may support all desired metrics.
 
-== Operational ==
-  - Describes how the system will be operated, administered, and supported when it is running in its production environment
-  - Installation and upgrade, operational monitoring and control, configuration management, support, and backup and restore
+==== Operational ====
+# Describes how the system will be operated, administered, and supported when it is running in its production environment
+# Installation and upgrade, operational monitoring and control, configuration management, support, and backup and restore
 
 It may be necessary to configure the underlying platforms so as to make collection of all metrics possible. Potential requirements include:
-  * installing a kernel module in Linux that enables disk statistics
-  * increasing the fault "Data Collection Level" in vSphere (up to 3 or 4)
+* installing a kernel module in Linux that enables disk statistics
+* increasing the fault "Data Collection Level" in vSphere (up to 3 or 4)
 
 === Cross-cutting Concerns ===
-  - As referenced in the feature specification, the following may need to be addressed.
-    - Security
-      - new sensors will need root-level access to the system to obtain network and disk stats
-        - there is potential for limiting all permission-elevating functions to a well defined portion in a sensor library
-      - if existing communication mechanisms are used (CC- and NC-level Web Services), no new authentication mechanisms
-    - Usability
-      - usability of the reporting UI dictates metrics, so no new considerations at the back-end level
-    - Performance and Scalability
-      - an important concern, given a x6 increase in number of metrics
-        - over a dozen values per instance, depending on number of attached disks/volumes
-        - potentially with a set of historical values returned, to guard against message loss
-        - new Describe request can have its own polling frequency, which can be lower than DescribeInstance
-    - Availability and Resilience
-      - state relevant to any cumulative metrics that originate on CC or VB must persist across failover of that component (or upstream must handle counters that may reset - not 100% full proof)
-      - state relevant to any cumulative metrics that originate on NC must persist across EBS-backed instance stop/start periods
-      - any non-cumulative metrics should be guarded against message loss (e.g., by sending a time-bound history of values) if partial data is unacceptable to upstream
-    - Evolution: Extensibility, Modification, Modularization, and Sustainability
-      - sensor report format should be forward-looking: 
-        - easy addition of new sensor types
-        - support for several kinds of sensors: cumulative, samples, rates
-      - should consider changing ad-hoc Perl scripts into something more modular
+# As referenced in the feature specification, the following may need to be addressed.
+## Security
+### new sensors will need root-level access to the system to obtain network and disk stats
+  ### there is potential for limiting all permission-elevating functions to a well defined portion in a sensor library
+### if existing communication mechanisms are used (CC- and NC-level Web Services), no new authentication mechanisms
+## Usability
+### usability of the reporting UI dictates metrics, so no new considerations at the back-end level
+## Performance and Scalability
+### an important concern, given a x6 increase in number of metrics
+  ### over a dozen values per instance, depending on number of attached disks/volumes
+  ### potentially with a set of historical values returned, to guard against message loss
+  ### new Describe request can have its own polling frequency, which can be lower than DescribeInstance
+## Availability and Resilience
+### state relevant to any cumulative metrics that originate on CC or VB must persist across failover of that component (or upstream must handle counters that may reset - not 100% full proof)
+### state relevant to any cumulative metrics that originate on NC must persist across EBS-backed instance stop/start periods
+### any non-cumulative metrics should be guarded against message loss (e.g., by sending a time-bound history of values) if partial data is unacceptable to upstream
+## Evolution: Extensibility, Modification, Modularization, and Sustainability
+### sensor report format should be forward-looking: 
+  ### easy addition of new sensor types
+  ### support for several kinds of sensors: cumulative, samples, rates
+### should consider changing ad-hoc Perl scripts into something more modular
 
-===== References =====
-  * [[http://docs.amazonwebservices.com/AmazonCloudWatch/latest/DeveloperGuide/CW_Support_For_AWS.html#ec2-metricscollected|ec2 metrics]]
-  * [[http://www.vmware.com/support/developer/vc-sdk/visdk41pubs/ApiReference/disk_counters.html| VMWare Disk I/O Counters]]
-  * [[http://www.vmware.com/support/developer/vc-sdk/visdk41pubs/ApiReference/cpu_counters.html| VMWare CPU Counters]]
-  * [[http://www.vmware.com/support/developer/vc-sdk/visdk41pubs/ApiReference/virtual_disk_counters.html| VMWare Virtual Disk Counters]]
+= References =
+* [[#ec2-metricscollected|ec2 metrics]]
+* [[http://www.vmware.com/support/developer/vc-sdk/visdk41pubs/ApiReference/disk_counters.html| VMWare Disk I/O Counters]]
+* [[http://www.vmware.com/support/developer/vc-sdk/visdk41pubs/ApiReference/cpu_counters.html| VMWare CPU Counters]]
+* [[http://www.vmware.com/support/developer/vc-sdk/visdk41pubs/ApiReference/virtual_disk_counters.html| VMWare Virtual Disk Counters]]
 
-===== Appendix A: Agile stories =====
+= Appendix A: Agile stories =
 ^ Story ^ Task ^ Estimate ^ Assignee ^
 | As a back-end engineer I'd like to have get stats request to be defined so back-end components can provide arbitrary reporting metrics to CLC. | Design the message with CLC team | | |
 | ::: | NC implementation | | |
