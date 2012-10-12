@@ -1,1 +1,1 @@
-GOTO: [[features/Home.wiki]]
+Go to the [wiki](wiki).
