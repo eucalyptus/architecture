@@ -42,12 +42,13 @@ Generational documents consist of:
 = Contributing =
 The contents of this repository are reviewed and, to that end, all changes should be submitted as a pull request: [[https://help.github.com/articles/fork-a-repo|Fork & Pull]].
 
-* Get a [[github account|https://github.com/signup/free]]
-* Create a [[fork|https://help.github.com/articles/fork-a-repo]] of this repository.
-# [[Synchronize|https://help.github.com/articles/syncing-a-fork]] your fork with this repository.
-# Make your changes  ('''NOTE''': See [[Formats]] and [[Organization]] below for restrictions/expectations)
-# Commit to your forked repository
-# Submit a [[pull request|https://help.github.com/articles/creating-a-pull-request]]
+* Get a [[https://github.com/signup/free|github account]].
+* Create a [[https://help.github.com/articles/fork-a-repo|fork]] of this repository.
+# [[https://help.github.com/articles/syncing-a-fork|Synchronize]] your fork with this repository.
+# Make your changes  ('''NOTE''': See [[#Formats]] and [[#Organization]] below for restrictions/expectations).
+# Commit to your forked repository.
+# Submit a [[https://help.github.com/articles/creating-a-pull-request|pull request]].
+# Be patient and contented.
 
 == Formats ==
 Broadly, this repository should have versionable source materials except when not available (e.g., third party PDF documentation).
