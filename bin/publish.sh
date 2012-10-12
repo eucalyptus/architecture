@@ -2,7 +2,7 @@
 BASEDIR=$(git rev-parse --show-toplevel)
 DESTDIR=${BASEDIR}/wiki
 EXCLUDE="TODO|README.wiki|.wiki.log|EUCA-....|Home.wiki|README.md"
-EXCLUDE_SUFFIX="pdf|zip|wsdl|git|puml|keep|notes"
+EXCLUDE_SUFFIX="pdf|zip|wsdl|git|puml|keep|notes.wiki"
 EXCLUDE_DIRS="/bin/|/releases/|/lib/|/wiki/|/.git"
 
 echo > ${BASEDIR}/.wiki.log
