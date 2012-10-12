@@ -7,7 +7,7 @@ We have three classes of documents which contribute to the definition of the sys
 # '''Specification Documents''' are overarching definitions of a feature.
 # '''Generational Documents''' specific to the context and determined by the constraints of a particular release.
 # '''Architectural documents'''<ref>https://github.com/eucalyptus/architecture-docs</ref> are the final documents describing the architecture of the system combining the intensional and emergent characteristics.
-#: For more documents see the [[https://github.com/eucalyptus/architecture-docs|separate architecture docs repository]].
+#: For more documents see the [[/eucalyptus/architecture-docs|separate architecture docs repository]].
 
 __TOC__
 = Documents =
@@ -41,18 +41,18 @@ Generational documents consist of:
 * [[features]] directory
 
 = Contributing =
-The contents of this repository are reviewed and, to that end, all changes should be submitted as a pull request: [[https://help.github.com/articles/fork-a-repo|Fork & Pull]].
+The contents of this repository are reviewed and, to that end, all changes should be submitted as a pull request: [https://help.github.com/articles/fork-a-repo Fork & Pull].
 
-* Get a [[https://github.com/signup/free|github account]].
-* Create a [[https://help.github.com/articles/fork-a-repo|fork ]] of this repository.
-# [[https://help.github.com/articles/syncing-a-fork|Synchronize ]] your fork with this repository.
+* Get a [https://github.com/signup/free github account].
+* Create a [https://help.github.com/articles/fork-a-repo fork] of this repository.
+# [https://help.github.com/articles/syncing-a-fork Synchronize] your fork with this repository.
 # Make your changes  ('''NOTE''': See [[#formats|Formats]] and [[#organization|Organization]] below for restrictions/expectations).
 # Commit to your forked repository.
-# Submit a [[https://help.github.com/articles/creating-a-pull-request|pull request]].
+# Submit a [https://help.github.com/articles/creating-a-pull-request pull request].
 # Be patient and contented.
 
 == Formats ==
-Broadly, this repository should have versionable source materials except when not available (e.g., third party PDF documentation).
+Broadly, this repository should have version-able source materials except when not available (e.g., third party PDF documentation).
 
 * '''Text''':  must be renderable through the github interface 
 * '''Graphics''':  must be text-based so a compile step is not only acceptable, but required.  
@@ -97,13 +97,13 @@ Each feature is contained in its own directory.  The organization of the feature
 |}
 
 = Tools =
-* [[https://github.com/github/markup|github markup]]: github markup library
-* [[https://github.com/github/gollum|gollum]]: rendering library used by github-markup
-* [[https://github.com/pediapress|pediapress tools]]: mediawiki tools
-* [[http://mwlib.readthedocs.org/en/latest/installation.html|mw-render]]: mediawiki renderer
-* [[https://bitbucket.org/bspeakmon_atlassian/jira-python.git|python-jira]]: jira library used for xrefs
-* [[http://plantuml.sourceforge.net/|PlantUML]]: text based uml diagramming tool
-* [[http://www.graphviz.org/|dot/graphviz]]: used by plantuml for diagrams
+* [https://github.com/github/markup github markup]: github markup library
+* [https://github.com/github/gollum gollum]: rendering library used by github-markup
+* [https://github.com/pediapress pediapress tools]]: mediawiki tools
+* [http://mwlib.readthedocs.org/en/latest/installation.html mw-render]: mediawiki renderer
+* [https://bitbucket.org/bspeakmon_atlassian/jira-python.git python-jira]: jira library used for xrefs
+* [http://plantuml.sourceforge.net/ PlantUML]: text based uml diagramming tool
+* [http://www.graphviz.org/ dot/graphviz]: used by plantuml for diagrams
 
 
 
