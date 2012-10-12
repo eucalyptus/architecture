@@ -43,8 +43,8 @@ Generational documents consist of:
 The contents of this repository are reviewed and, to that end, all changes should be submitted as a pull request: [[https://help.github.com/articles/fork-a-repo|Fork & Pull]].
 
 * Get a [[https://github.com/signup/free|github account]].
-* Create a [[https://help.github.com/articles/fork-a-repo|fork]] of this repository.
-# [[https://help.github.com/articles/syncing-a-fork|Synchronize]] your fork with this repository.
+* Create a [[https://help.github.com/articles/fork-a-repo|fork ]] of this repository.
+# [[https://help.github.com/articles/syncing-a-fork|Synchronize ]] your fork with this repository.
 # Make your changes  ('''NOTE''': See [[#Formats]] and [[#Organization]] below for restrictions/expectations).
 # Commit to your forked repository.
 # Submit a [[https://help.github.com/articles/creating-a-pull-request|pull request]].
@@ -54,7 +54,7 @@ The contents of this repository are reviewed and, to that end, all changes shoul
 Broadly, this repository should have versionable source materials except when not available (e.g., third party PDF documentation).
 
 * '''Text''':  must be renderable through the github interface 
-** See '[[https://github.com/github/markup|github markup]] which uses '[[https://github.com/github/gollum|gollum]] 
+** See [[https://github.com/github/markup|github markup ]] which uses [[https://github.com/github/gollum|gollum]] 
 * '''Graphics''':  must be text-based so a compile step is not only acceptable, but required.  
 ** [[PlantUML]]
 * '''Binary files''': may be committed in the cases that:
