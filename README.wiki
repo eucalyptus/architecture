@@ -10,7 +10,7 @@ We have three classes of documents which contribute to the definition of the sys
 #: For more documents see the [[https://github.com/eucalyptus/architecture-docs|separate architecture docs repository]].
 
 __TOC__
-= Contents =
+= Documents =
 
 '''Specification Documents''' 
 ----
@@ -36,10 +36,20 @@ Generational documents consist of:
 * Functional requirements: as identified by a corresponding epic in JIRA
 * Specification:  release-specific technical interpretation of functional requirements 
 
+= Feature/Releases =
+'''TODO''' feature list hya
 
 = Contributing =
-'''Formats'''
-----
+The contents of this repository are reviewed and, to that end, all changes should be submitted as a pull request: [[Fork & Pull|https://help.github.com/articles/fork-a-repo]].
+
+* Get a [[github account|https://github.com/signup/free]]
+* Create a [[fork|https://help.github.com/articles/fork-a-repo]] of this repository.
+# [[Synchronize|https://help.github.com/articles/syncing-a-fork]] your fork with this repository.
+# Make your changes  ('''NOTE''': See [[Formats]] and [[Organization]] below for restrictions/expectations)
+# Commit to your forked repository
+# Submit a [[pull request|https://help.github.com/articles/creating-a-pull-request]]
+
+== Formats ==
 Broadly, this repository should have versionable source materials except when not available (e.g., third party PDF documentation).
 
 * '''Text''':  must be renderable through the github interface 
@@ -49,43 +59,35 @@ Broadly, this repository should have versionable source materials except when no
 * '''Binary files''': may be committed in the cases that:
 *# A binary output format (e.g., images) is needed:  In this case, it has to be compilable from a text-based and versioned file.
 *# A reference document or tool is included:  These belong in specific places noted below.
-
-= Organization =
-== Important Note ==
-Please read these primary cautions before committing to this repository.
-=== Generated Files ===
 * A number of files in this repo are automatically generated **DO NOT EDIT THEM DIRECTLY**
 ** features/FEATURE_NAME/spec.wiki
 ** features/FEATURE_NAME/stories.wiki
 ** Any binary file is auto-generated.
-=== Binary Files ===
-* Only text based files are editable.
-* No binary source files are allowed.
 
+
+== Organization ==
+
+hi.
 
 
 === Directory Structure ===
-==== Overview ====
 {|
+! bin/, lib/
+| Ignore these. Contain helpers and their libraries
+|-
 ! features/
 | this is where **all** content goes
+|-
+! releases/
+| auto-generated xref of features to releases
 |}
 
 
-
-
-=== Build ===
+'''Build Tools'''
 * pediapress tools: https://github.com/pediapress
 * mw-render: http://mwlib.readthedocs.org/en/latest/installation.html
 * python-jira: https://bitbucket.org/bspeakmon_atlassian/jira-python.git
 * dot/graphviz: 
-
-==== Documents ====
-
-* Requirements are referenced in JIRA (vis a vis Epic)
-* Epic/Feature specifications go here
-* Release/Feature specifications go here
-* Feature designs go here
 
 
 
