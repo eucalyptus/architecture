@@ -192,4 +192,7 @@ new SchemaUpdate(conf.getHibernateConfiguration()).execute(true, false);
 -- better to document than not
 -- more can automate is good
 
+- @PreUpgrade check for unsupported previous versions
+- HA upgrade procedures
+
   
