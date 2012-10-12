@@ -51,7 +51,7 @@ Generational documents consist of:
 * Functional requirements: as identified by a corresponding epic in JIRA
 * Specification:  release-specific technical interpretation of functional requirements 
 
-= Document Index =
+= Document Categories =
 {| style="width: 90%"
 |+ ''Documents By Category''
 | '''Release'''
