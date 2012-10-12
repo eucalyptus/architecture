@@ -2,7 +2,7 @@
 BASEDIR=$(git rev-parse --show-toplevel)
 DESTDIR=${BASEDIR}/wiki
 EXCLUDE="TODO|README.wiki|.wiki.log|EUCA-....|Home.wiki|README.md"
-EXCLUDE_SUFFIX="pdf|zip|wsdl|git|puml|keep"
+EXCLUDE_SUFFIX="pdf|zip|wsdl|git|puml|keep|notes"
 EXCLUDE_DIRS="/bin/|/releases/|/lib/|/wiki/|/.git"
 
 echo > ${BASEDIR}/.wiki.log
@@ -20,7 +20,8 @@ for f in  $(echo "${FILELIST}" | sed 's/^\.\///g'); do
   t=${dir//\//-}
   dest=${DESTDIR}/$t
   echo "$f => ${dir}/${file} ($t)"
-	if egrep '{{[^ ]*}}' $f >/dev/null 2>&1; then
+	if echo $f | egrep "\.(${EXCLUDE_SUFFIX})" &&
+ 		egrep '{{[^ ]*}}' $f >/dev/null 2>&1; then
 		(cd $dir; 
 			sed -nf ${BASEDIR}/bin/include.sed $file | sed 'N;N;s/\n//' | sed -f - $file > ${DESTDIR}/${dir//\//-}-${file}
 			)
