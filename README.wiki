@@ -4,33 +4,33 @@ This repository is for handling the architectural documents related to specifica
 The organization of the repository reflects the long-lived nature of a features true specification.  That is, the specification and design work related to a feature's implementation for a particular release often corresponds with only a portion of the entire feature's implementation.  Moreover, feature's specification evolves over time as the requirements, architecture, and upstream specifications evolve.
 
 == Contents ==
-We have three classes of documents which contribute to the definition of the system:
-1. [[#Specification Documents]] are overarching definitions of a feature.
-2. [[#Generational Documents]] specific to the context and determined by the constraints of a particular release.
-3. [[https://github.com/eucalyptus/architecture-docs Architectural documents]] are the final documents describing the architecture of the system combining the intensional and emergent characteristics.
--- These are in a [[https://github.com/eucalyptus/architecture-docs separate repository]].
+We have three classe of documents which contribute to the definition of the system:
+# [[#Specification Documents]] are overarching definitions of a feature.
+# [[#Generational Documents]] specific to the context and determined by the constraints of a particular release.
+# [[https://github.com/eucalyptus/architecture-docs Architectural documents]] are the final documents describing the architecture of the system combining the intensional and emergent characteristics.
+** These are in a [[https://github.com/eucalyptus/architecture-docs separate repository]].
 
 === Specification Documents ===
 These documents are intentional and <ref name="intensional">http://en.wikipedia.org/wiki/Intensional_statement</ref>:
-- are "''timeless''" in that they are overarching and meant to be definitive of the feature overall.
-- evolve over time independent of the features current implementation status.
-- reflect our current understanding of the features definition in the broadest sense.
+* are "''timeless''" in that they are overarching and meant to be definitive of the feature overall.
+* evolve over time independent of the features current implementation status.
+* reflect our current understanding of the features definition in the broadest sense.
 
 Specification documents consist of:
-- Specification:  overall technical specification of the functional and architectural/quality characteristics.
-- High level design/Architecture:  definition of fundamental components, interfaces, behaviours including information, control, and concurrency models.
-- Supporting Documents: API/Service specifications, client tool chains, WSDLs, TCKs.
+* Specification:  overall technical specification of the functional and architectural/quality characteristics.
+* High level design/Architecture:  definition of fundamental components, interfaces, behaviours including information, control, and concurrency models.
+* Supporting Documents: API/Service specifications, client tool chains, WSDLs, TCKs.
 
 === Generational Documents ===
 These documents are specific to a release and meant to serve the tasks surrounding the planning, design, implementation, and delivery of a feature.
-- support the scoping, design, and implementation effort of the feature during that release.
-- defining the design and implementation objectives and details for a particular version of a feature.
-- specific to the context and determined by the constraints of a particular release time frame.
-- change as needed to support the above objectives and are quiesced after those tasks are completed.
+* support the scoping, design, and implementation effort of the feature during that release.
+* defining the design and implementation objectives and details for a particular version of a feature.
+* specific to the context and determined by the constraints of a particular release time frame.
+* change as needed to support the above objectives and are quiesced after those tasks are completed.
 
 Generational documents consist of:
-- Functional requirements: as identified by a corresponding epic in JIRA
-- Specification:  release-specific technical interpretation of functional requirements 
+* Functional requirements: as identified by a corresponding epic in JIRA
+* Specification:  release-specific technical interpretation of functional requirements 
 
 
 == Contributing ==
