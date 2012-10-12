@@ -54,16 +54,16 @@ Generational documents consist of:
 {| style="width: 90%"
 |+ ''Documents By Category''
 | '''Release'''
-| [[tag:rls-3.0|3.0]]
-| [[tag:rls-3.1|3.1]] 
+| [[tag:rls-3.0|3.0]]<br/>''pending''
+| [[tag:rls-3.1|3.1]]<br/>''pending'' 
 | [[tag:rls-3.2|3.2]]
 | [[tag:rls-3.3|3.3]]<br/>''impending''
 |-
 | '''Feature'''
-| colspan="4" | '''PENDING'''
+| colspan="4" | ''pending''
 |-
 | '''Component'''
-| colspan="4" | '''PENDING'''
+| colspan="4" | ''pending''
 |} 
 
 = Contributing =
