@@ -10,7 +10,7 @@ FILELIST=$(cd ${BASEDIR};
 find features  -type f  | 
 egrep -v '^./wiki' | 
 egrep -v "${EXCLUDE}" | 
-egrep -v "\.(${EXCLUDE_SUFFIX})$" |
+egrep -v "(${EXCLUDE_SUFFIX})$" |
 egrep -v "${EXCLUDE_DIRS}"
 )
 (cd ${DESTDIR}; git checkout master)
