@@ -14,7 +14,6 @@ __TOC__
 There are two kinds of documents for which this repository is the canonical reference:  specification and generational documents.
 
 == Specification Documents ==
-----
 These documents are intentional and intensional<ref name="Intensional Statement">http://en.wikipedia.org/wiki/Intensional_statement</ref>:
 * are "''timeless''" in that they are overarching and meant to be definitive of the feature overall.
 * evolve over time independent of the features current implementation status.
@@ -26,7 +25,6 @@ Specification documents consist of:
 * Supporting Documents: API/Service specifications, client tool chains, WSDLs, TCKs.
 
 == Generational Documents ==
-----
 These documents are specific to a release and meant to serve the tasks surrounding the planning, design, implementation, and delivery of a feature.
 * support the scoping, design, and implementation effort of the feature during that release.
 * defining the design and implementation objectives and details for a particular version of a feature.
@@ -83,7 +81,7 @@ The currently supported and ''seemingly reasonable'' formats are:
 ----
 The following table describes the organization of the top-level of the repository.
 
-{|
+{| width="100%"
 |+ '''Top-level Directory Structure'''
 | <code>bin/</code>, <code>lib/</code>
 | Ignore these. Contain helpers and their libraries
@@ -96,11 +94,10 @@ The following table describes the organization of the top-level of the repositor
 |}
 
 == Feature Directory ==
-----
-Each feature is contained in its own directory.  The organization of the features/${feature} directory, for some imagined ${feature}, is described in the following table:
+Each feature is contained in its own directory.  The organization of the '''features/${feature}''' directory, for some imagined ${feature}, is described in the following table:
 
-{|
-|+ '''Feature Directory Structure'''
+{| width="100%"
+|+ '''Feature Directory Structure''' (e.g., <code>features/${feature}/</code>)
 | <code>/overview.wiki</code>
 | Top-level feature specification document
 |-
@@ -115,6 +112,9 @@ Each feature is contained in its own directory.  The organization of the feature
 |-
 | <code>/img</code>
 | Generated images
+|- 
+| /X.Y (e.g., /3.3)
+| Documents 
 |}
 
 = See Also =
