@@ -91,6 +91,7 @@ The following table describes the organization of the top-level of the repositor
 === Feature Directory ===
 Each feature is contained in its own directory.  The organization of the features/${feature} directory, for some imagined ${feature}, is described in the following table:
 {|
+|+ align="bottom" style="color:#ff0000;" |''Feature Directory Overview''
 ! /overview.wiki
 | Top-level feature specification document
 |-
