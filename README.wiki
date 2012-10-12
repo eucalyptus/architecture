@@ -77,7 +77,7 @@ The currently supported and ''seemingly reasonable'' formats are:
 
 = Organization =
 The following table describes the organization of the top-level of the repository.
-{|align="left"
+{|
 ! bin/, lib/
 | Ignore these. Contain helpers and their libraries
 |-
@@ -87,10 +87,10 @@ The following table describes the organization of the top-level of the repositor
 ! releases/
 | auto-generated xref of features to releases
 |}
-.
+
 === Feature Directory ===
 Each feature is contained in its own directory.  The organization of the features/${feature} directory, for some imagined ${feature}, is described in the following table:
-{|align="left"
+{|
 ! /overview.wiki
 | Top-level feature specification document
 |-
@@ -106,7 +106,7 @@ Each feature is contained in its own directory.  The organization of the feature
 ! /img
 | Generated images
 |}
-.
+
 = See Also =
 * [https://github.com/github/markup github markup]: github markup library
 * [https://github.com/github/gollum gollum]: rendering library used by github-markup
