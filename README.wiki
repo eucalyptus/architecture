@@ -8,7 +8,7 @@ We have three classe of documents which contribute to the definition of the syst
 # [[#Specification Documents]] are overarching definitions of a feature.
 # [[#Generational Documents]] specific to the context and determined by the constraints of a particular release.
 # '''Architectural documents'''<ref>https://github.com/eucalyptus/architecture-docs</ref> are the final documents describing the architecture of the system combining the intensional and emergent characteristics.
-** These are in a [[separate repository|https://github.com/eucalyptus/architecture-docs]].
+** These are in a [[https://github.com/eucalyptus/architecture-docs|separate repository]].
 
 === Specification Documents ===
 These documents are intentional and intensional<ref>http://en.wikipedia.org/wiki/Intensional_statement</ref>:
