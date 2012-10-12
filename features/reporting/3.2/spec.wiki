@@ -1,27 +1,25 @@
-=====  3.2 Reporting Documents  =====
-====  Design Docs  ====
+=  3.2 Reporting Documents  =
 
-- [Backend Reporting Doc |https://wiki.eucalyptus-systems.com/doku.php?id=backend:3.2:reporting]
 - [Reporting Design Doc |https://docs.google.com/a/eucalyptus.com/document/d/1fdTet46EIBAc8VEFnUOFTcrK4T79aK_tolzMVGbkKL8/edit]
 - [HLD Component Diagram |https://wiki.eucalyptus-systems.com/lib/exe/fetch.php?cache=&w=900&h=534&media=arch:3.2:reporting-hld.png]
 
   
-====  Feature Overview  ====
+==  Feature Overview  ==
 
 The goal of reporting in 3.2 is three-fold:  
 - increase the number of metrics the system gathers and includes in reports
 - allow for the export and warehousing of reporting data (outside of Eucalyptus)
 - formalize command line support for report generation
 
-=  Metrics  =
+=====  Metrics  =====
 
 Feedback indicates the need for the gathering and reporting of additional metrics.  The contribution to this feature specification is in the form of a prioritized list of metrics motivated by customers.
 
-=  Data export/warehousing  =
+=====  Data export/warehousing  =====
 
 This is the addition of mechanism to support the option of external data warehousing.is the option of.  Currently, the co-location of Eucalyptus services with reporting data, as it is used during report generation, results in degraded service (or service outage) when reports are produced for large, active deployments.  The objective is to allow enable performance isolation for report generation in "large" such deployments.  At the same time, this feature should not require extra complexity for "small" deployments (e.g., PoCs, trials) which are numerous. The observed result which underlies the premise of the feature is that report generation is costly while storing/dumping the needed data has no measurable impact.  Report generations impact is both in terms of gathering the data (database load) and rendering the report (system load): customer feedback include 2hr+ report generation times with resulting service disruption.
 
-=  CLI Report Generation  =
+=====  CLI Report Generation  =====
 
 Current customers depend upon an intermediate solution for command-line report generation which needs to be replaced with a solution that is sustainable and addresses existing shortcomings.  Related to #3 are two aspects:  the need to run on a host external to the Eucalyptus deployment and generate reports from the default reference data warehouse (i.e., the reporting web ui can not do that).  
 
@@ -37,14 +35,14 @@ This limitation excludes support (but not design accommodation) for:
 - supporting report generation against external databases
 - modification or introduction of new functionality in the existing admin ui except as related to the addition of new reports.
 
-====  3.2 Reporting Requirements  ====
+==  3.2 Reporting Requirements  ==
 
 - Changes to the admin ui related to this feature should be limited to: modifying existing report presentation as needed to add new metrics, addition of new reports for access via admin ui as needed by new metrics.  This is to the exclusion of other improvements which are not w/in the scope of this feature.
 
 ===  Functional Requirements  ===
 
 
-==  New Metrics  ==
+====  New Metrics  ====
 
 - Metrics listed below are in priority order
 - A metric is implemented when it is accurately reflected in the appropriate reports
@@ -82,7 +80,7 @@ h5. Desired
 - Total amount of time spent in seconds writing to disks per instance per user with disk type ephemeral/EBS
 - Per user at volume level granularity – number of IO requests
 
-==  Data Export & Warehousing  ==
+====  Data Export & Warehousing  ====
 
 - Define an export format for reporting data
 -- exported data has a well-defined format:
@@ -119,7 +117,7 @@ h5. Desired
 -- document impact of parameter on data growth for reporting db
 - Best practices guidelines for data lifecycle management
 
-==  CLI Report Generation  ==
+====  CLI Report Generation  ====
 
 - CLI report generation must be capable of running on hosts outside of the corresponding Eucalyptus deployment
 - CLI must use the web-services API (export service specified above) to obtain needed reporting data from the Eucalyptus reporting service
@@ -135,12 +133,12 @@ h5. Desired
 
 ===  Architectural Constraints  ===
 
-=  Continuity/Parity  =
+=====  Continuity/Parity  =====
 
 - the presentation of data in reports must be the same whether generated in the GUI or using the CLI tool.
 - the availability of report types must be the same for the GUI and CLI.
 - the outcome (for both content and presentation thereof) of report generation against a fixed data set must be the same when the CLI report generation tool is used against the existing internal reporting database or the same data in the external reference datawarehouse.
-=  Coherence & Coupling  =
+=====  Coherence & Coupling  =====
 
 - the export web service involved must be w/in the existing web-services stack (i.e., does not involve a new server, port, etc.)
 -- Message exchange pattern: web services are document/literal, authenticated, sessionless, validated
@@ -153,14 +151,14 @@ h5. Desired
 --- ubiquitous: can be a build dependency (i.e., for cloudwatch)
 --- stable: (do not change as a consequence of changes in the consumers)
 -- In light of the existing design, this constraint must be validated retroactively
-=  Performance  =
+=====  Performance  =====
 
 - performance isolation expectations need to be met
 -- using the warehousing/CLI report generation can have no impact on general service availability. 
 -- PENDING: customer info to make these next two testable.
 -- export of reporting data export must not result in service interruption.
 -- generation of exportable file must not adversely impact the system's proper function (e.g., where a system slowdown is noticeable by a user).
-=  Upgrade, Extension, and Modification-ility  =
+=====  Upgrade, Extension, and Modification-ility  =====
 
 - data export model, CLI tools, and warehousing must account for schema changes across versions
 - data export model, CLI tools, and warehousing must be upgradeable -- account for gaps in old data and enforce version parity for service and tool interactions.
@@ -171,13 +169,13 @@ h5. Desired
 -- there must be only a data type dependency between them
 -- the data type dependency is well-defined and stable
 -- there cannot be a functional dependency
-=  Testability  =
+=====  Testability  =====
 
 - report events can be tested independently (e.g., to populate data for unfinished metric/decouple from report gen. side)
 - report generation can be tested independently (e.g., trace data can be used to populate reporting database)
 - data export can be tested independently (e.g., schema validation, apply reversible transform and compare to original data)
 - metric implementation can be evaluated w/o corresponding report (e.g., ... need a test strategy here)
-=  Releasability  =
+=====  Releasability  =====
 
 - all of the export service, export data, warehousing schema and CLI tools need to be versioned and validated 
 - Datawarehouse reference implementation is versioned using the same scheme as Eucalyptus, i.e., not a separate product. 
@@ -189,10 +187,10 @@ h5. Desired
 - updating the datawarehouse reference implementation installation can be done without disrupting service for the corresponding Eucalyptus deployment
 - Licenses for third-party software should be compatible with GPLv3.
 - Training plan for new technology/third party frameworks.
-=  Security  =
+=====  Security  =====
 
 - The datastore used by the warehouse service shall be protected from unauthorized access         
-=  Usability  =
+=====  Usability  =====
 
 - PENDING: usability reqs for reports (both existing UI and forthcoming CLI)
 
