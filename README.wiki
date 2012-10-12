@@ -63,6 +63,26 @@ Broadly, this repository should have version-able source materials except when n
 *# Any binary file is either auto-generated or 3rd-party.
 *# features/${FEATURE}/stories.wiki
 
+'''Text Format Note'''
+-----------
+The remainder of this document uses the suffix '''.wiki''' to identify a generic file which can be rendered using '''github-markup'''.  More broadly, the supported formats are:
+
+<code>
+  gem install github-markup
+</code>
+
+* .markdown, .mdown, .md -- gem install redcarpet (https://github.com/vmg/redcarpet)
+* .textile -- gem install RedCloth
+* .rdoc -- gem install rdoc -v 3.6.1
+* .org -- gem install org-ruby
+* .creole -- gem install creole
+* .mediawiki -- gem install wikicloth
+* .rst -- easy_install docutils
+* .asciidoc -- brew install asciidoc
+* .pod -- Pod::Simple::HTML comes with Perl >= 5.10. Lower versions should install Pod::Simple from CPAN.
+
+
+
 
 == Organization ==
 The following table describes the organization of the top-level of the repository.
