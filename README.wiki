@@ -27,7 +27,7 @@ __TOC__
 There are two kinds of documents for which this repository is the canonical reference:  specification and generational documents.
 
 == Specification Documents ==
-These documents are intentional and intensional<ref name="Intensional Statement">http://en.wikipedia.org/wiki/Intensional_statement</ref>:
+These documents are intentional and intensional<ref name="Intensional Definition">http://en.wikipedia.org/wiki/Intensional_definition</ref>:
 * are "''timeless''" in that they are overarching and meant to be definitive of the feature overall.
 * evolve over time independent of the features current implementation status.
 * reflect our current understanding of the features definition in the broadest sense.
