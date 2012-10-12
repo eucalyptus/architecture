@@ -1,8 +1,8 @@
-- Handle label mappings for issues
-- JIRA Epic Mapping
-- Confluence page rendering
-- Generated references
-- Spec document generation
-- Figure out diagram + design handling details
-- Mark generated files as readonly
-- Figure out feature xref
+* Handle label mappings for issues
+* JIRA Epic Mapping
+* Confluence page rendering
+* Generated references
+* Spec document generation
+* Figure out diagram + design handling details
+* Mark generated files as readonly
+* Figure out feature xref
