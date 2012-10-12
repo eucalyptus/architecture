@@ -99,7 +99,7 @@ Each feature is contained in its own directory.  The organization of the '''feat
 {| style="width=90%"
 |+ '''Feature Directory Structure''' (e.g., <code>features/${feature}/</code>)
 | <code>/overview.wiki</code>
-| colspan="2" | Top-level feature specification document
+| colspan="2" | Top-level document aggregating all the sub documents
 |-
 | <code>/xref</code>
 | colspan="2" | xref's to the JIRA epic(s) and confluence pages
