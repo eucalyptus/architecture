@@ -40,7 +40,7 @@ Generational documents consist of:
 '''TODO''' feature list hya
 
 = Contributing =
-The contents of this repository are reviewed and, to that end, all changes should be submitted as a pull request: `[[Fork & Pull|https://help.github.com/articles/fork-a-repo]].
+The contents of this repository are reviewed and, to that end, all changes should be submitted as a pull request: [[https://help.github.com/articles/fork-a-repo|Fork & Pull]].
 
 * Get a [[github account|https://github.com/signup/free]]
 * Create a [[fork|https://help.github.com/articles/fork-a-repo]] of this repository.
