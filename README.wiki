@@ -77,7 +77,7 @@ hi.
 | Ignore these. Contain helpers and their libraries
 |-
 ! features/
-| this is where **all** content goes
+| this is where '''all''' content goes
 |-
 ! releases/
 | auto-generated xref of features to releases
