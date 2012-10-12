@@ -79,13 +79,13 @@ The currently supported and ''seemingly reasonable'' formats are:
 The following table describes the organization of the top-level of the repository.
 {|
 |+ '''Top-level Directory Structure'''
-! <code>bin/</code>, <code>lib/</code>
+| <code>bin/</code>, <code>lib/</code>
 | Ignore these. Contain helpers and their libraries
 |-
-! <code>features/</code>
+| <code>features/</code>
 | this is where '''all''' content goes
 |-
-! <code>releases/</code>
+| <code>releases/</code>
 | auto-generated xref of features to releases
 |}
 
@@ -94,19 +94,19 @@ Each feature is contained in its own directory.  The organization of the feature
 
 {|
 |+ '''Feature Directory Structure'''
-! <code>/overview.wiki</code>
+| <code>/overview.wiki</code>
 | Top-level feature specification document
 |-
-! <code>/xref</code>
+| <code>/xref</code>
 | xref's to the JIRA epic(s) and confluence pages
 |-
-! <code>/architecture.wiki</code>
+| <code>/architecture.wiki</code>
 | High level architecture document
 |-
-! <code>/diagrams</code>
+| <code>/diagrams</code>
 | Source materials for generated documents (images)
 |-
-! <code>/img</code>
+| <code>/img</code>
 | Generated images
 |}
 
