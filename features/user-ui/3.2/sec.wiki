@@ -39,4 +39,4 @@ NOTE: Tornado 2.3 comes with built-in [[#cross-site-request-forgery-protection|C
 * If a framework like Hibernate is used, avoid using native queries. If native queries are absolutely necessary, sanitize any untrusted data in the query before passing it to the database layer.      
 
 == AJAX Best Practices ==
-* [[sec:kb:ajax|KB article]]
+* [[sec:kb:ajax|KB article]][[tag:rls-3-2]]

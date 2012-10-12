@@ -154,4 +154,4 @@ Either we package it within the eucalyptus install as part of the VNX adapter (w
 ### The naviseccli command line tool has high latency (in seconds) in execution. We may need to consider aggressive caching to minimize latency.
 ### LUN cloning has serious impact on the performance of the VNX device. Evaluation needs to be done to study the impact and what measures to be taken.
 ## Availability and Resilience
-## Evolution: Extensibility, Modification, Modularization, and Sustainability
+## Evolution: Extensibility, Modification, Modularization, and Sustainability[[tag:rls-3-2]]

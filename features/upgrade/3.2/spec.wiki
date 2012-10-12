@@ -196,3 +196,4 @@ new SchemaUpdate(conf.getHibernateConfiguration()).execute(true, false);
 - HA upgrade procedures
 
   
+[[tag:rls-3-2]]
