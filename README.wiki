@@ -97,12 +97,13 @@ Each feature is contained in its own directory.  The organization of the feature
 |}
 
 = Tools =
-* [[https://github.com/github/markup|github markup]]
-* [[https://github.com/github/gollum|gollum]]
-* [[https://github.com/pediapress|pediapress tools]]
-* [[http://mwlib.readthedocs.org/en/latest/installation.html|mw-render]]
-* [[https://bitbucket.org/bspeakmon_atlassian/jira-python.git|python-jira]]
-* [[http://www.graphviz.org/|dot/graphviz]]
+* [[https://github.com/github/markup|github markup]]: github markup library
+* [[https://github.com/github/gollum|gollum]]: rendering library used by github-markup
+* [[https://github.com/pediapress|pediapress tools]]: mediawiki tools
+* [[http://mwlib.readthedocs.org/en/latest/installation.html|mw-render]]: mediawiki renderer
+* [[https://bitbucket.org/bspeakmon_atlassian/jira-python.git|python-jira]]: jira library used for xrefs
+* [[http://plantuml.sourceforge.net/|PlantUML]]: text based uml diagramming tool
+* [[http://www.graphviz.org/|dot/graphviz]]: used by plantuml for diagrams
 
 
 
