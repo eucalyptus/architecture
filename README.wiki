@@ -38,11 +38,15 @@ Generational documents consist of:
 = Contributing =
 '''Formats'''
 ----
+Broadly, this repository should have versionable source materials except when not available (e.g., third party PDF documentation).
+
 * '''Text''':  must be renderable through the github interface 
 ** See [[https://github.com/github/markup|github-markup]] which uses [[https://github.com/github/gollum|gollum]] 
-
 * '''Graphics''':  must be text-based so a compile step is not only acceptable, but required.  
 ** [[PlantUML]]
+* '''Binary files''': may be committed in the cases that:
+*# A binary output format (e.g., images) is needed:  In this case, it has to be compilable from a text-based and versioned file.
+*# A reference document or tool is included:  These belong in specific places noted below.
 
 = Organization =
 == Important Note ==
@@ -55,9 +59,6 @@ Please read these primary cautions before committing to this repository.
 === Binary Files ===
 * Only text based files are editable.
 * No binary source files are allowed.
-* Binary files may be committed in the cases that:
-** A binary output format (e.g., images) is needed:  In this case, it has to be compilable from a text-based and versioned file.
-** A reference document or tool is included:  These belong in specific places noted below.
 
 
 
