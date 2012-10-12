@@ -1,5 +1,4 @@
 {{__NOTOC__}}
-{{_Sidebar.wiki}}
 = Overview =
 This repository is for handling the architectural documents related to specification and design of Eucalyptus features.  Notably, it is '''not''' the source for functional requirements:  those are in JIRA.  Relatedly, the contents here will be reflected in JIRA.
 
@@ -11,8 +10,8 @@ We have three classe of documents which contribute to the definition of the syst
 # '''Architectural documents'''<ref>https://github.com/eucalyptus/architecture-docs</ref> are the final documents describing the architecture of the system combining the intensional and emergent characteristics.
 ** These are in a [[https://github.com/eucalyptus/architecture-docs|separate repository]].
 
-'''Specification Documents'''
----
+=== '''Specification Documents''' ===
+
 These documents are intentional and intensional<ref>http://en.wikipedia.org/wiki/Intensional_statement</ref>:
 * are "''timeless''" in that they are overarching and meant to be definitive of the feature overall.
 * evolve over time independent of the features current implementation status.
@@ -23,8 +22,7 @@ Specification documents consist of:
 * High level design/Architecture:  definition of fundamental components, interfaces, behaviours including information, control, and concurrency models.
 * Supporting Documents: API/Service specifications, client tool chains, WSDLs, TCKs.
 
-'''Generational Documents'''
----
+=== '''Generational Documents''' ===
 These documents are specific to a release and meant to serve the tasks surrounding the planning, design, implementation, and delivery of a feature.
 * support the scoping, design, and implementation effort of the feature during that release.
 * defining the design and implementation objectives and details for a particular version of a feature.
