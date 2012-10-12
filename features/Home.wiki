@@ -48,10 +48,21 @@ Generational documents consist of:
 * Functional requirements: as identified by a corresponding epic in JIRA
 * Specification:  release-specific technical interpretation of functional requirements 
 
-= Links =
+
+= By Release =
 ----
-* [[features|Feature directory]] 
+* [[tag:rls-3.0|3.0]] (''PENDING'')
+* [[tag:rls-3.1|3.1]] (''PENDING'')
+* [[tag:rls-3.2|3.2]]
+* [[tag:rls-3.3|3.3]] (''IMPENDING'')
+
+= By Feature =
+----
+(''PENDING'')
 {{../TODO}}
+
+= By Component =
+(''PENDING'')
 
 = Contributing =
 ----

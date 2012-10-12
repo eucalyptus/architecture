@@ -4,6 +4,8 @@ DESTDIR=${BASEDIR}/wiki
 EXCLUDE="TODO|README.wiki|.wiki.log|EUCA-....|Home.wiki|README.md"
 EXCLUDE_SUFFIX="pdf|zip|wsdl|git|puml|keep|notes.wiki"
 EXCLUDE_DIRS="/bin/|/releases/|/lib/|/wiki/|/.git"
+TAGS="rls-3.0 rls-3.1 rls-3.2 rls-3.3"
+
 
 echo > ${BASEDIR}/.wiki.log
 FILELIST=$(cd ${BASEDIR}; 
@@ -32,6 +34,9 @@ done
 (cd features; 
 	sed -nf ${BASEDIR}/bin/include.sed Home.wiki | sed 'N;N;s/\n//' | sed -f - Home.wiki > ${DESTDIR}/Home.wiki
 	)
+for f in ${TAGS}; do
+  touch ${DESTDIR}/tag:${f}.md
+done
 (cd ${DESTDIR};${BASEDIR}//bin/tag-indexer.rb  -m tags -v)
 (cd ${DESTDIR}; git add ./*; git status -sb; git commit -m 'updated'; git push) | tee ${BASEDIR}/.wiki.log 2>&1
 (cd ${BASEDIR}; git add wiki; git commit -a -m 'update wiki'; git push )  | tee ${BASEDIR}/.wiki.log 2>&1

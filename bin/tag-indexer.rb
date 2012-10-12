@@ -158,9 +158,7 @@ unless options[:help]
     open("#{options[:directory]}/#{t[:file]}") { |f|
       text = f.read
       unless text.gsub!(LIST_RE, newlist)
-        text += "\n\n********\n\n**A list of pages containing _#{tag}_**\n\n"
         text += newlist
-        text += "\n\n********\n\n"
         index_added +=1
       else
         index_updated +=1
