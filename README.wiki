@@ -11,8 +11,10 @@ We have three classes of documents which contribute to the definition of the sys
 
 __TOC__
 = Documents =
+There are two kinds of documents for which this repository is the canonical reference:  specification and generational documents.
 
 == Specification Documents ==
+----
 These documents are intentional and intensional<ref name="Intensional Statement">http://en.wikipedia.org/wiki/Intensional_statement</ref>:
 * are "''timeless''" in that they are overarching and meant to be definitive of the feature overall.
 * evolve over time independent of the features current implementation status.
@@ -24,6 +26,7 @@ Specification documents consist of:
 * Supporting Documents: API/Service specifications, client tool chains, WSDLs, TCKs.
 
 == Generational Documents ==
+----
 These documents are specific to a release and meant to serve the tasks surrounding the planning, design, implementation, and delivery of a feature.
 * support the scoping, design, and implementation effort of the feature during that release.
 * defining the design and implementation objectives and details for a particular version of a feature.
@@ -35,11 +38,12 @@ Generational documents consist of:
 * Specification:  release-specific technical interpretation of functional requirements 
 
 = Links =
-
+----
 * [[TODO|TODO items]] 
 * [[features|Feature directory]]
 
 = Contributing =
+----
 The contents of this repository are reviewed and, to that end, all changes should be submitted as a pull request: [https://help.github.com/articles/fork-a-repo Fork & Pull].
 
 * Get a [https://github.com/signup/free github account].
@@ -51,6 +55,7 @@ The contents of this repository are reviewed and, to that end, all changes shoul
 # Be patient and contented.
 
 == Formats ==
+----
 Broadly, this repository should have version-able source materials except when not available (e.g., third party PDF documentation).
 
 * '''Text''':  must be renderable through the github interface 
@@ -63,7 +68,7 @@ Broadly, this repository should have version-able source materials except when n
 *# features/${FEATURE}/stories.wiki
 
 '''Text Format Note'''
------------
+----
 The remainder of this document uses the suffix <code>.wiki</code> to identify a generic file which can be rendered using <code>github-markup</code>.  
 
 To use <code>github-markup</code> see the directions at [[https://github.com/github/markup|the github-markup repository]].
@@ -75,6 +80,7 @@ The currently supported and ''seemingly reasonable'' formats are:
 * .asciidoc -- <code>brew install asciidoc</code>
 
 = Organization =
+----
 The following table describes the organization of the top-level of the repository.
 
 {|
@@ -89,7 +95,8 @@ The following table describes the organization of the top-level of the repositor
 | auto-generated xref of features to releases
 |}
 
-=== Feature Directory ===
+== Feature Directory ==
+----
 Each feature is contained in its own directory.  The organization of the features/${feature} directory, for some imagined ${feature}, is described in the following table:
 
 {|
@@ -111,6 +118,7 @@ Each feature is contained in its own directory.  The organization of the feature
 |}
 
 = See Also =
+----
 * [https://github.com/github/markup github markup]: github markup library
 * [https://github.com/github/gollum gollum]: rendering library used by github-markup
 * [https://github.com/pediapress pediapress tools]: mediawiki tools
@@ -121,4 +129,5 @@ Each feature is contained in its own directory.  The organization of the feature
 
 
 = References =
+----
 <references/>
