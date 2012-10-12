@@ -58,7 +58,7 @@ The report generator reads data from the reporting database. Then it performs a 
 Each node for every user, account, group, availability zone, and report, will contain "usage total" nodes as children. Those "usage total" nodes will contain the aggregate statistics for all instances, volumes, snapshots, etc, for that entity. For example, an account node in a report of instances and volumes would contain an "instances total" child and a "volumes total" child, which contain the aggregate instance and volume usage information for all users of that account.
 
 The renderers will take such a tree and will transform it into either an HTML document or a CSV document. An HTML document would contain a table which might look something like the following:
-[[File:../img/art.png|Abstract Reporting Tree]]
+[[../img/art.png]]
 
 
 Containing: Instance, Volume, and elastic IP data
