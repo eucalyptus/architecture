@@ -58,18 +58,18 @@ Generational documents consist of:
 | [[tag:rls-3.1|3.1]] 
 | [[tag:rls-3.2|3.2]]
 | [[tag:rls-3.3|3.3]] 
-|- style="font-size: 8px;"
+|- 
 | 
-| ''pending''
-| ''pending''
+| style="font-size: 8px;" | ''pending''
+| style="font-size: 8px;" | ''pending''
 | 
 | 
 |-
 | '''Feature'''
-| colspan=5 | '''PENDING'''
+| colspan="4" | '''PENDING'''
 |-
 | '''Component'''
-| colspan=5 | '''PENDING'''
+| colspan="4" | '''PENDING'''
 |} 
 
 = Contributing =
