@@ -114,7 +114,7 @@ Each feature is contained in its own directory.  The organization of the '''feat
 | Generated images
 |- 
 | /X.Y (e.g., /3.3)
-| Documents 
+| Documents specific to the work done (or going on during) the X.Y release. 
 |}
 
 = See Also =
