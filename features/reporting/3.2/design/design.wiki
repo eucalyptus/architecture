@@ -41,7 +41,7 @@ The CLI tool for data export/import takes an xml document from the web service f
 In all cases, reporting data flows in one direction throughout the system, starting from events fired by eucalyptus components and ending in a visual report displayed to the user. The data flow is as follows:
 
 == Interfaces between components == 
-[[Image:img/hld.png]]
+[[features:reporting:3.2:design:img:hld.png]]
 
 [[Image:img/hld-2.png]]
 
