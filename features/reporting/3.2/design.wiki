@@ -1,4 +1,4 @@
-[[release-3.2]]
+[[rls-3.2]]
 = Introduction =
 
 The reporting subsystem tracks usage statistics of a eucalyptus cloud, and then generates reports based upon those statistics.
