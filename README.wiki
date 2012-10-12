@@ -63,7 +63,7 @@ Broadly, this repository should have version-able source materials except when n
 *# A reference document or tool is included:  These belong in specific places noted below.
 * '''Auto-generated''':  A number of files in this repo are automatically generated **DO NOT EDIT THEM DIRECTLY**
 *# Any binary file is either auto-generated or 3rd-party.
-*# features/${FEATURE}/stories.wiki
+*# ''Surely more of them go here...''
 
 '''Text Format Note'''
 ----
