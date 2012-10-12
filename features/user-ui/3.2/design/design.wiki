@@ -1,0 +1,62 @@
+= EUI Design =
+The Eucalyptus UI (EUI) is a new component that offers an extensible user console for Eucalyptus.
+
+= Design Overview =
+[[hld.png]]
+The design can be broken down into two main components, the client user interface (in the browser) and a UI Proxy that will be installed on 1 or more servers (and could be co-located with the CLC for POC). The UI toolkit will be jQuery (http://jqueryui.com/) which provides a rich set of user interface components and supporting code for AJAX calls. The user will authenticate in the browser with the same username and password as they use for the Eucalyptus admin interface (on the CLC). The UI Proxy will be a separate component that is a light-weight proxy between the user interface and the CLC. The proxy will handle session management and provide a set of rest interfaces that the UI will use to get information from the CLC via API calls (EC2, S3, etc). The only state held in the proxy will be some access credentials for the API calls stored in the session. Those will be discarded when the session expires. Specific details of the design will be addressed in the sections below.
+
+= Scalability, Availability & Statelessness =
+
+The only state maintained in each proxy is the session id and its associated Eucalyptus credentials. [HA] Because of its statelessness, multiple proxy instances can be setup and take over each other when one instance becomes unavailable. Switching the instance will require the clients to login again with the new instance and we assume this is the acceptable consequence. [SCALABITLITY] We consider round-robin dns as the way to address multiple proxy instances. In this case, the session affinity can be implemented by returning the IP address of the proxy that the client initially authenticates with and using the IP for subsequent client operations. When the proxy becomes unavailable, the browser will redirect the client to the log-in page using the DNS name.
+Although not stated in the requirements, the design does not preclude the caching resource states at the proxy-level. This can reduce the number of message exchanges between the proxy and CLC, thereby helping the CLC to scale. It will also help reducing the response time from the browser. There could be configurable, poll frequency, parameter at the proxy.
+
+= Performance =
+
+On the browser, the JQuery-based implementation will heavily use Ajax to partially update the state changes. The frequency of the state update will be configurable in order to help customers to balance scalability vs. accuracy. The proxy will be a thin layer that translates from the EC2/S3 messages to the light-weight JSON objects. The REST interface between the proxy and the JQuery will emulate the corresponding EC2/S3 operations such that the translation is a straightforward operation.
+The latency when interacting with the UI will be predictable (assuming the latency of the CLC's operation is predictable) and in general is bounded with respect to the amount of client's resources.
+
+= Interoperability, Modifiability, Extensibility & Customizabilty =
+
+The proxy will use EC2/S3 libraries that is established to work with Eucalyptus (e.g., boto). The proxy will be able to switch to a different version of the library across releases. As we use JQuery, it will be possible to modify the presentation and the behavior of the UI between the system's restarts. IF we choose to base the server-side implementation on python framework (tornado, flask, django), entire UI application will be modifiable without re-compilation.
+[I18N] JQuery's i18n libraries (http://code.google.com/p/jquery-i18n-properties/) will be used to implement the i18n .We will provide customers the path to translate the English strings in UI to their langauges and to plug-in the translation to the application.
+The UI application will provide the interface to customize the UI (e.g., logos, strings, etc) and document the procedure. In addition the customers will be able to tweak the CSS to suit their needs.
+
+= Testability =
+
+The UI proxy will be built with a layer internally that abstracts the calls to the CLC. This layer can be implemented with a mock that provides static data for testing. This will allow the UI components to be tested independently of the cloud (CLC). The REST calls that the UI proxy implements will be callable from test code that would authenticate and maintain a session, thereby allowing testing of the UI proxy and back end without the browser.
+The browser components will maintain consistent identification (ids) to allow a test framework (likely Selenium) to perform tests in a sustainable way. The goal with the REST apis the UI calls will also be to maintain backwards compatibility for the purpose of not breaking tests.
+
+= Security =
+
+There are 2 aspects that will be addressed to offer a secure user interface. Those are around access and authentication, and around security attack prevention.
+The user will authenticate in the browser using their username and password. These are the same as used by the CLC admin UI and the same as created by the euare-usercreate and euare-useraddloginprofile commands. The login process will follow this sequence;
+
+# User enters username and password in the browser and presses the "login" button.
+# The request is sent to the UI proxy which forwards the values to the CLC authentication REST call (to be created by the CLC team).
+# The CLC will validate the user and if authorized, look up the access id and secret key which it returns to the UI proxy.
+# The UI proxy creates a session and stores the access id and secret key in the session.
+# The session ID is stored in a cookie which is stored in the client browser when the login response is sent to the user.
+
+In step 3, we might receive federated credentials from the CLC, but the treatment of those is the same. When the session expires, the credentials are discarded (i.e. not stored in any permanent way).
+Storing the credentials in the session also requires some session stickyness. This will be achieved in the case of multiple UI proxies, by the UI proxy returning the actual IP of the proxy to the browser, which it will use on subsequent requests. Because these are ajax requests, the URL the user sees will not be re-written. We assume a DNS solution with round-robin load balancing in front of multiple UI proxies. (this method needs validation in a prototype)
+An alternate plan for session affinity would be an actual load balancer that provides this feature, but that is more heavy-weight and won't be our first option.
+The communication between the browser and the UI proxy and between the UI proxy and the CLC will be over SSL.
+Attack prevention will be addressed in several ways. The session ID will be stored in a cookie which is inherently more secure than using a request parameter in the URL. SSL use has already been mentioned. To prevent CSRF attacks, the UI proxy will generate a unique token to be submitted with each request that will need to be verified on each request in addition to the session id. To prevent injection attacks (such as SQL injection and XSS), the UI proxy will also properly escape/encode/sanitize any untrusted data before using it using in security-sensitive operations, such as database querying and returning data back to the user. Client-side code will escape any untrusted data before inserting it into DOM dynamically.
+To limit the impact of attacks against user sessions (and in case other protection mechanisms discussed above fail), the UI proxy will ensure that user sessions have limited lifetime and expire as soon as not needed.
+Denial of service attacks which may be possible by issuing many requests from a browser, or browser substitute (script, etc) could certainly flood the UI proxy with requests. In general, these requests result in a request being made to the CLC. This this case, we feel that the CLC replay detection will act to ensure a high number of requests in a given time period are denied. [ NOTE: needs updates based on CSRF and XSS docs)
+
+= Portability, Distributability and Installation =
+
+The EUI will require the same deployment mechanisms as other components in the system. It will not require any special methods or procedures. The general sequence is this;
+
+# install package(s)
+# edit configuration file
+# start service
+
+The nature of the technologies used means that portability is maximized. This is achieved by using standard technologies and not requiring some new project that's only available in a few distros.
+The configuration file will be read by the UI proxy when it starts. Changes to the configuration will only take effect when the service is restarted.
+
+= Packaging / Deployment / Updates / Sustainability =
+
+The intent will be to provide the entire EUI (client side and proxy) in a package called eucalyptus-ui. This will be able to install separately on distinct machines, combined with the CLC or deployed on instances running inside the Eucalyptus cloud. The packaging and release methodologies will be consistent with other packages offered for Eucalyptus.
+The interfaces between the UI proxy and CLC will be mostly the standard web service APIs used by euca2ools with the exception of the authorization REST call. This call should not have to change and will provide only a very specific function to help reduce the chance for changes which might affect backward compatibility. In general, the EUI will be designed to match the features available in the same version of Eucalyptus (even if that is not initially the case). Changes or updates the the eucalyptus-ui package will not fundamentally require any changes or restarts to other Eucalyptus packages or services.
