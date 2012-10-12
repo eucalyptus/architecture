@@ -1,5 +1,0 @@
-{{overview}}
-
-{{functional}}
-
-{{architectural}}

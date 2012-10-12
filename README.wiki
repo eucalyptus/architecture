@@ -81,7 +81,7 @@ The currently supported and ''seemingly reasonable'' formats are:
 ----
 The following table describes the organization of the top-level of the repository.
 
-{| width="100%"
+{| style="width=90%"
 |+ '''Top-level Directory Structure'''
 | <code>bin/</code>, <code>lib/</code>
 | Ignore these. Contain helpers and their libraries
@@ -96,25 +96,40 @@ The following table describes the organization of the top-level of the repositor
 == Feature Directory ==
 Each feature is contained in its own directory.  The organization of the '''features/${feature}''' directory, for some imagined ${feature}, is described in the following table:
 
-{| width="100%"
+{| style="width=90%"
 |+ '''Feature Directory Structure''' (e.g., <code>features/${feature}/</code>)
 | <code>/overview.wiki</code>
 | Top-level feature specification document
+|
 |-
 | <code>/xref</code>
 | xref's to the JIRA epic(s) and confluence pages
+|
 |-
-| <code>/architecture.wiki</code>
+| <code>/spec.wiki</code>
 | High level architecture document
+|
 |-
 | <code>/diagrams</code>
 | Source materials for generated documents (images)
+|
 |-
 | <code>/img</code>
 | Generated images
+|
 |- 
-| /X.Y (e.g., /3.3)
-| Documents specific to the work done (or going on during) the X.Y release. 
+| <code>/X.Y</code> 
+| Documents specific to the work done (or going on during) the X.Y release. For example <code>features/${feature}/3.3/</code> contains documents for the 3.3 release.
+|-
+|
+| <code>/X.Y/spec.wiki</code>
+| Release specific feature specification
+|-
+| <code>/X.Y/xref</code> 
+|
+|-
+| <code>/X.Y/diagrams</code> 
+|
 |}
 
 = See Also =
