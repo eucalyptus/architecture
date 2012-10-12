@@ -36,6 +36,8 @@ Generational documents consist of:
 * Functional requirements: as identified by a corresponding epic in JIRA
 * Specification:  release-specific technical interpretation of functional requirements 
 
+
+
 = TODOs =
 ```html:EucalyptusSystems/architecture/master/TODO```
 
