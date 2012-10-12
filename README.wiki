@@ -1,5 +1,3 @@
-{{__NOTOC__}}
-= Overview =
 This repository is for handling the architectural documents related to specification and design of Eucalyptus features.  Notably, it is '''not''' the source for functional requirements:  those are in JIRA.  Relatedly, the contents here will be reflected in JIRA.
 
 The organization of the repository reflects the long-lived nature of a features true specification.  That is, the specification and design work related to a feature's implementation for a particular release often corresponds with only a portion of the entire feature's implementation.  Moreover, feature's specification evolves over time as the requirements, architecture, and upstream specifications evolve.
@@ -9,6 +7,8 @@ We have three classe of documents which contribute to the definition of the syst
 # '''Generational Documents''' specific to the context and determined by the constraints of a particular release.
 # '''Architectural documents'''<ref>https://github.com/eucalyptus/architecture-docs</ref> are the final documents describing the architecture of the system combining the intensional and emergent characteristics.
 #: For more documents see the [[https://github.com/eucalyptus/architecture-docs|separate architecture docs repository]].
+
+{{__TOC__}}
 
 '''Specification Documents''' 
 ----
@@ -41,7 +41,7 @@ Generational documents consist of:
 Broadly, this repository should have versionable source materials except when not available (e.g., third party PDF documentation).
 
 * '''Text''':  must be renderable through the github interface 
-** See [[https://github.com/github/markup|github-markup]] which uses [[https://github.com/github/gollum|gollum]] 
+** See [[https://github.com/github/markup|github markup]] which uses [[https://github.com/github/gollum|gollum]] 
 * '''Graphics''':  must be text-based so a compile step is not only acceptable, but required.  
 ** [[PlantUML]]
 * '''Binary files''': may be committed in the cases that:
