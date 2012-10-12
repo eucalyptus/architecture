@@ -1,3 +1,4 @@
+{{__NOTOC__}}
 = Overview =
 This repository is for handling the architectural documents related to specification and design of Eucalyptus features.  Notably, it is '''not''' the source for functional requirements:  those are in JIRA.  Relatedly, the contents here will be reflected in JIRA.
 
