@@ -8,11 +8,10 @@ We have three classe of documents which contribute to the definition of the syst
 # '''Specification Documents''' are overarching definitions of a feature.
 # '''Generational Documents''' specific to the context and determined by the constraints of a particular release.
 # '''Architectural documents'''<ref>https://github.com/eucalyptus/architecture-docs</ref> are the final documents describing the architecture of the system combining the intensional and emergent characteristics.
+#: For more documents see the [[https://github.com/eucalyptus/architecture-docs|separate architecture docs repository]].
 
-For more documents see the [[https://github.com/eucalyptus/architecture-docs|separate architecture docs repository]].
-
-=== '''Specification Documents''' ===
-
+'''Specification Documents''' 
+----
 These documents are intentional and intensional<ref>http://en.wikipedia.org/wiki/Intensional_statement</ref>:
 * are "''timeless''" in that they are overarching and meant to be definitive of the feature overall.
 * evolve over time independent of the features current implementation status.
@@ -23,7 +22,8 @@ Specification documents consist of:
 * High level design/Architecture:  definition of fundamental components, interfaces, behaviours including information, control, and concurrency models.
 * Supporting Documents: API/Service specifications, client tool chains, WSDLs, TCKs.
 
-=== '''Generational Documents''' ===
+'''Generational Documents'''
+----
 These documents are specific to a release and meant to serve the tasks surrounding the planning, design, implementation, and delivery of a feature.
 * support the scoping, design, and implementation effort of the feature during that release.
 * defining the design and implementation objectives and details for a particular version of a feature.
@@ -38,10 +38,10 @@ Generational documents consist of:
 = Contributing =
 '''Formats'''
 * '''Text''':  must be renderable through the github interface 
-** [[gollum|https://github.com/github/gollum]]
-** [[github-markup|https://github.com/github/markup]]
+*: [[gollum|https://github.com/github/gollum]]
+*: [[github-markup|https://github.com/github/markup]]
 * '''Graphics''':  must be text-based so a compile step is not only acceptable, but required.  
-** [[PlantUML]]
+*: [[PlantUML]]
 
 = Organization =
 == Important Note ==
