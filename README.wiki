@@ -99,37 +99,37 @@ Each feature is contained in its own directory.  The organization of the '''feat
 {| style="width=90%"
 |+ '''Feature Directory Structure''' (e.g., <code>features/${feature}/</code>)
 | <code>/overview.wiki</code>
-| Top-level feature specification document
-|
+| colspan="2" | Top-level feature specification document
 |-
 | <code>/xref</code>
-| xref's to the JIRA epic(s) and confluence pages
-|
+| colspan="2" | xref's to the JIRA epic(s) and confluence pages
 |-
 | <code>/spec.wiki</code>
-| High level architecture document
-|
+| colspan="2" | High level architecture document
 |-
 | <code>/diagrams</code>
-| Source materials for generated documents (images)
-|
+| colspan="2" | Source materials for generated documents (images)
 |-
 | <code>/img</code>
-| Generated images
-|
+| colspan="2" | Generated images
 |- 
 | <code>/X.Y</code> 
 | Documents specific to the work done (or going on during) the X.Y release. For example <code>features/${feature}/3.3/</code> contains documents for the 3.3 release.
 |-
-|
-| <code>/X.Y/spec.wiki</code>
+| colspan="2" | <code>/X.Y/spec.wiki</code>
 | Release specific feature specification
 |-
-| <code>/X.Y/xref</code> 
-|
+| colspan="2" | <code>/X.Y/design</code>
+| Release specific design documents
 |-
-| <code>/X.Y/diagrams</code> 
-|
+| colspan="2" | <code>/X.Y/xref</code> 
+| xref's to the JIRA epic for the current release
+|-
+| colspan="2" | <code>/X.Y/diagrams</code> 
+| Source materials for generated documents (images)
+|-
+| colspan="2" | <code>/X.Y/img</code> 
+| Source materials for generated documents (images)
 |}
 
 = See Also =
