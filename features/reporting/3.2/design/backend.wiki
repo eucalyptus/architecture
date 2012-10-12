@@ -220,19 +220,3 @@ It may be necessary to configure the underlying platforms so as to make collecti
 * [[http://www.vmware.com/support/developer/vc-sdk/visdk41pubs/ApiReference/cpu_counters.html| VMWare CPU Counters]]
 * [[http://www.vmware.com/support/developer/vc-sdk/visdk41pubs/ApiReference/virtual_disk_counters.html| VMWare Virtual Disk Counters]]
 
-= Appendix A: Agile stories =
-^ Story ^ Task ^ Estimate ^ Assignee ^
-| As a back-end engineer I'd like to have get stats request to be defined so back-end components can provide arbitrary reporting metrics to CLC. | Design the message with CLC team | | |
-| ::: | NC implementation | | |
-| ::: | Broker implementation | | |
-| As a back-end engineer I'd like to persistence store extra performance information so it can be periodically provided to CLC upon request | Performance storage on NC | | |
-| ::: | Performance storage for Broker | | |
-| As a back-end engineer I'd like to collect number of disk read/write operations so it can be communicated back to CLC. | NC implementation | | |
-| ::: | Broker implementation | | |
-| As a back-end engineer I'd like to collect number of disk read/write bytes so it can be communicated back to CLC | NC implementation | | |
-| ::: | Broker implementation | | |
-| As a back-end engineer I'd like to collect volume read/write time so it can be communicated back to CLC | NC implementation | | |
-| ::: | Broker implementation | | |
-| As a back-end engineer I'd like to collect network in/out bytes count so it can be communicated back to CLC | NC "out" implementation | | |
-| ::: | CC "in" implementation | | |
-| ::: | Broker ??? | | |
