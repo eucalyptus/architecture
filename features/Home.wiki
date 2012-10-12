@@ -9,18 +9,7 @@ We have three classes of documents which contribute to the definition of the sys
 # '''Architectural documents'''<ref>https://github.com/eucalyptus/architecture-docs</ref> are the final documents describing the architecture of the system combining the intensional and emergent characteristics.
 #: For more documents see the '[[/eucalyptus/architecture-docs|separate architecture docs repository]].
 
-Briefly, the repository is organized as follows:
-{| style="width=90%"
-|+ '''Top-level Directory Structure'''
-| <code>features/</code>
-| this is where '''all''' content goes
-|-
-| <code>bin/</code>, <code>lib/</code>
-| ''Ignore these. '' Contain helpers and their libraries
-|-
-| <code>releases/</code>
-| ''Ignore these. '' Contain auto-generated xref of features to releases
-|}
+
 
 
 
@@ -28,6 +17,22 @@ Briefly, the repository is organized as follows:
 __TOC__
 = Documents =
 There are two kinds of documents for which this repository is the canonical reference:  specification and generational documents.
+
+= Document Categories =
+{| style="width: 90%"
+|+ ''Documents By Category''
+| '''Release'''
+| [[tag:rls-3.0|3.0]]<br/><code>pending</code>
+| [[tag:rls-3.1|3.1]]<br/><code>pending</code>
+| [[tag:rls-3.2|3.2]]
+| [[tag:rls-3.3|3.3]]<br/><code>pending</code>
+|-
+| '''Feature'''
+| colspan="4" | <code>pending</code>
+|-
+| '''Component'''
+| colspan="4" | <code>pending</code>
+|} 
 
 == Specification Documents ==
 These documents are intentional and intensional<ref name="Intensional Definition">http://en.wikipedia.org/wiki/Intensional_definition</ref>:
@@ -51,21 +56,7 @@ Generational documents consist of:
 * Functional requirements: as identified by a corresponding epic in JIRA
 * Specification:  release-specific technical interpretation of functional requirements 
 
-= Document Categories =
-{| style="width: 90%"
-|+ ''Documents By Category''
-| '''Release'''
-| [[tag:rls-3.0|3.0]]<br/><code>pending</code>
-| [[tag:rls-3.1|3.1]]<br/><code>pending</code>
-| [[tag:rls-3.2|3.2]]
-| [[tag:rls-3.3|3.3]]<br/><code>pending</code>
-|-
-| '''Feature'''
-| colspan="4" | <code>pending</code>
-|-
-| '''Component'''
-| colspan="4" | <code>pending</code>
-|} 
+
 
 = Contributing =
 ----
