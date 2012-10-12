@@ -7,11 +7,11 @@ The organization of the repository reflects the long-lived nature of a features 
 We have three classe of documents which contribute to the definition of the system:
 # [[#Specification Documents]] are overarching definitions of a feature.
 # [[#Generational Documents]] specific to the context and determined by the constraints of a particular release.
-# [[https://github.com/eucalyptus/architecture-docs Architectural documents]] are the final documents describing the architecture of the system combining the intensional and emergent characteristics.
+# '''Architectural documents'''<ref>https://github.com/eucalyptus/architecture-docs</ref> are the final documents describing the architecture of the system combining the intensional and emergent characteristics.
 ** These are in a [[https://github.com/eucalyptus/architecture-docs separate repository]].
 
 === Specification Documents ===
-These documents are intentional and <ref name="intensional">http://en.wikipedia.org/wiki/Intensional_statement</ref>:
+These documents are intentional and intensional<ref>http://en.wikipedia.org/wiki/Intensional_statement</ref>:
 * are "''timeless''" in that they are overarching and meant to be definitive of the feature overall.
 * evolve over time independent of the features current implementation status.
 * reflect our current understanding of the features definition in the broadest sense.
