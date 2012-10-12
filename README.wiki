@@ -19,10 +19,10 @@ These documents are intentional and intensional<ref name="Intensional Statement"
 * evolve over time independent of the features current implementation status.
 * reflect our current understanding of the features definition in the broadest sense.
 
-Specification documents consist of:
-* Specification:  overall technical specification of the functional and architectural/quality characteristics.
-* High level design/Architecture:  definition of fundamental components, interfaces, behaviours including information, control, and concurrency models.
-* Supporting Documents: API/Service specifications, client tool chains, WSDLs, TCKs.
+; Specification documents consist of:
+;* Specification:  overall technical specification of the functional and architectural/quality characteristics.
+;* High level design/Architecture:  definition of fundamental components, interfaces, behaviours including information, control, and concurrency models.
+;* Supporting Documents: API/Service specifications, client tool chains, WSDLs, TCKs.
 
 '''Generational Documents'''
 ----
@@ -77,6 +77,7 @@ The currently supported and ''seemingly reasonable'' formats are:
 
 = Organization =
 The following table describes the organization of the top-level of the repository.
+
 {|
 |+ '''Top-level Directory Structure'''
 | <code>bin/</code>, <code>lib/</code>
