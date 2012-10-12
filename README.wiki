@@ -14,7 +14,7 @@ __TOC__
 
 '''Specification Documents''' 
 ----
-These documents are intentional and intensional<ref>http://en.wikipedia.org/wiki/Intensional_statement</ref>:
+These documents are intentional and intensional<ref name="Intensional Statement">http://en.wikipedia.org/wiki/Intensional_statement</ref>:
 * are "''timeless''" in that they are overarching and meant to be definitive of the feature overall.
 * evolve over time independent of the features current implementation status.
 * reflect our current understanding of the features definition in the broadest sense.
@@ -96,15 +96,15 @@ Each feature is contained in its own directory.  The organization of the feature
 | Generated images
 |}
 
-= Tools =
+= See Also =
 * [https://github.com/github/markup github markup]: github markup library
 * [https://github.com/github/gollum gollum]: rendering library used by github-markup
-* [https://github.com/pediapress pediapress tools]]: mediawiki tools
+* [https://github.com/pediapress pediapress tools]: mediawiki tools
 * [http://mwlib.readthedocs.org/en/latest/installation.html mw-render]: mediawiki renderer
 * [https://bitbucket.org/bspeakmon_atlassian/jira-python.git python-jira]: jira library used for xrefs
 * [http://plantuml.sourceforge.net/ PlantUML]: text based uml diagramming tool
 * [http://www.graphviz.org/ dot/graphviz]: used by plantuml for diagrams
 
 
-
+= References =
 <references/>
