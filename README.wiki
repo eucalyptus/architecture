@@ -5,8 +5,8 @@ This repository is for handling the architectural documents related to specifica
 The organization of the repository reflects the long-lived nature of a features true specification.  That is, the specification and design work related to a feature's implementation for a particular release often corresponds with only a portion of the entire feature's implementation.  Moreover, feature's specification evolves over time as the requirements, architecture, and upstream specifications evolve.
 
 We have three classe of documents which contribute to the definition of the system:
-# [[#Specification Documents]] are overarching definitions of a feature.
-# [[#Generational Documents]] specific to the context and determined by the constraints of a particular release.
+# [[Specification Documents]] are overarching definitions of a feature.
+# [[Generational Documents]] specific to the context and determined by the constraints of a particular release.
 # '''Architectural documents'''<ref>https://github.com/eucalyptus/architecture-docs</ref> are the final documents describing the architecture of the system combining the intensional and emergent characteristics.
 ** These are in a [[https://github.com/eucalyptus/architecture-docs|separate repository]].
 
