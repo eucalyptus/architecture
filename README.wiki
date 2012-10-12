@@ -55,24 +55,17 @@ The contents of this repository are reviewed and, to that end, all changes shoul
 Broadly, this repository should have versionable source materials except when not available (e.g., third party PDF documentation).
 
 * '''Text''':  must be renderable through the github interface 
-** See [[https://github.com/github/markup|github markup ]] which uses [[https://github.com/github/gollum|gollum]] 
 * '''Graphics''':  must be text-based so a compile step is not only acceptable, but required.  
-** [[PlantUML]]
 * '''Binary files''': may be committed in the cases that:
 *# A binary output format (e.g., images) is needed:  In this case, it has to be compilable from a text-based and versioned file.
 *# A reference document or tool is included:  These belong in specific places noted below.
-* A number of files in this repo are automatically generated **DO NOT EDIT THEM DIRECTLY**
-** features/FEATURE_NAME/spec.wiki
-** features/FEATURE_NAME/stories.wiki
-** Any binary file is auto-generated.
+* '''Auto-generated''':  A number of files in this repo are automatically generated **DO NOT EDIT THEM DIRECTLY**
+*# Any binary file is either auto-generated or 3rd-party.
+*# features/${FEATURE}/stories.wiki
 
 
 == Organization ==
-
-hi.
-
-
-=== Directory Structure ===
+The following table describes the organization of the top-level of the repository.
 {|
 ! bin/, lib/
 | Ignore these. Contain helpers and their libraries
@@ -84,12 +77,32 @@ hi.
 | auto-generated xref of features to releases
 |}
 
+=== Feature Directory ===
+Each feature is contained in its own directory.  The organization of the features/${feature} directory, for some imagined ${feature}, is described in the following table:
+{|
+! /overview.wiki
+| Top-level feature specification document
+|-
+! /xref
+| xref's to the JIRA epic(s) and confluence pages
+|-
+! /architecture.wiki
+| High level architecture document
+|-
+! /diagrams
+| Source materials for generated documents (images)
+|-
+! /img
+| Generated images
+|}
 
-'''Build Tools'''
-* pediapress tools: https://github.com/pediapress
-* mw-render: http://mwlib.readthedocs.org/en/latest/installation.html
-* python-jira: https://bitbucket.org/bspeakmon_atlassian/jira-python.git
-* dot/graphviz: 
+= Tools =
+* [[https://github.com/github/markup|github markup]]
+* [[https://github.com/github/gollum|gollum]]
+* [[https://github.com/pediapress|pediapress tools]]
+* [[http://mwlib.readthedocs.org/en/latest/installation.html|mw-render]]
+* [[https://bitbucket.org/bspeakmon_atlassian/jira-python.git|python-jira]]
+* [[http://www.graphviz.org/|dot/graphviz]]
 
 
 
