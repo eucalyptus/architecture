@@ -4,8 +4,7 @@
 
 ==Design Docs==
 
-* [Backend Troubleshooting |https://wiki.eucalyptus-systems.com/doku.php?id=backend:3.2:troubleshooting]
-* [Files formats |https://wiki.eucalyptus-systems.com/doku.php?id=arch:3.2:troubleshooting:files ]
+
 * [Troubleshooting Feedback |https://wiki.eucalyptus-systems.com/doku.php?id=arch:3.2:troubleshooting:feedback]
 
 

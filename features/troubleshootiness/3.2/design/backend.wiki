@@ -1,0 +1,531 @@
+= 3.2 Back-end Troubleshooting Feature Design =
+
+== Requirements & Constraints ==
+=== Identifying Concerns ===
+* C and Java people must define and encode in mutually agreeable format a registry of error codes and message templates for events
+** messages should be potentially translatable into any language
+** messages should be parametarizable so that instructions specific to an installation can be produced
+*** e.g. "no GBs left under %s, please clean up %d GBs"
+** location and naming of logs should be consistent
+* C and Java people should agree on any syntax and semantics of the new fault logs that are not prescrbed by the messages from the registry
+** how duplicate messages are handled
+** how the logs rotate
+* Old logs should be made more consistent, presumably by ensuring that lines in logs from Java and C components have a common prefix
+=== Elaboration & Conflicts ===
+* Need a reasonably comprehensive list of candidate faults that are already identified '''RECEIVED'''
+* Need an example of a fault log entry
+* What determines a unique error?
+** perhaps (what, why, where) tuples, with params stubbed out?
+* '''Question:''' It is OK to distribute fault message templates for //proprietary// components of Eucalyptus with the open-source files (if not, a more convoluted multi-file strategy would be needed)
+* '''Question:''' do these items from the spec doc need stories or tasks?
+** '''Production Troubleshooting'''
+*** 3. Java-based components have specific log files; does this include shared components / utility code?
+*** 4. Provide uniformly formatted logs across components; need a task for propagation of contextual info?
+** '''Architectural Constraints'''
+*** 3. Modifiability: fault log messages modifiable; does this imply local config changes? (i.e. post package install)
+*** 4. Configurability: common logging configuration parameters alterable at runtime; does this imply more than just a severity threshold?
+*** 8. Usability: guidelines ... need formulation and ... an evaluation method; need a task for evaluation?
+ 
+=== Assumptions & Interpretations ===
+
+'''Definitions'''
+
+* '''component:''' implied by name of the log file (e.g., cloud, walrus, cc, nc, ...)
+* '''code:''' the error code
+* '''who/initiator:''' ultimate actor in the action that caused the detection of the fault (eucalyptus, user...)
+* '''what/fault:''' the concise description of the fault [parametarizable]
+* '''when/timestamp:''' UTC timestamp in ISO 8601:2004 format
+* '''why/cause:''' reason for the fault or "unknown"
+* '''where/location:''' the object of the failed action
+* '''how/condition:''' details regarding how the system identified the fault
+* '''resolution:''' e.g.,
+** any additional detail for identifying the problem
+** instructions for fixing the problem
+** addressing side-effects of the fault
+** verification of the resolution
+* may want to qualify "fault" and "failure"
+ 
+== High-Level Feature Design ==
+=== External View ===
+# the external facing elements of the feature
+** new type of fault messages, formatted consistently across all components
+*** when a fault is synchronous (in response to a user command), the message will be printed to standard output
+*** when a fault is asynchronous, it will be logged into a new log on the file system for such faults
+*** potentially a way to configure the language used by the messages, even if only English is available initially
+** changes to eucalyptus.conf are picked up dynamically (at least LOGLEVEL)
+** existing logs in the system (cloud-output.log, cc.log, nc.log) are formatted more consistently
+# their responsibilities, boundaries, interfaces, and interactions
+** this feature mainly affects the content of messages seen by cloud admin on the command line and in the logs
+** error codes do not change, only disappear - that way they can be referenced in documentation that is not distributed along with the system
+== Detailed Feature Design ==
+=== Logical Design ===
+==== Functional ====
+# Describes the system’s runtime functional elements and their responsibilities, interfaces, and primary interactions
+# Concerns: Functional capabilities, external interfaces, internal structure, faults, and design implications
+
+* new fault message construction interface (function(s) for creating multilingual fault messages)
+** implementations in different languages
+*** one for Java code
+*** one for C code
+*** possibly others if faults are to be reported on command line, e.g. by init scripts
+** shared text data, located on the file system and immutable
+* new fault logging interface (logprintfl() and log.error()-type functions)
+** takes a constructed fault message and logs it to a file
+** takes de-duplication and log rotation into account
+** ''syslogd'' interface is a possibility
+* case-by-case augmentation of existing code, throughout the system, to generate the faults
+** will need a better general approach to propagating component state and fault information up or down call stack in C
+*** can use request-specific data structure (e.g. run-task, volume-task struct)
+
+
+
+==== Information ====
+# Describes the way that the system stores, manipulates, manages, and distributes information
+# Concerns: Information structure and content; information flow; data ownership; timeliness, latency, and age; references and mappings; transaction management and recovery; data quality; data volumes.
+
+
+----
+
+'''File format'''
+
+Various [[:arch:3.2:troubleshooting:files|options]] for formatting the fault registry file were considered. At the end, XML format was selected (with JSON a close second) due to libraries for parsing already being dependencies for Java and C components. Properties file was considered limiting given translation considerations and the need for at least one multi-line entry (Resolution).
+
+Strings common to all faults, such as prefix names, are to be formatted as follows:
+
+<code xml>
+<?xml version="1.0" encoding="UTF-8"?>
+<eucafaults version="1" description="Common strings for the fault subsystem">
+  <common>
+    <var name="condition" value="Condition" localized="Условия"/>
+    <var name="cause" value="Cause" localized="Причина"/>
+    <var name="initiator" value="Initiator" localized="Инициатор"/>
+    <var name="location" value="Location" localized="Место"/>
+    <var name="resolution" value="Resolution" localized="Решение"/>
+    <var name="unknown" value="unknown" localized="не известна"/>
+    <var name="na" value="not applicable" localized="не применительно"/>
+    <var name="started_template" value="${component} started" localized="${component} запущен"/>
+  </common>
+</eucafaults>
+</code>
+
+The above example defines variables that may be used in construction of all fault messages. The ''localized'' attribute is optional in the default, English-language file. All non-default locales should specify the ''localized'' attribute, while the ''value'' attribute should remain in English, consistent with the default file. Using bash-like syntax, the template for a fault message would be:
+
+<code bash>
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''*
+| $err_id $timestamp $fault_msg
+|
+|  $condition: $condition_msg
+|      $cause: $cause_msg
+|  $initiator: $initiator_msg 
+|   $location: $location_msg
+| $resolution: 
+|
+| $resolution_msg
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''*
+</code>
+
+Where
+
+* '''$err_id''' ∷= '''ERR-'''NNNN (a unique four-digit code for the fault)
+* '''$timestamp''' ∷= YYYY-MM-DD HH:MM:SSZ
+* '''$fault_msg''' ∷= $fault_template //after variable substitution//
+* '''$condition_msg''' ∷= $condition_template //after variable substitution//
+* '''$cause_msg''' ∷= $unknown or, if set, $cause_template //after variable substitution//
+* '''$initiator_msg''' ∷= $initiator_template //after variable substitution//
+* '''$location_msg''' ∷= $na or, if set, $location_template //after variable substitution//
+* '''$resolution_msg''' ∷= $resolution_template //after variable substitution//
+
+The error codes are assigned by developers sequentially, starting with ERR-0001. The timestamp should be in UTC and consistent with other log files in the system (and in those, a more compact format than '''ISO 8601:2004''' is //probably// desirable). All the '''$*_msg''' variables are subject to variable substitution that is specific to each fault. For example, a fault definition may contain template ''$condition_template="directory ${dir} does not exist"'' which will be turned into ''$condition_msg'' by substituting ''${dir}'' that must be specified when the fault is being logged. As a special case, some fault definitions may omit ''$cause_template'' and ''$location_template'', in which case localized versions of "unknown" and "not applicable" would be printed, respectively.
+
+Other formatting considerations:
+
+* Each entry starts and ends with a line of 72 asterisks, to clearly separate one entry from another and from status messages
+* Prior to the initial line of asterisks there is an empty line for further separation
+* All lines between the asterisk lines start with a vertical bar '|' followed by a space
+* All whitespace in the message should be formed by the space character
+* The five inner entries should be lined up on the colon character, based on the length of the longest header in the specific LOCALE
+
+Here is an example log entry in English followed by a log entry in Russian:
+
+<code>
+STATUS 2012-07-24 21:02:45 node controller restarted
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''*
+| ERR-3456 2012-07-24 21:23:01Z ntpd is not running
+|
+|  Condition: can't find running ntpd process
+|      Cause: cause unknown
+|  Initiator: eucalyptus 
+|   Location: ntpd daemon on localhost
+| Resolution: 
+|
+|  1) install NTPD
+|  2) run NTPD
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''*
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''*
+| ERR-3456 2012-07-24 21:24:23Z ntpd не запущен
+|
+|   Условия: процесс ntpd на системе не найден
+|   Причина: не известна
+| Инициатор: eucalyptus 
+|     Место: ntpd сервер на системе localhost
+|   Решение: 
+|
+|  1) установите пакет NTPD
+|  2) запустите сервер NTPD
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''*
+</code>
+
+The previous example also shows a status message that will be logged whenever a component is restarted. (And perhaps at other salient points.) The format of the status message is as follows:
+
+<code>
+STATUS $timestamp $started_msg
+</code>
+
+Where
+
+* '''$started_msg''' ∷= $started_template //after variable substitution//
+
+The templates ('''$*_template''' variable values) come from multiple XML documents, all of the following format:
+
+<code xml>
+<?xml version="1.0" encoding="UTF-8"?>
+<eucafaults version="1" description="Templates for the fault subsystem">
+  <fault 
+    id="1234"
+    message="${daemon} is not running" 
+    localized="${daemon} не запущен">
+    
+    <condition 
+      message="can't find running ${daemon} process" 
+      localized="процесс ${daemon} на системе не найден"/>
+
+    <cause/> <!-- since 'message' is not set, default value, $unknown, will be used --> 
+
+    <initiator 
+      message="eucalyptus" 
+      localized="eucalyptus"/>
+      
+    <location 
+      message="${daemon} daemon on localhost" 
+      localized="${daemon} сервер на системе localhost"/>
+
+    <resolution>
+      <message>
+        1) install NTPD
+        2) run NTPD
+      </message>
+      <localized>
+        1) установите пакет NTPD
+        2) запустите сервер NTPD
+      </localized>
+    </resolution>
+  </fault>
+  
+  <fault 
+    id="1235"
+    message="ESX(i) host ${hostIp} is not accessible any more" 
+    localized="ESX(i) машина ${hostIp} больше не доступна">
+    
+    <condition 
+      message="can't issue requests for host ${hostIp}" 
+      localized="запросы на машину ${hostIp} не успешны"/>
+
+    <cause/> <!-- since 'message' is not set, default value, $unknown, will be used --> 
+
+    <initiator 
+      message="eucalyptus" 
+      localized="eucalyptus"/>
+      
+    <location 
+      message="requests from ${brokerIp} to endpoint ${endpointIp}" 
+      localized="запросы от ${brokerIp} на ${endpointIp}"/>
+
+    <resolution>
+      <message>
+        Ensure that:
+  ### host ${hostIp} is powered on
+  ### host is accessible from ${brokerIp} on port 443 
+  ### host credentials match those in Broker's configuration
+      </message>
+      <localized>
+        Убедитесь, что:
+  ### машина ${hostIp} включена
+  ### машина доступна на порту 443 с машины ${brokerIp}
+  ### логин и пароль соответствуют конфигурации Брокера
+      </localized>
+    </resolution>
+  </fault>
+</eucafaults>
+</code>
+
+The example fault above depends on two variables, ''${daemon}'' and ''${host}'', which should contain the (distribution dependent) name of the NTPD daemon on the particular system and the name of the host, respectively. To log this fault, one must provide the values for these variables. Potentially, this can be done in Java as follows:
+
+<code java>
+FaultSubsystem.fault( EucaFaults.NTPD )
+              .withVar( "daemon", "ntpd" )
+              .withVar( "host", "localhost" )
+              .log();
+FaultSubsystem.fault( EucaFaults.VMWARE_HOST_UNREACHABLE )
+              .withVar( "brokerIp", "192.168.33.3" )
+              .withVar( "endpointIp", "192.168.51.3" )
+              .withVar( "hostIp", "192.168.51.198" )
+              .log();
+</code>
+
+In C the following idiom may be used:
+
+<code c>
+euca_faults * F = faults_init ();
+
+euca_fault f;
+fault_init ( F, &f, EUCAFAULTS_NTPD );
+fault_with_var ( &f, "daemon", "ntpd" );
+fault_with_var ( &f, "host", "localhost" );
+fault_log (&f);
+</code>
+
+When the fault subsystem is being initialized, it will aggregate information from multiple XML files to arrive at a set of known fault templates and the common variables that may be used by them. The following file system layout will be used for the XML files:
+
+'''Default templates''' (shipped with Eucalyptus) will be spread into per-locale directories with one XML file per fault and one file for common strings:
+
+<code bash>
+/usr/share/eucalyptus/faults/en_US/0001.xml
+/usr/share/eucalyptus/faults/en_US/1234.xml
+/usr/share/eucalyptus/faults/en_US/common.xml
+/usr/share/eucalyptus/faults/ru_RU/0001.xml
+/usr/share/eucalyptus/faults/ru_RU/1234.xml
+/usr/share/eucalyptus/faults/ru_RU/common.xml
+</code>
+
+'''Customized templates''' (potentially added by Eucalyptus administrators) will be, likewise, spread into per-locale directories with one XML file per fault and one file for common strings, all of which are optional:
+
+<code bash>
+/etc/eucalyptus/faults/en_US/1234.xml
+/etc/eucalyptus/faults/en_US/common.xml
+</code>
+
+The following algorithm will determine which template is used:
+
+* for each fault and common string
+** if '''locale''' is set
+*** if //localized// custom value is available
+*** use it
+** if ''en_US'' custom value is available
+*** use it
+** if '''locale''' is set
+*** if //localized// default value is available
+*** use it
+** use the ''en_US'' value 
+
+Where '''locale''' is chosen as follows (inspired by algorithm described on ''man 7 locale'' page):
+
+* if env var ''LC_ALL'' is set, use it
+* if env var ''LC_MESSAGES'' is set, use it
+* if env var ''LANG'' is set, use it
+* otherwise, assume ''en_US''
+
+When logging to the file system, each component will use its own file:
+
+<code bash>
+/var/log/eucalyptus/$component-fault.log
+</code>
+
+Where
+
+* '''$component''' ∷= cloud | walrus | sc | broker | cc | nc
+
+All fault template entries except ''Resolution'' are expected to be one-liners. They may be arbitrarily long, but they should not contain newline characters (\n). The logging subsystem //may// wrap the lines in an aesthetically pleasing manner, preserving the offset to the line header.
+
+The following validation mechanisms are desirable:
+
+* Ensure uniqueness of error codes assigned across components
+* Ensure error registry files are well formatted
+** in terms of XML syntax
+** in terms of variables being used correctly within strings
+* Ensure that fault generation (in code) 
+** sets all required parameters and 
+** does not set any non-existing parameters
+
+
+----
+
+
+'''Faults'''
+
+# ntp issues
+## '''fault: ntpd is not running'''
+### solution: install and run it
+## fault: failed to accept message due to clock skew
+### solution: install and run NTP
+# NC: libvirt issues when instances are being launched
+## fault: running instance failed because of error returned by libvirt
+### solution: restart libvirtd and NC
+## fault: running instance failed because libvirt has hung
+### solution: restart libvirtd and NC
+# NC: issues around volume attachment/detachment
+## fault: attach failed
+### solution: may have to manually reset some state in VMware or SAN?
+## fault: detach failed
+### solution: may have to manually reset some state in VMware or SAN?
+# Messaging errors in axis2c [will need some hackery in httpd]
+## fault: msg failed validation constraints (e.g. keys)
+### solution: sync keys
+## fault: more
+# NC: libvirt errors/NC errors in case the instance terminated prematurely
+## //what is meant by prematurely? before running? is that not covered by libvirt condition above? have example?//
+# DNS setup
+## //example fault?//
+# system ran out of some resource
+## '''fault: disk is (almost) full'''
+### solution: many possible causes (blobstore overprovisioned optimistically, logs not rotated,...)
+## fault: almost out of database connections
+### solution: get more or whatever
+## fault: almost out of memory (Java)
+### solution: buy more or whatever
+## fault: out of memory (Java) - fatal
+### solution: buy more or whatever
+## //other examples?//
+# traceability of resources (i.e., which CC did request go to, which NC did request go to)
+## //not a fault? maybe needs a helpful log message? maybe a new log file with only scheduling decisions made by the component?//
+# quite a few errors derives from images
+## having some way to keep track of a certain image boot success could be useful
+### //not a fault? grepping for [booting] in nc.log not good enough?//
+## been able to check that the emi booted successfully on all the NCs
+### //not a fault? grepping for [booting] in nc.log not good enough?//
+## been able to check that the emi booted successfully as all (some) users
+### //not a fault? grepping for [booting] in nc.log not good enough?//
+## it booted well on all NC but X and Y
+### //not a fault? grepping for [booting] in nc.log not good enough?//
+## it did booted but with a different kernel
+### //huh?//
+## image/NC size limits
+### //huh?//
+# eucalyptus.conf sanity checks
+## '''fault: nonsense ADDRS_PER_NET'''
+### solution: how to define it correctly
+## //which other faults???//
+# vmware_conf sanity checks
+## fault: Vmware Broker configuration as supplied is invalid (e.g. incorrect datastore)
+### solution: how to fix the config
+## fault: some vSphere resource changed outside of Eucalyptus's control (name changed, host went away)
+### solution: undo that
+# #2177: Option to euca_conf to automatically sync eucalyptus.conf
+## note: solution as defined by ticket is out of scope, but can be diagnosed
+## fault: ADDRS_PER_NET mismatched for CCs in same AZ
+### solution: synchronize conf manually
+# #8726: euca_conf --initialize: check to make sure hostname is resolvable
+## fault: hostname is not resolvable
+### solution: supply a resolvable hostname
+# Registration: be more verbose than "RESPONSE true" or "RESPONSE false". how about: "Registration succeeded."
+## fault: several registration faults
+### solution: specific to a fault
+# host systems limitations (check and warn for disk size and provide other such hints).
+## //same as 'running out of some resource' above???//
+# image/cluster/node/hypervisor compatibility
+## //how do we detect in euca when image is not compatible with hypervisor???//
+# handling of network mode/config changes
+## note: related to ADDRS_PER_NET above,
+## fault: network config changed while instances were running
+### solution: do not do that
+# NOTREADY state error reporting
+## some reports of NOTREADY are useless now
+## probably can be turned into a set of faults (actionable) - follow up with Chris
+# Log errors about SELinux/Apparmor related issues
+## //errors that result from SELinux and Apparmor are hard to identify as such: what are top 3???//
+# error information about attempted image boot (e.g., partition table, kernel info?)
+## //specific examples of the fault?//
+# vmware image import validation
+## //specific examples of the fault???//
+# VMFS datastore configuration validation, esp. w/ multiple datastores
+## //sub-item of vmware_conf sanity check above//
+# esxi node specific error information
+## fault: ESX host not reachable
+### solution: fix your wifis
+
+'''Old log formatting'''
+
+Our existing logs look different:
+
+<code>
+cloud-output.log
+
+Fri Oct 28 17:57:06 2011 DEBUG setup_db                | Connected as: eucalyptus
+Fri Oct 28 17:57:08 2011 DEBUG yreanTransactionManager | Setting up transaction manager: java:comp/UserTransaction
+Fri Oct 28 17:57:25 2011  INFO PersistenceContexts     | -> Setup done for persistence context: eucalyptus_cloud
+
+cc.log
+
+[Sat Oct 29 14:11:25 2011][020710][EUCADEBUG ] monitor_thread(localState=ENABLED): done
+[Sat Oct 29 14:11:25 2011][020481][EUCAINFO  ] DescribeResources(): called 
+[Sat Oct 29 14:11:25 2011][020481][EUCADEBUG ] DescribeResources(): params: userId=eucalyptus, vmLen=5
+[Sat Oct 29 14:11:25 2011][020481][EUCADEBUG ] init_thread(): init=1 6E9F0000 FE4AE000 045A4000 6E950000
+
+nc.log 
+
+[Sat Oct 29 12:47:19 2011][021338][EUCADEBUG ] [i-51470931] found 2 prereqs and 3 partitions in the VBR
+[Sat Oct 29 12:47:19 2011][021338][EUCADEBUG ] [i-51470931] allocated artifact 001|i-51470931 size=-1 vbr=0 cache=0 file=0
+[Sat Oct 29 12:47:19 2011][021338][EUCADEBUG ] {335542016} walrus_request: writing GET output to /tmp/walrus-digest-I1rP5M
+</code>
+
+We can achieve greater consistency by unifying the prefix of the logs
+
+<code>
+2012-07-27 22:00:12 DEBUG 021338:335542016 loggingMethodOrClass     | the rest...
+YYYY-MM-DD HH:MM:SS >>5>> 000006:000000009 <<<<<<<<<<<24<<<<<<<<<<< | the rest...
+</code>
+
+==== Concurrency  ====
+# Describes the concurrency structure of the system, mapping functional elements to concurrency units to clearly identify the parts of the system that can execute concurrently, and shows how this is coordinated and controlled
+# Concerns: Task structure, mapping of functional elements to tasks, interprocess communication, state management, synchronization and integrity, startup and shutdown, task failure, and reentrancy
+
+The new fault log should be guarded from concurrent modification by different threads of control inside a component. While this is not always done for other logs, readability expectations are higher for this log, so it is important to keep multi-line faults coherent, for clarity.
+
+=== Physical Design ===
+==== Development ====
+# Describes the architecture that supports the software development process
+# Concerns: Module organization, common processing, standardization of testing, instrumentation, and codeline organization
+
+'''Testing'''
+
+Parts of troubleshootiness feature that are easily verified and tested:
+
+* Changing log levels at runtime
+* Ensuring each component has its own log
+* Ensuring faults are logged for each of the requested items using fault injection
+
+The challenges in testing troubleshootiness come from the analysis of faults generated. 
+Concerns are:
+
+* The expected results of added log messages, ie path to resolution, will highly depend on the user's skill level. For example, Does the user know how to setup NTP already on their distro? How much detail do we provide in the fault message about how to remedy an issue.
+* There is still some required understanding of Eucalyptus components and their architecture/topology. Ex You need to know where each component lives and in the case of a particular user level fault which components were involved in the failing operation
+
+In order to hedge against these two concerns, the Quality team will need to rely heavily on the Support and Sales teams to verify the proper level of detail in each log message that is to be delivered to end users. A possible interface here could be for the QA team to generate the faults required, ensure the log message is present, then pull in a member from support or sales engineering in order to verify that a user would be able to rectify the fault that was produced.
+
+==== Deployment ====
+# Describes the environment into which the system will be deployed, including the dependencies the system has on its runtime environment
+# Concerns: Types of hardware required, specification, multiplicity wrt logical elements, and quantity of hardware required, third-party software requirements, technology compatibility.
+
+There are potential new 3rd party software requirements, depending on the syntax chosen for the error registry/templates. (E.g., we already depend on XML parsers in both C and Java components, but using JSON would mean introducing a new dependency.)
+
+==== Operational ====
+# Describes how the system will be operated, administered, and supported when it is running in its production environment
+# Installation and upgrade, operational monitoring and control, configuration management, support, and backup and restore
+
+As component is upgraded to a version past 3.2, even a point release (where new faults could be introduced), any changes to the error registry would need to be kept in mind.
+
+=== Cross-cutting Concerns ===
+# As referenced in the feature specification, the following may need to be addressed.
+## Security
+### Permissions of the new log
+## Usability
+### Syntax and semantics of the fault messages
+## Performance and Scalability
+### Log aggregation (across multiple nodes) is left as an exercise for the cloud admin
+## Availability and Resilience
+### We maintain the assumption that logs do not have to survive component host failure
+## Evolution: Extensibility, Modification, Modularization, and Sustainability
+### C and Java components should share as much as is reasonable (probably text files with fault message templates), but not more (probably not code for constructing messages and logging them)
+### logging facility for all C-based components should be the same
+

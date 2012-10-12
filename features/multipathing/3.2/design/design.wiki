@@ -1,0 +1,126 @@
+= Design of Multi-Pathing support for SAN (EBS) =
+
+This is the design document for the multi-pathing support for EMC VNX SAN volumes in the 3.2 release.
+
+The primary focus of this feature is providing data-path redundancy and high-availability between the instance/NC and the SAN hosting the EBS volume via iSCSI.
+
+The primary development efforts and impacts will be: 
+# Passing additional connection information from the SAN to the NC via SC, CLC, and CC. 
+# Modification of the messages in the messaging sequence for step 1.
+# Modification to the NC-side code to configure the multipath device and present it to the instance.
+
+== Requirements & Constraints ==
+* Must support multiple paths to a single logical volume on a single SAN device that has at least 2 storage processors (SP) and at least 1 IP per SP
+* ALUA fail-over mode support is the sole fail-over configuration for the 3.2 release
+* Must use tools/systems available on all supported Linux distributions
+* Must be configured on a per-SC basis and may be required for all iSCSI connections within a cluster (i.e. we do not support mixing of non-multipath and multipathed connections within a Eucalyptus cluster). If the feature is enabled, then all attach-volume operations on that cluster will utilize it, and conversely if not set then no new connections will utilize it.
+* While the 3.2 feature release is explicitly for EMC VNX support only, the design should not preclude support for other devices (NetApp or Equallogic)
+* Multipath support will impact the attach-volume and detach-volume operations only. All other volume operations are unaffected.
+
+=== Identified Concerns ===
+* SAN manufacturer-recommended settings for multipathing may or may not be available for all devices we support. It is for VNX, but we should also define reasonable and generic defaults.
+* Failure-modes for multipathing at the device-mapper layer need to be explored and understood
+* VMware support should be addressed as it may require changes to the VMware-broker
+* Messages from the SC to the NC will be changed, requiring changes at both SC and NC.
+* Modification of the NC will be required to pass the correct parameters to the scripts/code responsible for configuring the device setup (connect_iscsitarget.pl)
+* Need to investigate and test how many multi-pathed volumes a normal NC can handle. There may be device name mapping issues since each mpathX device will comprise 4 other block devices. That could result in easily seeing 24 or more block devices attached to an NC. Need to make sure that Xen and KVM can handle this reasonably.
+
+=== Elaboration & Conflicts ===
+* Changes to the NC to support multipathing may be non-trivial due to complexity introduced by partial failures during device configuration
+* Multi-pathing addresses data-path reliability and availability only. The control path (from SC to SAN) must be addressed independently.
+* The current device string used to pass connection information from the SAN to the NC will no longer be sufficient and must be modified to support multiple endpoints. This requirement leads to replacing the currently used special-format string with an XML structure as follows:
+<code>
+<DeviceConnection>
+  <Host>
+    <IP>192.xxx.xxx.xxx</IP>
+    <IQN>iqn-....</IQN>
+    <SP>A|B</SP>
+    <Credential>[encrypted info]</Credential>
+  </Host>
+  <Host>...</HOST>
+</DeviceConnection>
+</code>
+
+=== Assumptions & Interpretations ===
+* We assume that network independence and availability of the SAN on multiple networks is handled outside of Eucalyptus. Our design and implementation will address only utilizing a previously configured SAN/multipath installation. For example, network configuration (bonding network interfaces) is out-of-scope.
+
+== High-Level Feature Design ==
+=== External View ===
+# Eucalyptus users will see no difference between a cluster with multipathing enabled and one without
+# SC must
+## Configure ALUA for lun
+## Ensure that lun is reachable via either SP and configure which is the optimized path
+# CLC must pass connection information to CC from SC
+# CC must pass connection information from CLC to NC
+# NC must
+## Discover the targets based on the connection information provided by CC/CLC/SC
+## Configure the block devices for each path
+## Configure the multipath device from the block devices
+## Expose the multipath device to the instance as a single, normal, block device
+
+== Detailed Feature Design ==
+Overall view of the multipathing datapath between a SAN and the instance:
+
+[[nc_san_data_path.png]]
+
+The overall design is to add support to pass the necessary endpoint information from the SAN->SC->NC to allow the NC to construct the proper multipath device and expose it to the instance VM.
+
+Specifically, we will support ALUA mode for volumes/luns exposed to instances.
+
+=== ALUA ===
+At a high-level, ALUA (Asymmetric Logical Unit Access) is an active/active setup where one path is 'optimized' and the other is not. A LUN is typically "owned" by a single storage processor but is accessible from multiple simultaneously but non-owning paths incur a performance penalty.
+
+[[alua-diagram.png]]
+
+=== Logical Design ===
+[[nc_iscsi_configuration_sequence.png]]
+
+==== Functional ====
+# Storage Controller
+## Responsible for configuring volumes to be exposed on multiple SPs and configuring ownership as well as ALUA properties at the SAN.
+## Responsible for conveying correct connection information and credentials for each endpoint back to the CC to be distributed to the NC.
+# Cluster Controller
+## Responsible for passing the connection information to the desired volume from the request by the CLC to the NC hosting the instance to which the volume will be attached.
+# Node Controller
+## Responsible for taking the connection information from the SC (via the CLC and CC) and configuring a single block device over iscsi to be exposed to the requested instance using libvirt.
+## Libvirt: Responsible for exposing the block device on the host OS to the VM guest as a block device. Multipath support should have no impact on current libvirt interfaces or commands used by the NC.
+## Device Mapper & Multipath daemon/kernel modules (/sbin/multipath and config file /etc/multipath.conf)
+### Handles mapping block requests from the meta block-device (/dev/mp-X)
+### Configuration files (/etc/multipath.conf) are required for proper operation. The NC should install a default based on the specific back-end device used (VNX currently, but eventually NetApp and Equallogic) but allow them to be configured out-of-band by system admins as necessary.
+## LVM
+### Manages devices presented to the OS and mapping them to physical media. Must be modified to ensure that it scans the multipath device and not the individual 'real' iscsi devices.
+### LVM is invoked by the NC via scripts.
+## ISCSIAdm (iscsi-initiator-utils)
+### Responsible for creating the session to the target, including discovery and login. Successful login creates a block device representing the target.
+### ISCSIAdm is invoked by the NC via some script(s).
+
+==== Information ====
+# IQN and host information will be stored using entities and the entity layer. Schemas may be changed to support additional columns.
+# The current information flow and persistence requirements do not change.
+## The CLC maintains high-level volume information that is not back-end specific, just Eucalyptus-specific metadata. The CLC alone is responsible for that metadata (resource id, size, state, etc)
+## The SC maintains volume-specific metadata as well as SAN-device metadata on a per-device per-cluster level. The SC alone is responsible for the metadata. It is split into a set of entities: SANInfo, VolumeInfo, per-device info (i.e. EmcVnxInfo or NetappInfo).
+### The SC-maintained metadata is actually stored in the DB hosted on the CLC(s). It utilizes the system-wide common entity layer for persisting and retrieving the metadata.
+
+=== Physical Design ===
+==== Development ====
+# Resources required: a development configuration of the VNX SAN, a CLC, CC, SC, Walrus frontend and a single NC backend machine. The NC must have at least two active network ports both connected, preferably to different switches on different networks.
+# Testing
+## In addition to the normal functional testing for Volume operations as well as regression tests, the test plan for multipath support should include failure testing of individual network interfaces on the NC host at minimum, and ideally full switch or network failure tests.
+## NC network failures can be simulated by tearing-down ethernet interfaces during execution
+## SP failure testing is not required, but would be ideal. However, additional research is needed to determine how best to create an SP failure while allowing the failed SP to be recovered quickly for further testing later.
+# 
+==== Deployment ====
+# Multipath support requires an EMC VNX SAN with at least 2 SPs (this is the minimum VNX configuration available from EMC so it should easily be met)
+# Each NC must have at least 2 NICs. Bonded and/or virtual interfaces may be supported but that must be statically configured by the administrator as Eucalyptus will not manage such configurations automatically. Eucalyptus will expect 2 network interfaces that are both functioning and can reach the respective SAN endpoints.
+# For full redundancy, each NIC should attach to a unique network, but this is not a requirement, just a suggestion
+# Because EMC supports only RHEL for its VNX line we will only support RHEL for the 3.2 release as well, RHEL 5 and RHEL 6 will be the only supported distributions.
+# Each NC must have the multipath kernel modules for the device mapper installed and running. The module is device-mapper-multipath and there is an associated daemon: multipathd.
+==== Packaging ====
+# In CentOS 6 (I am assuming it is the same in RHEL), the packages required on the NC are:
+## device-mapper-multipath.x86_64 : Tools to manage multipath devices using device-mapper
+## device-mapper-multipath-libs.x86_64 : The device-mapper-multipath modules and shared library
+# No additional software or packaging considerations are required for the other components of the system, just the NC.
+
+==== Operational ====
+# The implementation will provide its own handling of DB changes for upgrades from previous Eucalyptus versions.
+# Normal Eucalyptus upgrade procedures should be followed. This may include a shutdown of all NCs. Existing attached volumes do not have to be removed.

@@ -1,0 +1,157 @@
+= EMC VNX SAN Adapter Design =
+== Requirements & Constraints ==
+
+EMC SAN storage devices, including models like VNX, are one of the most popular SANs in the industry. Supporting it as part of Eucalyptus could address many existing/potential customers' needs. The requirement for this product feature is to provide an adapter bridging the EBS functionality with the EMC VNX SAN device.
+
+=== Identifying Concerns ===
+# Snapshot support is the most complex functionality to implement and will require significant pre-development testing
+# There is a possibility that performing a snapshot will require a small pause of I/O to the source LUN in order to synchronize the source and sink. This will be avoided if at all possible, but there is a chance that it may be required.
+
+=== Elaboration & Conflicts ===
+=== Assumptions & Interpretations ===
+
+* Implementation of basic EBS functionalities as other SAN adapters (namely, Equallogic and NetApp), including create/delete/attach/detach volumes and create/delete snapshots.
+* Failover and multipathing is not in the scope of this design, and will be covered in the multipathing design doc.
+
+== High-Level Feature Design ==
+
+=== External View ===
+
+==== User facing features ====
+From the normal user's point of view, the VNX adapter is transparent. The user can use the usual EBS features without worrying about the underlying details on how to manage a SAN device. There may be performance impacts due to the detailed design of the adapter itself. But otherwise, the user should feel no difference from other SAN devices or open source iSCSI target backend.
+
+==== Administrator features ====
+For the administrator, the VNX adapter provides the following features:
+# Management of designated resources on the VNX device that is used to provide EBS backend, e.g. the storage pool, etc.
+# Knobs to adjust the parameters of above management via system properties configured at runtime, e.g. the port to use, the chap user name, etc.
+# Allow multiple installations of Eucalyptus to use the same SAN device, for either internal QA testing or for customer testing purpose.
+# Allow the sharing of the SAN device with other purposes, i.e. no assumption of exclusive use of the device.
+
+== Detailed Feature Design ==
+
+The essential goal of this feature is to implement the common SANProvider interface as other SAN adapters, including the following functions:
+# Volume creation
+# Volume deletion
+# Volume attachment
+# Volume detachment
+# Snapshot creation
+# Snapshot deletion
+# Volume creation from snapshot
+# Authentication
+
+=== Logical Design ===
+==== Functional ====
+# Programming interface to the device. VNX uses naviseccli command line tool to access the device from a Linux system (usually RHEL or CentOS). The adapter needs to shell out to call the command line tool for any device interaction. The shell code needs to return:
+## Command return value
+## Command std output
+## Command error output
+# Device initial setup for Eucalyptus to use
+## Authentication for command line access:
+### User
+### Password
+### Login scope
+## Pre-allocated storage pool. Dedicated for Eucalyptus use.
+## Data ports
+# Configurations: use system properties and configured at runtime
+## Command line tool path
+## Command line login details
+## Device ports to use
+## CHAP user name
+## Other configurations for performance tuning, e.g. whether to proactively clean up empty storage groups.
+# Authentication
+## Use CHAP initiator authentication
+## Same user for all initiators
+## Same random password for all initiators
+## Allow specification of CHAP user name for each Eucalyptus installation, so that multiple installations can share the same device, mostly for internal QA testing requirements.
+## LUNs can only be accessed while in a storage group and only by hosts explicitly added to that group. This group mapping is done at Attach time and the mapping is removed at Detach time, so NCs cannot even view LUNs that are not explicitly exposed to them, regardless of credentials.
+# Storage group management
+## One storage group for each node
+### How to generate storage group name for each node? (In SANProvider, there is no access to the node information)
+## Add all initiators and paths for one node to the same storage group
+## Virtual LUN ID (local LUN ID) generation for storage group
+### Scan the current LUN mapping in a storage group to use the minimal unused virtual LUN ID
+# Snapshot
+## Use VNX clone EBS snapshot operation
+### VNX clone
+  ### Good: cloned LUN is a normal LUN; no performance cost after cloning
+  ### Bad: slow; space cost; performance hit during cloning
+  ### State Diagram:
+[[vnx_clone_state_diagram.png]]
+### VNX snapshot (another option is clone does not work as we expect):
+  ### Good: fast; minimal space cost
+  ### Bad: snapshot is not a normal LUN, can not be used directly (must attached to SC to create volume from); performance hit as long as the snapshot is live
+### Current choice: clone
+# Operation workflow
+## Create volume
+### Create a LUN for the volume (use volume ID as the LUN name)
+## Delete volume
+### Remove LUN mapping from any storage groups it's been part of
+### Delete the LUN using the volume ID as LUN name
+## Attach volume
+### Make sure the storage group for the node to attach exists (if not, create a new one)
+### Make sure the initiator paths are added to the storage group (if not, add paths)
+### Add virtual LUN mapping for the volume's LUN
+## Detach volume
+### Remove the volume's LUN from every storage group it belongs to
+### Optionally delete the storage group if it is empty (controlled by a system property so that we can adjust the aggressiveness of storage group cleaning)
+## Create snapshot
+### Check if source lun is in a storage group, if not create a temporary one and add the lun.
+### Create a new lun to be the clone, add it to the same storage group
+### Create a new clone group from source lun
+### Add destination lun (snapshot) to the clone group as a clone
+### Wait for clone lun to synchronize
+### Fracture the clone (using clone ID from the addclone operation above)
+### Remove clone from clone group
+### Delete clone group
+### Copy clone lun to Walrus as a snapshot object
+## Delete snapshot
+### Remove the cloned LUN
+### Remove it from Walrus
+## Create volume from snapshot
+### Clone the volume's LUN clone into a new LUN if the local SAN has the clone
+### Otherwise, copy the snapshot from Walrus to a newly created LUN
+
+==== Information ====
+The goal is to store and retrieve the device information at where the ground truth is, i.e. the device itself, without keeping a copy of information in the database, which may result in inconsistency. The potential cost is extra round of command line access to get those information. Here we study the challenges of getting correct information from the device:
+# Get LUN ID. LUN is named with volume ID. But most CLI commands require LUN ID. This can be obtained by calling "lun -list -Name".
+# Get a LUN's storage groups. To detach a volume or to delete a volume, we need to remove a LUN from all its storage groups. Turns out there is a command to obtain this information: "getlun <LUN> -all". This saves us from using database to track a LUN's storage groups. Note that listing all storage groups to obtain this information is inefficient.
+
+The other challenge is parsing the output of the naviseccli tool. It is semi-structured and has no consistent format. The output format can change from one command to another. The most challenging one is the "storagegroup -list" output, which mixes indentation at different levels of information. For example, the host information of a virtual LUN mapping has no indentation, while interleaved with the virtual LUN mapping list, which is indented. The output parser should be flexible to handle these situations.
+
+Another concern is the requirement to change the remoteDev string CLC sends to NC for connecting the iSCSI target. Because of the need to specifying the CHAP user (instead of EUCALYPTUS as other SAN adapter impl.), we need to add additional field to the remoteDev string for CHAP user specification.
+
+==== Concurrency  ====
+Most operations are resilient to concurrent operations. The cases where race condition may rise:
+# Virtual LUN mapping allocation during volume attachment. Because we obtain the storage group information first, then allocate the virtual LUN, concurrent operations may cause premature failure.
+
+=== Physical Design ===
+==== Development ====
+For development, we need the installation of a VNX device attached to the network of the dev machines. The NC component should be able to access both the management ports and the data ports of the device.
+
+==== Testing ====
+* Testing will follow the normal EBS testing regimen. The VNX provider gives no new features, so regression tests plus the normal EBS test suites covering all operations is sufficient. 
+* Additional load testing to observe the performance characteristics of the VNX are desirable but not required.
+
+==== Deployment ====
+# A VNX SAN device with its management ports and data ports connected to the network of NC nodes.
+# NC and SC hosts need the naviseccli command line tool installed
+==== Packaging ====
+The Navisec CLI tool is required on the SC, and this is provided by EMC to customers directly, not through a package repository. The tool is unversioned and has no associated license, so we need to be very careful with how we deploy it. They provide an rpm package that includes the tool and its library dependencies.
+
+Either we package it within the eucalyptus install as part of the VNX adapter (we would need some permission to do this from EMC I suspect), or we require that the cloud administrator install it out-of-band of Eucalyptus and simply point Eucalyptus at the executable.
+
+
+==== Operational ====
+# Detailed operation logging is required for debugging and problem diagnose.
+
+=== Cross-cutting Concerns ===
+# As referenced in the feature specification, the following may need to be addressed.
+## Security
+### Use both CHAP authentication and initiator authentication
+### Remove sensitive information from logging
+## Usability
+## Performance and Scalability
+### The naviseccli command line tool has high latency (in seconds) in execution. We may need to consider aggressive caching to minimize latency.
+### LUN cloning has serious impact on the performance of the VNX device. Evaluation needs to be done to study the impact and what measures to be taken.
+## Availability and Resilience
+## Evolution: Extensibility, Modification, Modularization, and Sustainability

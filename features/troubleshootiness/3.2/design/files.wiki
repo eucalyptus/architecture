@@ -1,0 +1,137 @@
+= Fault message template options =
+== Formatted strings ==
+* One file per language. Language is defined by file name's suffix: EN, RU, FR, etc.
+* File's encoding is UTF-8.
+* Some C/Java string format specifiers are allowed inside fault template
+** %s
+** %i  
+
+=== JSON based ===
+* File is a JSON object that has version, description url and array of fault messages.
+* Each fault message a well formatted  JSON object.
+* Each object must have code, problem (message and optional localized message) and resolution (message and optional localized message).
+ 
+Example:
+<code>
+{
+    "version": "1",
+    "description": "This file has localized error messages. For more information visit http://eucalyptus.com/blah/foo",
+    "common": {
+        "user":"пользователь",
+        "foo": "что-то"  
+    },
+    "faults": [
+        {
+            "id": "1232",
+            "problem": {
+                "message": "directory %s does not exists",
+                "localized": "отсутствует директория %s"
+            },
+            "resolution": {
+                "message": "please create directory %s with 600 permission for user %s",
+                "localized": "создайте директорию %s с правами доступа 600 для пользователя %s"
+            }
+        }
+    ]
+}
+</code>
+
+=== XML based ===
+* File is a XML document that has version, description url and list of fault messages.
+* Each fault message must have code, problem (message and optional localized message) and resolution (message and optional localized message).
+
+Example:
+<code>
+<?xml version="1.0" encoding="UTF-8"?>
+<faults version="1" description="This file has localized error messages. For more information visit http://eucalyptus.com/blah/foo">
+<common>
+<attr message="user" localized="пользователь"/>
+</common>
+<fault>
+<id>1232</id>
+<problem>
+<message>directory %s does not exists</message>
+<localized>отсутствует директория %s</localized>
+</problem>
+<resolution>
+<message>please create directory %s with 600 permission for user %s</message>
+</fault>
+</faults>
+</code>
+
+=== Properties ===
+Example:
+<code>
+fault.123.problem.message: directory %s does not exists
+fault.123.problem.localized: отсутствует директория %s
+fault.123.resolution.message: please create directory %s with 600 permission for user %s
+fault.123.resolution.localized: создайте директорию %s с правами доступа 600 для пользователя %s
+</code>
+
+=== Notes ===
+It might be beneficial to have template file validation tool. This tool should check files for consistency and accuracy.
+
+== gettext() ==
+
+* [[http://en.wikipedia.org/wiki/Gettext| Gettext on Wiki]]
+* [[http://code.google.com/p/gettext-commons/| Gettext for Java]]
+
+Code will print error message using 
+<code>
+log_fault (gettext(ERR234-fault), gettext(ERR234-cause), ...)
+</code>
+if we don't want to have descriptive messages in the code or
+<code>
+log_fault (ERR234, gettext("Disk full"), printf(gettext("Please free some space on %s"), "/opt/eucalyptus"), ...)
+</code>
+if we are ok to have canonical (English) version in the code.
+
+= Fault log options =
+* File encoding: UTF-8
+* File's headers:
+ ** First line: log version with a URL to a web page has log file's description/definition. This page also linked to a page(s) that defines error codes that used later in the fault messages
+ ** Second line: indicate when this file was started/rolled up.
+ 
+=== JSON based ===
+* Each fault message is a well formatted JOSN object. 
+* One message per line with system depended new line separator.
+
+* [[http://splunk-base.splunk.com/answers/7114/can-splunk-interpret-json| Splunk and JSON]]
+=== Text bases ===
+* Each fault message is clearly separated from each over. 
+* Use system depended new line separator.
+
+<code>
+       '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''*
+       ERR-3456 YYYY-MM-DDTHH:MM:SS.MMMZ      fault: ntpd is not running
+       ERR-3456 YYYY-MM-DDTHH:MM:SS.MMMZ  condition: can't find running ntpd process
+       ERR-3456 YYYY-MM-DDTHH:MM:SS.MMMZ      cause: cause unknown
+       ERR-3456 YYYY-MM-DDTHH:MM:SS.MMMZ  initiator: user234245 
+       ERR-3456 YYYY-MM-DDTHH:MM:SS.MMMZ      where: the one you installed
+       ERR-3456 YYYY-MM-DDTHH:MM:SS.MMMZ resolution: 
+       ERR-3456 YYYY-MM-DDTHH:MM:SS.MMMZ
+       ERR-3456 YYYY-MM-DDTHH:MM:SS.MMMZ  1) install NTPD
+       ERR-3456 YYYY-MM-DDTHH:MM:SS.MMMZ  2) run NTPD
+       
+       ERR-3456 YYYY-MM-DDTHH:MM:SS.MMMZ ntpd is not running
+       ERR-3456 
+       ERR-3456   condition: can't find running ntpd process
+       ERR-3456       cause: cause unknown
+       ERR-3456   initiator: user234245 
+       ERR-3456    location: ntpd daemon on localhost
+       ERR-3456  resolution: 
+       ERR-3456 
+       ERR-3456   1) install NTPD
+       ERR-3456   2) run NTPD
+
+       ERR-3456 YYYY-MM-DDTHH:MM:SS.MMMZ ntpd is not running
+       |
+       |  condition: can't find running ntpd process
+       |      cause: cause unknown
+       |  initiator: user234245 
+       |   location: ntpd daemon on localhost
+       | resolution: 
+       |
+       |  1) install NTPD
+       |  2) run NTPD      
+       </code>

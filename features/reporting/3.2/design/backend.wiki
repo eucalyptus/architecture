@@ -195,23 +195,23 @@ It may be necessary to configure the underlying platforms so as to make collecti
 # As referenced in the feature specification, the following may need to be addressed.
 ## Security
 ### new sensors will need root-level access to the system to obtain network and disk stats
-  ### there is potential for limiting all permission-elevating functions to a well defined portion in a sensor library
+#### there is potential for limiting all permission-elevating functions to a well defined portion in a sensor library
 ### if existing communication mechanisms are used (CC- and NC-level Web Services), no new authentication mechanisms
 ## Usability
 ### usability of the reporting UI dictates metrics, so no new considerations at the back-end level
 ## Performance and Scalability
 ### an important concern, given a x6 increase in number of metrics
-  ### over a dozen values per instance, depending on number of attached disks/volumes
-  ### potentially with a set of historical values returned, to guard against message loss
-  ### new Describe request can have its own polling frequency, which can be lower than DescribeInstance
+#### over a dozen values per instance, depending on number of attached disks/volumes
+#### potentially with a set of historical values returned, to guard against message loss
+#### new Describe request can have its own polling frequency, which can be lower than DescribeInstance
 ## Availability and Resilience
 ### state relevant to any cumulative metrics that originate on CC or VB must persist across failover of that component (or upstream must handle counters that may reset - not 100% full proof)
 ### state relevant to any cumulative metrics that originate on NC must persist across EBS-backed instance stop/start periods
 ### any non-cumulative metrics should be guarded against message loss (e.g., by sending a time-bound history of values) if partial data is unacceptable to upstream
 ## Evolution: Extensibility, Modification, Modularization, and Sustainability
 ### sensor report format should be forward-looking: 
-  ### easy addition of new sensor types
-  ### support for several kinds of sensors: cumulative, samples, rates
+#### easy addition of new sensor types
+#### support for several kinds of sensors: cumulative, samples, rates
 ### should consider changing ad-hoc Perl scripts into something more modular
 
 = References =
