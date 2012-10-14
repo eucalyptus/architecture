@@ -1,8 +1,64 @@
 = Eucalyptus Specification, Design, and Architecture =
 The purpose of this repository is to manage the specification, design and architecture working documents.
 
-This is the right place to be if you wish to contribute to Eucalyptus in this area.
+= See Also =
+* [[Eucalyptus Specification, Design, and Architecture (rendered version)|https://github.com/eucalyptus/eucalyptus/architecture/wiki]].
+*: [[Contributing to Eucalyptus Specification, Design, and Architecture|https://github.com/eucalyptus/eucalyptus/architecture/wiki/contributing]].
+* [[Eucalyptus Architecture Documentation (rendered version)|https://github.com/eucalyptus/eucalyptus/architecture-docs]].
+* [[Eucalyptus Bug Tracker (requirements)|http://eucalyptus.atlassian.net/]]
 
-''Otherwise'' please see the [[https://github.com/eucalyptus/eucalyptus/architecture/wiki rendered version of the documents]].
+= Organization =
+----
+The organization of the repository reflects the long-lived nature of a features true specification.  That is, the specification and design work related to a feature's implementation for a particular release often corresponds with only a portion of the entire feature's implementation.  Moreover, feature's specification evolves over time as the requirements, architecture, and upstream specifications evolve.
 
+The following table describes the organization of the top-level of the repository.
 
+{| style="width=90%"
+|+ '''Top-level Directory Structure'''
+| <code>features/</code>
+| this is where '''all''' content goes
+|-
+| <code>bin/</code>, <code>lib/</code>
+| ''Ignore these. '' Contain helpers and their libraries
+|-
+| <code>releases/</code>
+| ''Ignore these. '' Contain auto-generated xref of features to releases
+|}
+
+== Feature Directory ==
+Each feature is contained in its own directory.  The organization of the <code>features/${feature}</code> directory, for some imagined <code>${feature}</code>, is described in the following table:
+
+{| style="width=90%"
+|+ '''Feature Directory Structure''' (e.g., <code>features/${feature}/</code>)
+| <code>/overview.wiki</code>
+| colspan="2" | Top-level document aggregating all the sub documents
+|-
+| <code>/xref</code>
+| colspan="2" | xref's to the JIRA epic(s) and confluence pages
+|-
+| <code>/spec.wiki</code>
+| colspan="2" | High level architecture document
+|-
+| <code>/diagrams</code>
+| colspan="2" | Source materials for diagrams and their generated documents (images)
+|- 
+| <code>/X.Y</code> 
+| Documents specific to the work done (or going on during) the X.Y release. 
+| For example <code>features/${feature}/3.3/</code> contains documents for the 3.3 release.
+|-
+|
+| <code>/overview.wiki</code>
+| Overview document aggregating all the release specific feature information
+|-
+|
+| <code>/spec.wiki</code>
+| Release specific feature specification
+|-
+|
+| <code>/design</code>
+| Release specific design documents
+|-
+|
+| <code>/xref</code> 
+| xref's to the JIRA epic for the current release
+|}
