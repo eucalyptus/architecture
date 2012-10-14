@@ -1,0 +1,66 @@
+= IAM Roles =
+Roles allow for automatic provisioning of federated tokens for use by instance-hosted applications.  Using roles for instances, access keys and control the associated permissions (IAM profile).
+
+Things to know about roles and their use from instances:
+* AWS access keys are automatically made available to running instances.
+* AWS access keys are rotated automatically multiple times a day. Keys are made available at least 5 minutes before the expiration of the previous set.
+* You can assign granular service permissions for applications running on an EC2 instance that make requests to other services in AWS.
+* Roles can be used with all Windows and Linux AMIs.
+* The instance metadata service is used to expose access keys to the instances.
+* Precautions to restrict instance metadata service should be taken on role-based instances which run services that might interact with the metadata service (e.g., HTTP proxies).
+* 
+
+== Launching an instance with a role ==
+# Create roles using the IAM APIs ([[http://docs.amazonwebservices.com/IAM/latest/UserGuide/CreateRole.html See creating a role]])
+# Launch an instance while specifying the role ([[http://docs.amazonwebservices.com/AWSEC2/latest/UserGuide/launching-an-instance.html See launching an instance with a role]])
+# Use the metadata service from the instance to obtain the federated credentials ([[http://docs.amazonwebservices.com/AWSEC2/latest/UserGuide/UsingIAM.html#UsingTemporarySecurityCredentials_EC2 See using temporary security credentials]])
+```bash
+$ iam-rolecreate -r s3access -s ec2.amazonaws.com
+
+$ iam-roleaddpolicy -r s3access -e Allow -a s3:\* -c \* -p s3star -o
+{"Version":"2008-10-17","Statement":[{"Effect":"Allow","Action":["s3:*"],"Resource":["*"]}]}
+
+$ iam-instanceprofilecreate -s s3access -r s3access arn:aws:iam::111111111111:instance-profile/s3access
+```    
+
+= Related Service Interfaces/Operations =
+* Impacted services which need to add support are:
+** EUARE
+*** Role related operations
+*** InstanceProfile related operations
+** EC2
+*** running an instance with a profile
+*** using the profile information to populate the instance metadata service credentials periodically
+** STS
+*** Federated tokens
+
+== '''IAM Operations''' ==
+----
+* [[http://docs.amazonwebservices.com/IAM/latest/APIReference/API_Operations.html API Reference]]
+** [[http://docs.amazonwebservices.com/IAM/latest/APIReference/API_AddRoleToInstanceProfile.html AddRoleToInstanceProfile]]
+** [[http://docs.amazonwebservices.com/IAM/latest/APIReference/API_CreateInstanceProfile.html CreateInstanceProfile]]
+** [[http://docs.amazonwebservices.com/IAM/latest/APIReference/API_CreateRole.html CreateRole]]
+** [[http://docs.amazonwebservices.com/IAM/latest/APIReference/API_DeleteInstanceProfile.html DeleteInstanceProfile]]
+** [[http://docs.amazonwebservices.com/IAM/latest/APIReference/API_DeleteRole.html DeleteRole]]
+** [[http://docs.amazonwebservices.com/IAM/latest/APIReference/API_DeleteRolePolicy.html DeleteRolePolicy]]
+** [[http://docs.amazonwebservices.com/IAM/latest/APIReference/API_GetInstanceProfile.html GetInstanceProfile]]
+** [[http://docs.amazonwebservices.com/IAM/latest/APIReference/API_GetRole.html GetRole]]
+** [[http://docs.amazonwebservices.com/IAM/latest/APIReference/API_GetRolePolicy.html GetRolePolicy]]
+** [[http://docs.amazonwebservices.com/IAM/latest/APIReference/API_ListInstanceProfiles.html ListInstanceProfiles]]
+** [[http://docs.amazonwebservices.com/IAM/latest/APIReference/API_ListInstanceProfilesForRole.html ListInstanceProfilesForRole]]
+** [[http://docs.amazonwebservices.com/IAM/latest/APIReference/API_ListRolePolicies.html ListRolePolicies]]
+** [[http://docs.amazonwebservices.com/IAM/latest/APIReference/API_ListRoles.html ListRoles]]
+** [[http://docs.amazonwebservices.com/IAM/latest/APIReference/API_PutRolePolicy.html PutRolePolicy]]
+** [[http://docs.amazonwebservices.com/IAM/latest/APIReference/API_RemoveRoleFromInstanceProfile.html API_RemoveRoleFromInstanceProfile]]
+** [[http://docs.amazonwebservices.com/IAM/latest/APIReference/API_UpdateAssumeRolePolicy.html UpdateAssumeRolePolicy]]
+
+== '''STS Operations''' ==
+----
+
+== '''EC2 Changes''' ==
+{|
+|+ Instance Metadata Items
+! iam/info 	|| Returns information about the last time the instance profile was updated, including the instance's LastUpdated date, InstanceProfileArn, and InstanceProfileId.	|| 2012-06-01
+! iam/security-credentials/ 	|| Returns the name of the IAM role associated with the instance. || 2012-06-01
+! iam/security-credentials/role-name ||	Where role-name is the name of the IAM role associated with the instance. Returns the temporary security credentials (AccessKeyId, SecretAccessKey, SessionToken, and Expiration) associated with the IAM role. ||	2012-06-01
+|}
