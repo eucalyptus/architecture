@@ -1,7 +1,6 @@
 * [https://github.com/eucalyptus/architecture/wiki Architecture Wiki]
 ** [https://github.com/eucalyptus/architecture/wiki/contributing Contributing to...]
 ** [https://github.com/eucalyptus/architecture/wiki/organization Organization of...] 
-* [https://github.com/eucalyptus/architecture-docs Architecture Docs]
 ----
 * [[tag:index|Tags]]
 ** Releases: [[tag:rls-3.0|3.0]], [[tag:rls-3.1|3.1]], [[tag:rls-3.2|3.2]], [[tag:rls-3.3|3.3]]
@@ -15,6 +14,7 @@
 ----
 * Eucalyptus Links
 ** [http://www.eucalyptus.com/ Main Site]
+** [https://github.com/eucalyptus/architecture-docs Architecture Docs]
 ** [https://github.com/eucalyptus Source Repository]
 ** [http://eucalyptus.atlassian.net/ Bug Tracker]
 ** [https://github.com/eucalyptus/eucalyptus/wiki Wiki]
