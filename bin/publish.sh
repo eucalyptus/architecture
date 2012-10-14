@@ -28,7 +28,7 @@ for f in  $(echo "${FILELIST}" | sed 's/^\.\///g'); do
 			sed -nf ${BASEDIR}/bin/include.sed $file | sed 'N;N;s/\n//' | sed -f - $file > ${DESTDIR}/${dir//\//-}-${file}
 			)
 	else
-		if grep -v 'tag:' ${DESTDIR}/${dir//\//-}-${file} | diff ${BASEDIR}/$f -; then
+		if grep -v 'tag:' ${DESTDIR}/${dir//\//-}-${file} | diff ${BASEDIR}/$f - >/dev/null 2>&1; then
   		cp -fv ${BASEDIR}/$f ${DESTDIR}/${dir//\//-}-${file} >> ${BASEDIR}/.wiki.log | tee ${BASEDIR}/.wiki.log 2>&1
 		fi
 	fi
