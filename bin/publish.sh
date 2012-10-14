@@ -21,7 +21,7 @@ for f in  $(echo "${FILELIST}" | sed 's/^\.\///g'); do
   file=$(basename $f)
   t=${dir//\//-}
   dest=${DESTDIR}/$t
-  echo "$f => ${dir}/${file} ($t)"
+#  echo "$f => ${dir}/${file} ($t)"
 	if echo $f | egrep "\.(${EXCLUDE_SUFFIX})" &&
  		egrep '{{[^ ]*}}' $f >/dev/null 2>&1; then
 		(cd $dir; 
