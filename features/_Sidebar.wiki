@@ -1,10 +1,11 @@
-* [https://github.com/eucalyptus/architecture/wiki <code>Architecture wiki</code>]
-** [https://github.com/eucalyptus/architecture/wiki/contributing <code>Contributing to...</code>]
-** [https://github.com/eucalyptus/architecture/wiki/organization <code>Organization of...</code>] 
+* [https://github.com/eucalyptus/architecture/wiki Architecture Wiki]
+** [https://github.com/eucalyptus/architecture/wiki/contributing Contributing to...]
+** [https://github.com/eucalyptus/architecture/wiki/organization Organization of...] 
+* [https://github.com/eucalyptus/architecture-docs Architecture Docs]
 * Contact Info
 ** email: architecture@eucalyptus.com
 ** IRC:   #eucalyptus-devel (freenode)
-** WWW: 
+** Twitter: @grrrze
 * '''Tags''': [[tag:index|index]]
 ** '''Releases''': [[tag:rls-3.0|3.0]], [[tag:rls-3.1|3.1]], [[tag:rls-3.2|3.2]], [[tag:rls-3.3|3.3]]
 ** '''Features''': [[features]]
@@ -12,7 +13,10 @@
 ----
 * Eucalyptus Links
 ** [http://www.eucalyptus.com/ Main Site]
-** [https://github.com/eucalyptus/architecture-docs Architecture Docs]
+** [https://github.com/eucalyptus Source Repository]
 ** [http://eucalyptus.atlassian.net/ Bug Tracker]
+** [https://github.com/eucalyptus/eucalyptus/wiki Wiki]
+** [http://lists.eucalyptus.com/cgi-bin/mailman/listinfo Mailing Lists]
 * Other Links
-** [http://grrrze.blogspot.com
+** [http://grrrze.blogspot.com @grrrze's blog]
+** [http://www.eucalyptus.com/blog/rich Rich's blog]
