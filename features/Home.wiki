@@ -1,22 +1,22 @@
 Here you will find ''technical'' documents which support the evaluation, planning, and implementation of features in [http://www.eucalyptus.com Eucalyptus].  
 
-= Eucalyptus Specification/Design/Architecture Documents =
+= Eucalyptus Architecture =
 This the ''canonical'' reference for two classes of documents:  '''feature specifications''' used in planning releases and generational '''design documents''' which evolve iteratively with the ongoing implementation of the system.
 This page serves the presentation and navigation of all the documents from the [https://github.com/eucalyptus/architecture/ underlying repository] with the raw materials.  
 The purpose of the documents aggregated here is to provide the needed technical specifications, background, analysis, and record of '''architecturally significant decisions''' in support of the development of all new features in Eucalyptus.
 
 __TOC__
-= Eucalyptus Doc Links =
-{{SEEALSO}}
-= Find me all the things... =
 {| style="width: 90%"
-|+ ''Documents By Category''
+|+ Find me '''all the things'''...
 | '''in a certain release'''
 | [[tag:rls-3.0|3.0]]<br/><code>pending</code>
 | [[tag:rls-3.1|3.1]]<br/><code>pending</code>
 | [[tag:rls-3.2|3.2]]
 | [[tag:rls-3.3|3.3]]<br/><code>pending</code>
 |} 
+
+= Where else might I look... =
+{{SEEALSO}}
 
 = What it is used for... =
 The purpose of the documents aggregated here is to support the development of new features in Eucalyptus.  To that end, they play a role in several stages of the development process:
