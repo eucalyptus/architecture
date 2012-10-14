@@ -203,4 +203,6 @@ does not require a separate installation and deployment process).
 -- it cannot require a service restart of other system components
 - Licenses for third-party software should be compatible with GPLv3.
 - Training plan for new technology/third party frameworks.
-[[tag:rls-3-2]]
+
+----
+[[tag:rls-3.2]]

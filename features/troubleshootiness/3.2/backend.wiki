@@ -529,4 +529,5 @@ As component is upgraded to a version past 3.2, even a point release (where new 
 ### C and Java components should share as much as is reasonable (probably text files with fault message templates), but not more (probably not code for constructing messages and logging them)
 ### logging facility for all C-based components should be the same
 
-[[tag:rls-3-2]]
+----
+[[tag:rls-3.2]]

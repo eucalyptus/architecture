@@ -220,4 +220,5 @@ It may be necessary to configure the underlying platforms so as to make collecti
 * [[http://www.vmware.com/support/developer/vc-sdk/visdk41pubs/ApiReference/cpu_counters.html| VMWare CPU Counters]]
 * [[http://www.vmware.com/support/developer/vc-sdk/visdk41pubs/ApiReference/virtual_disk_counters.html| VMWare Virtual Disk Counters]]
 
-[[tag:rls-3-2]]
+----
+[[tag:rls-3.2]]

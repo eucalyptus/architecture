@@ -132,4 +132,5 @@ The GUI will display the resultant report in a frame, whereas the CLI will save 
   7. Total amount of time spent in seconds writing to disks per instance per user with disk type ephemeral/EBS
   8. Per user at volume level granularity - number of IO requests
 
-[[tag:rls-3-2]]
+----
+[[tag:rls-3.2]]
