@@ -18,6 +18,7 @@ __TOC__
 
 = Where else might I look... =
 {{SEEALSO}}
+[[tag:index]]
 
 = What it is used for... =
 The purpose of the documents aggregated here is to support the development of new features in Eucalyptus.  To that end, they play a role in several stages of the development process:
