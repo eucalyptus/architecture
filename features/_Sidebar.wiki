@@ -3,7 +3,7 @@
 ** [https://github.com/eucalyptus/architecture/wiki/organization Organization of...] 
 * [https://github.com/eucalyptus/architecture-docs Architecture Docs]
 ----
-* Tags: [[tag:index|index]]
+* [[tag:index|Tags]]
 ** Releases: [[tag:rls-3.0|3.0]], [[tag:rls-3.1|3.1]], [[tag:rls-3.2|3.2]], [[tag:rls-3.3|3.3]]
 ** Features: [[features]]
 ** Components: [[components]]
