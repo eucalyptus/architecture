@@ -1,6 +1,6 @@
 * [https://github.com/eucalyptus/architecture/wiki Architecture wiki]
 ** [https://github.com/eucalyptus/architecture/wiki/contributing Contributing to...]
 ** [https://github.com/eucalyptus/architecture/wiki/organization Organization of...] 
-*'''Releases'''
-** [[tag:rls-3.2|3.2]]
-** [[tag:rls-3.3|3.3]]
+* '''Releases''': [[tag:rls-3.2|3.0]], [[tag:rls-3.2|3.1]], [[tag:rls-3.2|3.2]], [[tag:rls-3.2|3.3]]
+* '''Features''': [[features]]
+* '''Components''': [[components]]
