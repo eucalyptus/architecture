@@ -1,4 +1,4 @@
-[[arch-repo-diagrams-workflow.png]]
+[[arch-repo-diagrams-workflow.png|float|width=400px|align=right|frame]]
 = Contributing =
 There are two classes of documents to which it is appropriate contributing here:  See [[Home#document_definitions|Document Definitions]]
 The contents of this repository are reviewed and, to that end, all changes should be submitted as a pull request: [https://help.github.com/articles/fork-a-repo Fork & Pull].
