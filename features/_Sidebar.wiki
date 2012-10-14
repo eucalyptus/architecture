@@ -5,8 +5,8 @@
 * '''Releases''': [[tag:rls-3.2|3.0]], [[tag:rls-3.2|3.1]], [[tag:rls-3.2|3.2]], [[tag:rls-3.2|3.3]]
 * '''Features''': [[features]]
 * '''Components''': [[components]]
-= Eucalyptus Links =
 ----
+= Eucalyptus Links =
 * [http://www.eucalyptus.com/ Eucalyptus]
 * [https://github.com/eucalyptus/architecture-docs Eucalyptus Architecture Documentation]
 * [http://eucalyptus.atlassian.net/ Eucalyptus Bug Tracker]
