@@ -1,0 +1,100 @@
+= Contributing =
+----
+[[arch-repo-diagrams-workflow.png|float|width=400px|align=right|frame]]
+The contents of this repository are reviewed and, to that end, all changes should be submitted as a pull request: [https://help.github.com/articles/fork-a-repo Fork & Pull].
+
+* Get a [https://github.com/signup/free github account].
+* Create a [https://help.github.com/articles/fork-a-repo fork] of this repository.
+# [https://help.github.com/articles/syncing-a-fork Synchronize] your fork with this repository.
+# Make your changes  ('''NOTE''': See [[#formats|Formats]] and [[#organization|Organization]] below for restrictions/expectations).
+# Commit to your forked repository.
+# Submit a [https://help.github.com/articles/creating-a-pull-request pull request].
+# Be patient and contented.
+
+'''Formats'''
+Broadly, this repository should have version-able source materials except when not available (e.g., third party PDF documentation).
+
+* '''Text''':  must be renderable through the github interface 
+* '''Graphics''':  must be text-based so a compile step is not only acceptable, but required.  
+* '''Binary files''': may be committed in the cases that:
+*# A binary output format (e.g., images) is needed:  In this case, it has to be compilable from a text-based and versioned file.
+*# A reference document or tool is included:  These belong in specific places noted below.
+* '''Auto-generated''':  A number of files in this repo are automatically generated **DO NOT EDIT THEM DIRECTLY**
+*# Any binary file is either auto-generated or 3rd-party.
+*# ''Surely more of them go here...''
+
+'''Text Format Note'''
+----
+The remainder of this document uses the suffix <code>.wiki</code> to identify a generic file which can be rendered using <code>github-markup</code>.  
+
+To use <code>github-markup</code> see the directions at [[https://github.com/github/markup|the github-markup repository]].
+
+The currently supported and ''seemingly reasonable'' formats are:
+* '''.markdown, .mdown, .md''' -- <code>gem install redcarpet (https://github.com/vmg/redcarpet)</code>
+* '''.textile''' -- <code>gem install RedCloth</code>
+* '''.mediawiki''' -- <code>gem install wikicloth</code>
+* '''.asciidoc''' -- <code>brew install asciidoc</code>
+
+= Organization =
+----
+The following table describes the organization of the top-level of the repository.
+
+{| style="width=90%"
+|+ '''Top-level Directory Structure'''
+| <code>features/</code>
+| this is where '''all''' content goes
+|-
+| <code>bin/</code>, <code>lib/</code>
+| ''Ignore these. '' Contain helpers and their libraries
+|-
+| <code>releases/</code>
+| ''Ignore these. '' Contain auto-generated xref of features to releases
+|}
+
+== Feature Directory ==
+Each feature is contained in its own directory.  The organization of the <code>features/${feature}</code> directory, for some imagined <code>${feature}</code>, is described in the following table:
+
+{| style="width=90%"
+|+ '''Feature Directory Structure''' (e.g., <code>features/${feature}/</code>)
+| <code>/overview.wiki</code>
+| colspan="2" | Top-level document aggregating all the sub documents
+|-
+| <code>/xref</code>
+| colspan="2" | xref's to the JIRA epic(s) and confluence pages
+|-
+| <code>/spec.wiki</code>
+| colspan="2" | High level architecture document
+|-
+| <code>/diagrams</code>
+| colspan="2" | Source materials for diagrams and their generated documents (images)
+|- 
+| <code>/X.Y</code> 
+| Documents specific to the work done (or going on during) the X.Y release. 
+| For example <code>features/${feature}/3.3/</code> contains documents for the 3.3 release.
+|-
+|
+| <code>/overview.wiki</code>
+| Overview document aggregating all the release specific feature information
+|-
+|
+| <code>/spec.wiki</code>
+| Release specific feature specification
+|-
+|
+| <code>/design</code>
+| Release specific design documents
+|-
+|
+| <code>/xref</code> 
+| xref's to the JIRA epic for the current release
+|}
+
+= See Also =
+----
+* [https://github.com/github/markup github markup]: github markup library
+* [https://github.com/github/gollum gollum]: rendering library used by github-markup
+* [https://github.com/pediapress pediapress tools]: mediawiki tools
+* [http://mwlib.readthedocs.org/en/latest/installation.html mw-render]: mediawiki renderer
+* [https://bitbucket.org/bspeakmon_atlassian/jira-python.git python-jira]: jira library used for xrefs
+* [http://plantuml.sourceforge.net/ PlantUML]: text based uml diagramming tool
+* [http://www.graphviz.org/ dot/graphviz]: used by plantuml for diagrams
