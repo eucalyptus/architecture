@@ -1,9 +1,10 @@
 __NOTOC__
 = Eucalyptus Specification/Design/Architecture Documents =
-Here you will find technical documents which support the evaluation, planning, and implementation of features in [[http://www.eucalyptus.com Eucalyptus]].  
+Here you will find technical documents which support the evaluation, planning, and implementation of features in [http://www.eucalyptus.com Eucalyptus].  
 This the canonical reference for two kinds of documents:  feature specifications used in planning releases and generational design documents which evolve iteratively with the ongoing implementation of the system.  
-The purpose of this page is to aggregate and classify these documents from the [[https://github.com/eucalyptus/architecture/ underlying repository]] with the raw materials.  
+The purpose of this page is to aggregate and classify these documents from the [https://github.com/eucalyptus/architecture/ underlying repository] with the raw materials.  
 
+= Categories =
 {| style="width: 90%"
 |+ ''Documents By Category''
 | '''Release'''
@@ -13,12 +14,13 @@ The purpose of this page is to aggregate and classify these documents from the [
 | [[tag:rls-3.3|3.3]]<br/><code>pending</code>
 |} 
 
+= Purpose of Documents =
 The purpose of the documents aggregated here is to support the development of new features in Eucalyptus.  To that end, they play a role in several stages of the development process:
 # Feature specification:  associated with each feature is an overall document describing the important technical characteristics in a release (or generation) independent fashion.  These reflect the understanding of the feature which is used in subsequent steps.
 # Scope & Estimation:  prior to release planning a technical assessment is made about the aspects of functionality to go into a generation of the feature.  The <code>spec</code> documents which are associated with a release start life at that time.  These subsequently evolve until they have been committed to for a particular release (but may be present even when not committed to a release).
 # Design & Implementation:  a feature which has been committed to a release is supported by a design document for that release.  The <code>design</code> documents start their life when work towards that release does.  These subsequently evolve until work stops for that release of the feature.  (They would then be ported forward to the final documentation).
 
-= Document Descriptions =
+= Document Type Descriptions =
 There are two classes of documents which you can expect to find the authoritative copy of here:  feature specifications used in planning/estimation of releases and generational design documents which evolve iteratively with the ongoing implementation of the system.  
 
 '''Specification documents''' are intentional and intensional<ref name="Intensional Definition">http://en.wikipedia.org/wiki/Intensional_definition</ref>:
@@ -44,9 +46,9 @@ Generational documents consist of:
 == See Also ==
 To find the documentation you may need please also see:
 * Feature requirements/user stories/epics
-**: [https://eucalyptus.atlassian.net/secure/Dashboard.jspa JIRA]
+** [https://eucalyptus.atlassian.net/secure/Dashboard.jspa JIRA]
 * High level architectural documentation
-**: [https://github.com/eucalyptus/architecture-docs Eucalyptus Architecure Documentation github repository]]
+** [https://github.com/eucalyptus/architecture-docs Eucalyptus Architecure Documentation github repository]
 * Specification, Design, and Architecture working documents
-**: [https://github.com/eucalyptus/architecture/ Eucalyptus Architecure github repository]]
-**: [[contributing|Contributing to Eucalyptus Architecture]]
+** [https://github.com/eucalyptus/architecture/ Eucalyptus Architecure github repository]
+** [[contributing|Contributing to Eucalyptus Architecture]]
