@@ -47,7 +47,7 @@ LIST_BEGIN = "<!-- THE LIST BELOW IS PROGRAMMATICALLY GENERATED. DO NOT REMOVE T
 LIST_END   = "<!-- THE LIST ABOVE IS PROGRAMMATICALLY GENERATED. DO NOT REMOVE THIS COMMENT. -->"
 LIST_RE = Regexp.new("#{LIST_BEGIN}(.*)#{LIST_END}",Regexp::MULTILINE)
 
-options = { :tagpattern => "(tag:[^\]]+)",  :wikifilepattern => "^\./(.+)\.(md|wiki)$", :directory => ".", :metatag => "tag:index"  }
+options = { :tagpattern => "(tag:[^\\]]+)",  :wikifilepattern => "^\./(.+)\.(md|wiki)$", :directory => ".", :metatag => "tag:index"  }
 
 opt_parser = OptionParser.new do |opt|
   opt.banner = "Usage: #{$0} [OPTIONS]"
