@@ -1,11 +1,10 @@
 = Eucalyptus Specification/Design/Architecture Documents =
-Here you will find technical documents which support the evaluation, planning, and implementation of features in [http://www.eucalyptus.com Eucalyptus].  
-This the canonical reference for two kinds of documents:  feature specifications used in planning releases and generational design documents which evolve iteratively with the ongoing implementation of the system.  
+Here you will find ''technical'' documents which support the evaluation, planning, and implementation of features in [http://www.eucalyptus.com Eucalyptus].  
+This the ''canonical'' reference for two kinds of documents:  '''feature specifications''' used in planning releases and generational '''design documents''' which evolve iteratively with the ongoing implementation of the system.
 The purpose of this page is to aggregate and classify these documents from the [https://github.com/eucalyptus/architecture/ underlying repository] with the raw materials.  
 __TOC__
 = Eucalyptus Doc Links =
 {{SEEALSO}}
-
 = Document Categories =
 {| style="width: 90%"
 |+ ''Documents By Category''
