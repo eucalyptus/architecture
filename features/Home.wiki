@@ -44,11 +44,4 @@ Generational documents consist of:
 * Specification:  release-specific technical interpretation of functional requirements 
 
 == See Also ==
-To find the documentation you may need please also see:
-* Feature requirements/user stories/epics
-** [https://eucalyptus.atlassian.net/secure/Dashboard.jspa JIRA]
-* High level architectural documentation
-** [https://github.com/eucalyptus/architecture-docs Eucalyptus Architecure Documentation github repository]
-* Specification, Design, and Architecture working documents
-** [https://github.com/eucalyptus/architecture/ Eucalyptus Architecure github repository]
-** [[contributing|Contributing to Eucalyptus Architecture]]
+{{SEEALSO}}

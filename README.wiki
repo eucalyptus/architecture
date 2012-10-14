@@ -1,9 +1,7 @@
 = Eucalyptus Specification, Design, and Architecture =
 The purpose of this repository is to manage the specification, design and architecture working documents.
 
-= See Also =
-* '''Rendered documents''': [[https://github.com/eucalyptus/architecture/wiki|Architecture wiki]].
-** '''Contributing''': [[https://github.com/eucalyptus/architecture/wiki/contributing|]].
-* '''Eucalyptus Architecture Documentation''': [[https://github.com/eucalyptus/architecture-docs|architecture-docs]].
-* '''Requirements documents''': [[http://eucalyptus.atlassian.net/|Eucalyptus Bug Tracker]]
+You most likely want to go [[https://github.com/eucalyptus/architecture/wiki|HERE]]
 
+= See Also =
+{{SEEALSO}}
