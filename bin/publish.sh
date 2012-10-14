@@ -40,6 +40,6 @@ done
 for f in ${TAGS}; do
   touch ${DESTDIR}/tag:${f}.md
 done
-(cd ${DESTDIR};${BASEDIR}//bin/tag-indexer.rb  -m tags -v)
+(cd ${DESTDIR};${BASEDIR}//bin/tag-indexer.rb  -m tags)
 (cd ${DESTDIR}; git add ./*; git status -sb; git commit -m 'updated'; git push) | tee ${BASEDIR}/.wiki.log 2>&1
 (cd ${BASEDIR}; git add wiki; git commit -a -m 'update wiki'; git push )  | tee ${BASEDIR}/.wiki.log 2>&1
