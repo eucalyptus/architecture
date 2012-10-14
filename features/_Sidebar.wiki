@@ -19,6 +19,7 @@
 ** [http://eucalyptus.atlassian.net/ Bug Tracker]
 ** [https://github.com/eucalyptus/eucalyptus/wiki Wiki]
 ** [http://lists.eucalyptus.com/cgi-bin/mailman/listinfo Mailing Lists]
+----
 * Other Links
 ** [http://grrrze.blogspot.com @grrrze's blog]
 ** [http://www.eucalyptus.com/blog/rich Rich's blog]
