@@ -37,7 +37,6 @@ The currently supported and ''seemingly reasonable'' formats are:
 * '''.mediawiki''' -- <code>gem install wikicloth</code>
 * '''.asciidoc''' -- <code>brew install asciidoc</code>
 
-
 = See Also =
 ----
 * [https://github.com/github/markup github markup]: github markup library
