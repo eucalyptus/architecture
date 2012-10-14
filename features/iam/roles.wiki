@@ -40,7 +40,7 @@ $ iam-instanceprofilecreate -s s3access -r s3access arn:aws:iam::111111111111:in
 ***: Example: arn:aws:iam::111111111111:instance-profile/s3access
 
 
-== '''IAM Operations''' ==
+== IAM Operations ==
 ----
 * [[http://docs.amazonwebservices.com/IAM/latest/APIReference/API_Operations.html API Reference]]
 ** [[http://docs.amazonwebservices.com/IAM/latest/APIReference/API_AddRoleToInstanceProfile.html AddRoleToInstanceProfile]]
@@ -60,12 +60,12 @@ $ iam-instanceprofilecreate -s s3access -r s3access arn:aws:iam::111111111111:in
 ** [[http://docs.amazonwebservices.com/IAM/latest/APIReference/API_RemoveRoleFromInstanceProfile.html API_RemoveRoleFromInstanceProfile]]
 ** [[http://docs.amazonwebservices.com/IAM/latest/APIReference/API_UpdateAssumeRolePolicy.html UpdateAssumeRolePolicy]]
 
-== '''STS Operations''' ==
+== STS Operations ==
 ----
 * [[http://docs.amazonwebservices.com/STS/latest/APIReference/API_Operations.html API Reference]]
 ** [[http://docs.amazonwebservices.com/STS/latest/APIReference/API_GetFederationToken.html GetFederationToken]]
 
-== '''EC2 Changes''' ==
+== EC2 Changes ==
 * [[http://docs.amazonwebservices.com/AWSEC2/latest/APIReference/ApiReference-query-RunInstances.html RunInstances]]
 ** IamInstanceProfile.Arn
 **: Amazon resource name (ARN) of the IAM Instance Profile (IIP) to associate with the instances. Type: String, Default: None
@@ -75,10 +75,12 @@ $ iam-instanceprofilecreate -s s3access -r s3access arn:aws:iam::111111111111:in
 {|
 |+ Instance Metadata Items
 ! iam/info 	|| Returns information about the last time the instance profile was updated, including the instance's LastUpdated date, InstanceProfileArn, and InstanceProfileId.	|| 2012-06-01
+|-
 ! iam/security-credentials/ 	|| Returns the name of the IAM role associated with the instance. || 2012-06-01
+|-
 ! iam/security-credentials/role-name ||	Where role-name is the name of the IAM role associated with the instance. Returns the temporary security credentials (AccessKeyId, SecretAccessKey, SessionToken, and Expiration) associated with the IAM role. ||	2012-06-01
 |}
 
-== '''euca2ools Changes''' ==
+== euca2ools Changes ==
 * run-instance support for  -p, --iam-profile arn|name
 *: The IAM instance profile to associate with the launched instance(s). IAM instance profiles enable you to manage permissions for applications running on EC2. This is either the Amazon Resource Name (ARN) of the instance profile (e.g., arn:aws:iam::111111111111:instance-profile/s3access) or the name of the role (e.g., s3access).
