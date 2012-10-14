@@ -1,4 +1,3 @@
-__NOTOC__
 = Eucalyptus Specification/Design/Architecture Documents =
 Here you will find technical documents which support the evaluation, planning, and implementation of features in [http://www.eucalyptus.com Eucalyptus].  
 This the canonical reference for two kinds of documents:  feature specifications used in planning releases and generational design documents which evolve iteratively with the ongoing implementation of the system.  
@@ -13,6 +12,10 @@ The purpose of this page is to aggregate and classify these documents from the [
 | [[tag:rls-3.2|3.2]]
 | [[tag:rls-3.3|3.3]]<br/><code>pending</code>
 |} 
+
+{{SEEALSO}}
+
+__TOC__
 
 = Purpose of Documents =
 The purpose of the documents aggregated here is to support the development of new features in Eucalyptus.  To that end, they play a role in several stages of the development process:
@@ -43,4 +46,3 @@ Generational documents consist of:
 * Functional requirements: as identified by a corresponding epic in JIRA
 * Specification:  release-specific technical interpretation of functional requirements 
 
-{{SEEALSO}}
