@@ -8,5 +8,5 @@
 ----
 = Eucalyptus Links =
 * [http://www.eucalyptus.com/ Main Site]
-* [https://github.com/eucalyptus/architecture-docs Architecture Documentation]
+* [https://github.com/eucalyptus/architecture-docs Architecture Docs]
 * [http://eucalyptus.atlassian.net/ Bug Tracker]
