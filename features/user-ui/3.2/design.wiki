@@ -60,4 +60,5 @@ The configuration file will be read by the UI proxy when it starts. Changes to t
 
 The intent will be to provide the entire EUI (client side and proxy) in a package called eucalyptus-ui. This will be able to install separately on distinct machines, combined with the CLC or deployed on instances running inside the Eucalyptus cloud. The packaging and release methodologies will be consistent with other packages offered for Eucalyptus.
 The interfaces between the UI proxy and CLC will be mostly the standard web service APIs used by euca2ools with the exception of the authorization REST call. This call should not have to change and will provide only a very specific function to help reduce the chance for changes which might affect backward compatibility. In general, the EUI will be designed to match the features available in the same version of Eucalyptus (even if that is not initially the case). Changes or updates the the eucalyptus-ui package will not fundamentally require any changes or restarts to other Eucalyptus packages or services.
-[[tag:rls-3-2]]
+
+[[tag:rls-3.2]]
