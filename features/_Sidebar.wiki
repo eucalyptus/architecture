@@ -7,6 +7,6 @@
 * '''Components''': [[components]]
 ----
 = Eucalyptus Links =
-* [http://www.eucalyptus.com/ Eucalyptus]
-* [https://github.com/eucalyptus/architecture-docs Eucalyptus Architecture Documentation]
-* [http://eucalyptus.atlassian.net/ Eucalyptus Bug Tracker]
+* [http://www.eucalyptus.com/ Main Site]
+* [https://github.com/eucalyptus/architecture-docs Architecture Documentation]
+* [http://eucalyptus.atlassian.net/ Bug Tracker]
