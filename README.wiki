@@ -3,5 +3,4 @@ The purpose of this repository is to manage the specification, design and archit
 
 You most likely want to go [[https://github.com/eucalyptus/architecture/wiki|HERE]]
 
-= See Also =
 {{SEEALSO}}
