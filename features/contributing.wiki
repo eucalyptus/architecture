@@ -1,28 +1,6 @@
-== Specification Documents ==
-These documents are intentional and intensional<ref name="Intensional Definition">http://en.wikipedia.org/wiki/Intensional_definition</ref>:
-* are "''timeless''" in that they are overarching and meant to be definitive of the feature overall.
-* evolve over time independent of the features current implementation status.
-* reflect our current understanding of the features definition in the broadest sense.
-
-Specification documents consist of:
-* Specification:  overall technical specification of the functional and architectural/quality characteristics.
-* High level design/Architecture:  definition of fundamental components, interfaces, behaviours including information, control, and concurrency models.
-* Supporting Documents: API/Service specifications, client tool chains, WSDLs, TCKs.
-
-== Generational Documents ==
-These documents are specific to a release and meant to serve the tasks surrounding the planning, design, implementation, and delivery of a feature.
-* support the scoping, design, and implementation effort of the feature during that release.
-* defining the design and implementation objectives and details for a particular version of a feature.
-* specific to the context and determined by the constraints of a particular release time frame.
-* change as needed to support the above objectives and are quiesced after those tasks are completed.
-
-Generational documents consist of:
-* Functional requirements: as identified by a corresponding epic in JIRA
-* Specification:  release-specific technical interpretation of functional requirements 
-
+[[arch-repo-diagrams-workflow.png]]
 = Contributing =
-----
-[[arch-repo-diagrams-workflow.png|float|width=400px|align=right|frame]]
+There are two classes of documents to which it is appropriate contributing here:  See [[Home#document_definitions|Document Definitions]]
 The contents of this repository are reviewed and, to that end, all changes should be submitted as a pull request: [https://help.github.com/articles/fork-a-repo Fork & Pull].
 
 * Get a [https://github.com/signup/free github account].
