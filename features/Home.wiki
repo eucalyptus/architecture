@@ -8,23 +8,23 @@ The purpose of the documents aggregated here is to provide the needed technical 
 __TOC__
 = Eucalyptus Doc Links =
 {{SEEALSO}}
-= Document Categories =
+= Find me all the things... =
 {| style="width: 90%"
 |+ ''Documents By Category''
-| '''Release'''
+| '''in a certain release'''
 | [[tag:rls-3.0|3.0]]<br/><code>pending</code>
 | [[tag:rls-3.1|3.1]]<br/><code>pending</code>
 | [[tag:rls-3.2|3.2]]
 | [[tag:rls-3.3|3.3]]<br/><code>pending</code>
 |} 
 
-= Purpose of Documents =
+= What it is used for... =
 The purpose of the documents aggregated here is to support the development of new features in Eucalyptus.  To that end, they play a role in several stages of the development process:
 # '''Feature specification''':  associated with each feature is an overall document describing the important technical characteristics in a release (or generation) independent fashion.  These reflect the understanding of the feature which is used in subsequent steps.
 # '''Scope & Estimation''':  prior to release planning a technical assessment is made about the aspects of functionality to go into a generation of the feature.  The <code>spec</code> documents which are associated with a release start life at that time.  These subsequently evolve until they have been committed to for a particular release (but may be present even when not committed to a release).
 # '''Design & Implementation''':  a feature which has been committed to a release is supported by a design document for that release.  The <code>design</code> documents start their life when work towards that release does.  These subsequently evolve until work stops for that release of the feature.  (They would then be ported forward to the final documentation).
 
-= Document Type Descriptions =
+= What you will find here... =
 There are two classes of documents which you can expect to find the authoritative copy of here:  feature specifications used in planning/estimation of releases and generational design documents which evolve iteratively with the ongoing implementation of the system.  
 
 '''Specification documents''' are intentional and intensional<ref name="Intensional Definition">http://en.wikipedia.org/wiki/Intensional_definition</ref>:
