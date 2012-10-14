@@ -1,0 +1,37 @@
+skinparam backgroundColor White
+skinparam state {
+  StartColor #fdb913
+  EndColor #fdb913
+  BackgroundColor #02405f
+  BackgroundColor<< Begin >> #02405f
+  BorderColor  	#73a434
+  FontName Verdana
+  FontSize 24
+  FontColor White
+}
+
+skinparam component {
+  FontSize 13
+  InterfaceBackgroundColor RosyBrown
+  InterfaceBorderColor orange
+  BackgroundColor<< Apache >> Red
+  BorderColor<< Apache >> #FF6655
+  FontName Courier
+  BorderColor black
+  BackgroundColor gold
+  ArrowFontName Impact
+  ArrowColor #FF6655
+  ArrowFontColor #777777
+}
+
+skinparam activity {
+  StartColor #fdb913
+  EndColor #fdb913
+  BarColor SaddleBrown 
+  BackgroundColor #02405f
+  BackgroundColor<< Begin >> #02405f
+  BorderColor #73a434
+  FontName Verdana
+  FontSize 18
+  FontColor White
+}

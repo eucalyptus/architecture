@@ -1,3 +1,25 @@
+== Specification Documents ==
+These documents are intentional and intensional<ref name="Intensional Definition">http://en.wikipedia.org/wiki/Intensional_definition</ref>:
+* are "''timeless''" in that they are overarching and meant to be definitive of the feature overall.
+* evolve over time independent of the features current implementation status.
+* reflect our current understanding of the features definition in the broadest sense.
+
+Specification documents consist of:
+* Specification:  overall technical specification of the functional and architectural/quality characteristics.
+* High level design/Architecture:  definition of fundamental components, interfaces, behaviours including information, control, and concurrency models.
+* Supporting Documents: API/Service specifications, client tool chains, WSDLs, TCKs.
+
+== Generational Documents ==
+These documents are specific to a release and meant to serve the tasks surrounding the planning, design, implementation, and delivery of a feature.
+* support the scoping, design, and implementation effort of the feature during that release.
+* defining the design and implementation objectives and details for a particular version of a feature.
+* specific to the context and determined by the constraints of a particular release time frame.
+* change as needed to support the above objectives and are quiesced after those tasks are completed.
+
+Generational documents consist of:
+* Functional requirements: as identified by a corresponding epic in JIRA
+* Specification:  release-specific technical interpretation of functional requirements 
+
 = Contributing =
 ----
 [[arch-repo-diagrams-workflow.png|float|width=400px|align=right|frame]]
@@ -37,6 +59,8 @@ The currently supported and ''seemingly reasonable'' formats are:
 
 = Organization =
 ----
+The organization of the repository reflects the long-lived nature of a features true specification.  That is, the specification and design work related to a feature's implementation for a particular release often corresponds with only a portion of the entire feature's implementation.  Moreover, feature's specification evolves over time as the requirements, architecture, and upstream specifications evolve.
+
 The following table describes the organization of the top-level of the repository.
 
 {| style="width=90%"
