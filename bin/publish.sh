@@ -4,8 +4,8 @@ DESTDIR=${BASEDIR}/wiki
 EXCLUDE="TODO|README.wiki|.wiki.log|EUCA-....|Home.wiki|README.md"
 EXCLUDE_SUFFIX="pdf|zip|wsdl|git|puml|keep|notes.wiki"
 EXCLUDE_DIRS="/bin/|/releases/|/lib/|/wiki/|/.git"
-TAGS="rls-3.0 rls-3.1 rls-3.2 rls-3.3"
-
+#TAGS="rls-3.0 rls-3.1 rls-3.2 rls-3.3"
+TAGS="rls-3.2 rls-3.3"
 
 echo > ${BASEDIR}/.wiki.log
 FILELIST=$(cd ${BASEDIR}; 
@@ -31,9 +31,12 @@ for f in  $(echo "${FILELIST}" | sed 's/^\.\///g'); do
   	cp -fv ${BASEDIR}/$f ${DESTDIR}/${dir//\//-}-${file} >> ${BASEDIR}/.wiki.log | tee ${BASEDIR}/.wiki.log 2>&1
 	fi
 done
+for f in ${BASEDIR}/features/*.wiki; do
 (cd features; 
-	sed -nf ${BASEDIR}/bin/include.sed Home.wiki | sed 'N;N;s/\n//' | sed -f - Home.wiki > ${DESTDIR}/Home.wiki
+	file=$(basename $f)
+	sed -nf ${BASEDIR}/bin/include.sed $file | sed 'N;N;s/\n//' | sed -f - $file > ${DESTDIR}/$file
 	)
+done
 for f in ${TAGS}; do
   touch ${DESTDIR}/tag:${f}.md
 done
