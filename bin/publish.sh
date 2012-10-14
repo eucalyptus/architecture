@@ -28,7 +28,9 @@ for f in  $(echo "${FILELIST}" | sed 's/^\.\///g'); do
 			sed -nf ${BASEDIR}/bin/include.sed $file | sed 'N;N;s/\n//' | sed -f - $file > ${DESTDIR}/${dir//\//-}-${file}
 			)
 	else
-  	cp -fv ${BASEDIR}/$f ${DESTDIR}/${dir//\//-}-${file} >> ${BASEDIR}/.wiki.log | tee ${BASEDIR}/.wiki.log 2>&1
+		if grep -v 'tag:' ${DESTDIR}/${dir//\//-}-${file} | diff ${BASEDIR}/$f -; then
+  		cp -fv ${BASEDIR}/$f ${DESTDIR}/${dir//\//-}-${file} >> ${BASEDIR}/.wiki.log | tee ${BASEDIR}/.wiki.log 2>&1
+		fi
 	fi
 done
 for f in ${BASEDIR}/features/*.wiki; do
@@ -41,5 +43,5 @@ for f in ${TAGS}; do
   touch ${DESTDIR}/tag:${f}.md
 done
 (cd ${DESTDIR};${BASEDIR}//bin/tag-indexer.rb  -m tags)
-(cd ${DESTDIR}; git add ./*; git status -sb; git commit -m 'updated'; git push) | tee ${BASEDIR}/.wiki.log 2>&1
-(cd ${BASEDIR}; git add wiki; git commit -a -m 'update wiki'; git push )  | tee ${BASEDIR}/.wiki.log 2>&1
+(cd ${DESTDIR}; git add ./*; git status -sb; git commit -m 'updated'; git push) 2>&1 | tee ${BASEDIR}/.wiki.log 
+(cd ${BASEDIR}; git add wiki; git commit -a -m 'update wiki'; git push ) 2>&1 | tee ${BASEDIR}/.wiki.log
