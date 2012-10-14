@@ -113,17 +113,17 @@ unless options[:help]
   Find.find("#{options[:directory]}") do |file|
     puts "file: #{file} #{options[:tagfilepattern]}" if options[:verbose]
     if re_tagfile.match(file)
-      puts "    Found tag file... #{file}" unless options[:silent]
+      puts "    Found tag file... #{file}" if options[:verbose]
       tags[$1] = { :file => file, :re => Regexp.new("\\[\\[#{$1}\\]\\]",Regexp::MULTILINE), :hits => [] }
     end
     if re_wikifile.match(file)
-       puts "    Found wiki file... #{file}" unless options[:silent]
+       puts "    Found wiki file... #{file}" if options[:verbose]
        files[file] = $1
     end
   end
-  puts "done. Found #{files.count} wiki pages and #{tags.count} tags." unless options[:silent]
+  puts "Found #{files.count} wiki pages and #{tags.count} tags." unless options[:silent]
 
-  put "  Indexing tag references...." unless options[:silent]
+  puts "  Indexing tag references...." if options[:verbose]
   hit_count = tagged_page_count = 0
   files.each_pair { |filename,label|
     unless label == options[:metatag]
@@ -140,9 +140,9 @@ unless options[:help]
       }
     end
   }
-  puts "done. Found #{hit_count} distinct tag references across #{tagged_page_count} pages. " unless options[:silent]
+  puts "Found #{hit_count} distinct tag references across #{tagged_page_count} pages. " unless options[:silent]
 
-  put "  Writing indices to tag pages...." unless options[:silent]
+  puts "  Writing indices to tag pages...." if options[:verbose]
   index_added = 0
   index_updated = 0
   tags.each_pair { |tag,t|
@@ -166,7 +166,7 @@ unless options[:help]
       File.open("#{options[:directory]}/#{t[:file]}",'w') { |g| g.write(text) }
     }
   }
-  puts "done. Tag index added to #{index_added} pages, updated on #{index_updated}." unless options[:silent]
+  puts "Tag index added to #{index_added} pages, updated on #{index_updated}." unless options[:silent]
   puts "WIKI TAG INDEXING COMPLETE." unless options[:silent]
 end
 
