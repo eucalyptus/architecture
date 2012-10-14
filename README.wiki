@@ -3,4 +3,9 @@ The purpose of this repository is to manage the specification, design and archit
 
 You most likely want to go [[https://github.com/eucalyptus/architecture/wiki|HERE]]
 
-{{SEEALSO}}
+* [https://github.com/eucalyptus/architecture/wiki Eucalyptus Architecture wiki].
+** [https://github.com/eucalyptus/architecture/wiki/contributing Contributing to Eucalyptus Architecture Repository].
+** [https://github.com/eucalyptus/architecture/wiki/organization Organization of the Eucalyptus Architecture Repository] 
+* [https://github.com/eucalyptus/architecture-docs Eucalyptus Architecture Documentation] for high level architectural documentation
+* [http://eucalyptus.atlassian.net/ Eucalyptus Bug Tracker] for new feature requests, requirements, priorities, epics, and user stories.
+
