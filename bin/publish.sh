@@ -1,7 +1,7 @@
 #!/bin/bash
 BASEDIR=$(git rev-parse --show-toplevel)
 DESTDIR=${BASEDIR}/wiki
-EXCLUDE="TODO|README.wiki|.wiki.log|EUCA-....|Home.wiki|README.md"
+EXCLUDE="TODO|README.wiki|.wiki.log|EUCA-....|"
 EXCLUDE_SUFFIX="pdf|zip|wsdl|git|puml|keep|notes.wiki"
 EXCLUDE_DIRS="/bin/|/releases/|/lib/|/wiki/|/.git"
 #TAGS="rls-3.0 rls-3.1 rls-3.2 rls-3.3"
@@ -11,7 +11,7 @@ echo > ${BASEDIR}/.wiki.log
 FILELIST=$(cd ${BASEDIR}; 
 find features  -type f  | 
 egrep -v '^./wiki' | 
-egrep -v './features/[^/]*.wiki' | 
+egrep -v 'features/[^/]*.wiki' | 
 egrep -v "${EXCLUDE}" | 
 egrep -v "(${EXCLUDE_SUFFIX})$" |
 egrep -v "${EXCLUDE_DIRS}"
