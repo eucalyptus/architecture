@@ -6,6 +6,7 @@ This page serves the presentation and navigation of all the documents from the [
 The purpose of the documents aggregated here is to provide the needed technical specifications, background, analysis, and record of '''architecturally significant decisions''' in support of the development of all new features in Eucalyptus.
 
 __TOC__
+= Convenient short cuts go here... =
 {| style="width: 90%"
 |+ Find me '''all the things'''...
 | '''in a certain release'''
