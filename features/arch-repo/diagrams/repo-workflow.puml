@@ -39,3 +39,15 @@ archrepo -down-> archjira : references requirements
 archrepo --> archconfluence : pushes documents
 
 @enduml
+
+@startuml lifecycle.png
+!include ../../../lib/diagram-colors
+(*) -down-> "Requirements\n(JIRA)" as reqs
+reqs -right-> "Feauture\nSpecification\n(github)" as spec
+spec --> reqs
+spec -down-> "Feature Design\nDocuments\n(github)" as design
+design -up-> "Documentation\n(github)" as docs
+design -right-> "Architectural\nDocumentation\n(github)" as arch
+design --> spec
+arch --> (*)
+@enduml
