@@ -2,7 +2,9 @@ Here you will find ''technical'' documents which support the evaluation, plannin
 
 = Eucalyptus Specification/Design/Architecture Documents =
 This the ''canonical'' reference for two kinds of documents:  '''feature specifications''' used in planning releases and generational '''design documents''' which evolve iteratively with the ongoing implementation of the system.
-The purpose of this page is to aggregate and classify these documents from the [https://github.com/eucalyptus/architecture/ underlying repository] with the raw materials.  
+This page serves the presentation and navigation of all the documents from the [https://github.com/eucalyptus/architecture/ underlying repository] with the raw materials.  
+The purpose of the documents aggregated here is to provide the technical background, analysis, and record of significant architectural decisions in support of the development of all new features in Eucalyptus.
+
 __TOC__
 = Eucalyptus Doc Links =
 {{SEEALSO}}
