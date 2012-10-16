@@ -23,15 +23,19 @@ for f in  $(echo "${FILELIST}" | sed 's/^\.\///g'); do
   t=${dir//\//-}
   dest=${DESTDIR}/$t
   echo "$f => ${dir}/${file} ($t)"
+        PREFIX=
+        if [ -n "${dir}" ]; then
+          PREFIX=${dir//\//-}-
+        fi
 	if echo $f | egrep "\.(${EXCLUDE_SUFFIX})" &&
  		egrep '{{[^ ]*}}' $f >/dev/null 2>&1; then
 		(cd $dir; 
-			sed -nf ${BASEDIR}/bin/include.sed $file | sed 'N;N;s/\n//' | sed -f - $file > ${DESTDIR}/${dir//\//-}-${file}
+			sed -nf ${BASEDIR}/bin/include.sed $file | sed 'N;N;s/\n//' | sed -f - $file > ${DESTDIR}/${PREFIX}${file}
 			)
 	else
-#		if grep -v 'tag:' ${DESTDIR}/${dir//\//-}-${file} | diff ${BASEDIR}/$f - >/dev/null 2>&1; then
-  		cp -fv ${BASEDIR}/$f ${DESTDIR}/${dir//\//-}-${file} >> ${BASEDIR}/.wiki.log | tee ${BASEDIR}/.wiki.log 2>&1
-#		fi
+		if grep -v 'tag:' ${DESTDIR}/${PREFIX}${file} | diff ${BASEDIR}/$f - >/dev/null 2>&1; then
+  		cp -fv ${BASEDIR}/$f ${DESTDIR}/${PREFIX}${file} >> ${BASEDIR}/.wiki.log | tee ${BASEDIR}/.wiki.log 2>&1
+		fi
 	fi
 done
 for f in ${BASEDIR}/features/*.wiki; do
