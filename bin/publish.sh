@@ -24,7 +24,7 @@ for f in  $(echo "${FILELIST}" | sed 's/^\.\///g'); do
   dest=${DESTDIR}/$t
   echo "$f => ${dir}/${file} ($t)"
         PREFIX=
-        if [ -n "${dir}" ]; then
+        if [[ "${dir}" != "" ]]; then
           PREFIX=${dir//\//-}-
         fi
 	if echo $f | egrep "\.(${EXCLUDE_SUFFIX})" &&
@@ -34,6 +34,8 @@ for f in  $(echo "${FILELIST}" | sed 's/^\.\///g'); do
 			)
 	else
 		if grep -v 'tag:' ${DESTDIR}/${PREFIX}${file} | diff ${BASEDIR}/$f - >/dev/null 2>&1; then
+  		cp -fv ${BASEDIR}/$f ${DESTDIR}/${PREFIX}${file} >> ${BASEDIR}/.wiki.log | tee ${BASEDIR}/.wiki.log 2>&1
+                elif [ ! -e ${DESTDIR}/${PREFIX}${file} ]; then
   		cp -fv ${BASEDIR}/$f ${DESTDIR}/${PREFIX}${file} >> ${BASEDIR}/.wiki.log | tee ${BASEDIR}/.wiki.log 2>&1
 		fi
 	fi
