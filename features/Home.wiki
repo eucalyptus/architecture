@@ -29,12 +29,12 @@ The purpose of the documents aggregated here is to support the development of ne
 = What you will find here... =
 There are two classes of documents which you can expect to find the authoritative copy of here:  feature specifications used in planning/estimation of releases and generational design documents which evolve iteratively with the ongoing implementation of the system.  
 
-'''Specification documents''' are intentional and intensional<ref name="Intensional Definition">http://en.wikipedia.org/wiki/Intensional_definition</ref>:
+'''Feature Specification documents''' are statements of our intentions, understanding, and long-term scope:
 * are "''timeless''" in that they are overarching and meant to be definitive of the feature overall.
 * evolve over time independent of the features current implementation status.
 * reflect our current understanding of the features definition in the broadest sense.
 
-Specification documents consist of:
+Feature Specification documents consist of:
 * Specification:  overall technical specification of the functional and architectural/quality characteristics.
 * High level design/Architecture:  definition of fundamental components, interfaces, behaviours including information, control, and concurrency models.
 * Supporting Documents: API/Service specifications, client tool chains, WSDLs, TCKs.
@@ -48,4 +48,6 @@ Specification documents consist of:
 Generational documents consist of:
 * Functional requirements: as identified by a corresponding epic in JIRA
 * Specification:  release-specific technical interpretation of functional requirements 
+* Designs: release-specific design models and descriptions, starting with just-enough and co-evolving with the implementation.
+
 
