@@ -92,8 +92,8 @@ String[] createSQL = config.generateSchemaUpdateScript(dialect, meta);
 ===== Schema Changes =====
 Broadly, the default SchemaUpdate has support for the following kinds of changes:
 # Supported Schema Updates 
- - Create a new table.
- - Add a column to an existing table.
+## Create a new table.
+## Add a column to an existing table.
 # Unsupported Schema Updates
 ## Dropping a table
 ## Dropping a column from an existing table
