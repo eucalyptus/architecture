@@ -11,7 +11,7 @@ echo > ${BASEDIR}/.wiki.log
 FILELIST=$(cd ${BASEDIR}; 
 find features  -type f  | 
 egrep -v '^./wiki' | 
-egrep -v 'features/[^/]*.wiki' | 
+#egrep -v 'features/[^/]*.wiki' | 
 egrep -v "${EXCLUDE}" | 
 egrep -v "(${EXCLUDE_SUFFIX})$" |
 egrep -v "${EXCLUDE_DIRS}"
