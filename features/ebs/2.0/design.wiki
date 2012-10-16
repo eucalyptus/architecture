@@ -22,7 +22,7 @@ Note: Additional attributes that are not directly related to Boot from EBS: Inst
 
 ==== Start Instances ====
 
-Start a previously stopped instance. Only available for instances booted from EBS. Instance ID is provided as part of the call. Uses existing EBS volume associated with the instance (new EBS volume not created). //Chris, check out the Start Instances response (especially the part about codes).//
+Start a previously stopped instance. Only available for instances booted from EBS. Instance ID is provided as part of the call. Uses existing EBS volume associated with the instance (new EBS volume not created). ''Chris, check out the Start Instances response (especially the part about codes).''
 
 ==== Stop Instances ====
 
@@ -50,7 +50,6 @@ Allocate resources. Send create volume from snapshot to SC. The SC will queue th
 
 Poll volume state. When marked "available," send an Attach Volume to the SC, get (and store) remote dev received from SC. Send RunInstances to CC/NC with the remote dev specified in the block dev mapping.
 
-Handle failures. //TODO: Enumerate all paths and failures.//
 
 ==== Start Instances ====
 
@@ -58,14 +57,14 @@ Send RunInstances to the CC/NC using the instance ID and stored information from
 
 ==== Stop Instances ====
 
-Send Terminate Instance to the CC/NC, retain instance ID and do //not// send Delete Volume to the SC. Mark state as "stopped." The backing EBS volume cannot be detached. Address is not released.
+Send Terminate Instance to the CC/NC, retain instance ID and do ''not'' send Delete Volume to the SC. Mark state as "stopped." The backing EBS volume cannot be detached. Address is not released.
  The NC treats a stop as a terminate (the volume is detached, so it can be reattached elsewhere, but the CLC will mark it as "in-use").
 
 If a stopped instance is terminate, the CLC should clean up instance state and delete the volume.
 
 ==== Terminate Instances ====
 
-Terminate instance as with S3 backed instances and also send a Delete Volume to the relevant SC, //after the CC/NC reports that the terminate succeeded.//
+Terminate instance as with S3 backed instances and also send a Delete Volume to the relevant SC, ''after the CC/NC reports that the terminate succeeded.''
 
 '''There is a possibility of causing a hypervisor fault/kernel oops if the SC deletes the volume and the NC has not terminate the instance yet (terminate is async). Investigate the severity/probability of this. Update: kvm as well as xen will mark the root disk read-only if the underlying root disk is deleted on the remote (SAN) end (karmic and above). No catastrophic failures'''
 
