@@ -1,8 +1,8 @@
-== Boot from EBS= ==
+= Boot from EBS =
 
 Provide the ability to start VM instances using EBS as the backing store and provide API compatibility with the Boot from EBS AWS EC2 feature.
 
-= Overview =
+== Overview ==
 
 Core functionality: Ability to register images by providing a backing snapshot, run these images, start/stop/terminate instances.
 
