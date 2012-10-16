@@ -5,7 +5,7 @@ EXCLUDE="TODO|README.wiki|.wiki.log|EUCA-...."
 EXCLUDE_SUFFIX="pdf|zip|wsdl|git|puml|keep|notes.wiki"
 EXCLUDE_DIRS="/bin/|/releases/|/lib/|/wiki/|/.git"
 #TAGS="rls-3.0 rls-3.1 rls-3.2 rls-3.3"
-TAGS="rls-3.2 rls-3.3 index"
+TAGS="rls-2.0 rls-3.2 rls-3.3 index"
 
 echo > ${BASEDIR}/.wiki.log
 FILELIST=$(cd ${BASEDIR}; 
