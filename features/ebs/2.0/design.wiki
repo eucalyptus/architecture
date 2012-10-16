@@ -1,50 +1,50 @@
-====== Boot from EBS ======
+== Boot from EBS= ==
 
 Provide the ability to start VM instances using EBS as the backing store and provide API compatibility with the Boot from EBS AWS EC2 feature.
 
-===== Overview =====
+= Overview =
 
 Core functionality: Ability to register images by providing a backing snapshot, run these images, start/stop/terminate instances.
 
 === Required Operations ===
 
-== Register Image from Snapshot ==
+==== Register Image from Snapshot ====
 
 Information about EBS snapshot and device name specified as part of the block device mapping. The block device mapping can also contain a volume size (for EBS volumes NOT created from a snapshot that should be associated with the instance), "NoDevice" to indicate that the device should not be mapped to a block device in the guest, virtual device name and "delete on termination," which indicates if the volume should be deleted on termination (this must be honored on a terminate. Similar to stop instances, but the instance id is not preserved).
 
-== Run Instances ==
+==== Run Instances ====
 
 Run instances creates a volume from the snapshot associated with the image, after which the instance is started and the instance uses the volume as the root (/dev/sda1 by default).
 
-Run instances accepts a block device mapping as well, similar to register image. Note: Does not necessarily have to be supported for basic Boot from EBS support. It is also possible to map a snapshot to a block dev which is not the root. In case of RunInstances, **block device mapping support and Boot from EBS are related, but the former is not necessary at the API level to achieve the latter**
+Run instances accepts a block device mapping as well, similar to register image. Note: Does not necessarily have to be supported for basic Boot from EBS support. It is also possible to map a snapshot to a block dev which is not the root. In case of RunInstances, '''block device mapping support and Boot from EBS are related, but the former is not necessary at the API level to achieve the latter'''
 
 Note: Additional attributes that are not directly related to Boot from EBS: InstanceInitiatedShutdownBehavior, DisableApiTermination
 
-== Start Instances ==
+==== Start Instances ====
 
 Start a previously stopped instance. Only available for instances booted from EBS. Instance ID is provided as part of the call. Uses existing EBS volume associated with the instance (new EBS volume not created). //Chris, check out the Start Instances response (especially the part about codes).//
 
-== Stop Instances ==
+==== Stop Instances ====
 
 Only available for instances booted from an EBS volume. Releases all resources, except the backing volume. Instance ID is retained and instance state is marked as "stopped." 
 
-== Terminate Instances ==
+==== Terminate Instances ====
 
 In addition to terminating the instance, delete volume that the instance booted from (unless delete on termination is set). If "disable api termination" is specified during RunInstances, terminate should fail immediately, without terminating the instance.
 
-== Create Image ==
+==== Create Image ====
 
 Create and register an image from an EBS backed instance.
 
-==== Proposed Design ====
+== Proposed Design ==
 
 CLC: Implement/modify Register Image, Run Instances, Start/Stop Instances, Terminate Instances.
 
-== Register Image ==
+==== Register Image ====
 
 Validate snapshot id, register image and store snapshot id (and block dev mapping).
 
-== Run Instances ==
+==== Run Instances ====
 
 Allocate resources. Send create volume from snapshot to SC. The SC will queue the request and respond. If response is success, return success to user.
 
@@ -52,22 +52,22 @@ Poll volume state. When marked "available," send an Attach Volume to the SC, get
 
 Handle failures. //TODO: Enumerate all paths and failures.//
 
-== Start Instances ==
+==== Start Instances ====
 
 Send RunInstances to the CC/NC using the instance ID and stored information from the stopped instance, including the remote device string.
 
-== Stop Instances ==
+==== Stop Instances ====
 
 Send Terminate Instance to the CC/NC, retain instance ID and do //not// send Delete Volume to the SC. Mark state as "stopped." The backing EBS volume cannot be detached. Address is not released.
  The NC treats a stop as a terminate (the volume is detached, so it can be reattached elsewhere, but the CLC will mark it as "in-use").
 
 If a stopped instance is terminate, the CLC should clean up instance state and delete the volume.
 
-== Terminate Instances ==
+==== Terminate Instances ====
 
 Terminate instance as with S3 backed instances and also send a Delete Volume to the relevant SC, //after the CC/NC reports that the terminate succeeded.//
 
-**There is a possibility of causing a hypervisor fault/kernel oops if the SC deletes the volume and the NC has not terminate the instance yet (terminate is async). Investigate the severity/probability of this. Update: kvm as well as xen will mark the root disk read-only if the underlying root disk is deleted on the remote (SAN) end (karmic and above). No catastrophic failures**
+'''There is a possibility of causing a hypervisor fault/kernel oops if the SC deletes the volume and the NC has not terminate the instance yet (terminate is async). Investigate the severity/probability of this. Update: kvm as well as xen will mark the root disk read-only if the underlying root disk is deleted on the remote (SAN) end (karmic and above). No catastrophic failures'''
 
 NC: Support for block dev mapping in run instances request. Remote dev for volume is specified as part of the device specification in the block dev map (first cut: only need it to use it for the root partition, but should be extensible). NC uses specified remote dev to prepare the client side (in case of iSCSI) and then uses it as the root partition of the instance.
 
@@ -79,18 +79,18 @@ Stop is the same as terminate from the NC's perspective.
 
 === Action Items ===
 
-  * Investigate severity of async terminate/volume deletion race. 
-  * Milestones
-  * Timeline/delivery date
-  * Finalize design doc
-  * Implement CLC changes
-  * Implement CC/NC changes
-  * Preliminary testing
-  * Iterate
-  * Write QA tests
-  * Automated QA
-  * Merge into main and QA
-  * Investigate Windows and VMware support for EEE.
+* Investigate severity of async terminate/volume deletion race. 
+* Milestones
+* Timeline/delivery date
+* Finalize design doc
+* Implement CLC changes
+* Implement CC/NC changes
+* Preliminary testing
+* Iterate
+* Write QA tests
+* Automated QA
+* Merge into main and QA
+* Investigate Windows and VMware support for EEE.
 
 ===  Proposed Task allocation ===
 
@@ -101,17 +101,17 @@ Vmware: Ye
 
 === References ===
 
-  * http://docs.amazonwebservices.com/AWSEC2/2010-06-15/APIReference/
-  * http://docs.amazonwebservices.com/AWSEC2/latest/UserGuide/index.html?instance-storage-concepts.html
-  * http://docs.amazonwebservices.com/AWSEC2/latest/UserGuide/index.html?instance-types.html
-  * http://docs.amazonwebservices.com/AWSEC2/latest/UserGuide/index.html?Using_AddingDefaultLocalInstanceStorageToAMI.html
-  * http://docs.amazonwebservices.com/AWSEC2/latest/UserGuide/index.html?Using_OverridingAMIBDM.html
-  * http://docs.amazonwebservices.com/AWSEC2/latest/UserGuide/index.html?creating-an-ami-ebs.html
+* http://docs.amazonwebservices.com/AWSEC2/2010-06-15/APIReference/
+* http://docs.amazonwebservices.com/AWSEC2/latest/UserGuide/index.html?instance-storage-concepts.html
+* http://docs.amazonwebservices.com/AWSEC2/latest/UserGuide/index.html?instance-types.html
+* http://docs.amazonwebservices.com/AWSEC2/latest/UserGuide/index.html?Using_AddingDefaultLocalInstanceStorageToAMI.html
+* http://docs.amazonwebservices.com/AWSEC2/latest/UserGuide/index.html?Using_OverridingAMIBDM.html
+* http://docs.amazonwebservices.com/AWSEC2/latest/UserGuide/index.html?creating-an-ami-ebs.html
 
-  * http://www.elastician.com/2009/12/creating-ebs-backed-ami-from-s3-backed.html
-  * http://coderslike.us/2009/12/07/amazon-ec2-boot-from-ebs-and-ami-conversion/
-  * http://www.webadminblog.com/index.php/2010/03/23/amazon-ec2-ebs-instances-and-ephemeral-storage/
-  * http://stackoverflow.com/questions/2082724/amazon-ec2-swap-root-instance-store-device-with-ebs-device
+* http://www.elastician.com/2009/12/creating-ebs-backed-ami-from-s3-backed.html
+* http://coderslike.us/2009/12/07/amazon-ec2-boot-from-ebs-and-ami-conversion/
+* http://www.webadminblog.com/index.php/2010/03/23/amazon-ec2-ebs-instances-and-ephemeral-storage/
+* http://stackoverflow.com/questions/2082724/amazon-ec2-swap-root-instance-store-device-with-ebs-device
 
 
 ----
