@@ -114,3 +114,5 @@ Vmware: Ye
   * http://stackoverflow.com/questions/2082724/amazon-ec2-swap-root-instance-store-device-with-ebs-device
 
 
+----
+[[tag:rls-2.0]]

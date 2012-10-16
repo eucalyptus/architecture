@@ -1,5 +1,0 @@
---2012-10-16 13:06:23--  https://wiki.eucalyptus-systems.com/lib/exe/fetch.php?cache=&media=boot_from_ebs.jpg
-Resolving wiki.eucalyptus-systems.com (wiki.eucalyptus-systems.com)... 10.1.1.251
-Connecting to wiki.eucalyptus-systems.com (wiki.eucalyptus-systems.com)|10.1.1.251|:443... connected.
-ERROR: The certificate of ‘wiki.eucalyptus-systems.com’ is not trusted.
-ERROR: The certificate of ‘wiki.eucalyptus-systems.com’ hasn't got a known issuer.
