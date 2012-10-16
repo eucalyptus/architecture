@@ -24,7 +24,7 @@ for f in  $(echo "${FILELIST}" | sed 's/^\.\///g'); do
   dest=${DESTDIR}/$t
   echo "$f => ${dir}/${file} ($t)"
         PREFIX=
-        if [[ "${dir}" != "" ]]; then
+        if [[ "${dir}" != "." ]]; then
           PREFIX=${dir//\//-}-
         fi
 	if echo $f | egrep "\.(${EXCLUDE_SUFFIX})" &&
