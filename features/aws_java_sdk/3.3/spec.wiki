@@ -33,7 +33,7 @@
 
 = EC2 =
 == Supported Functionality ==
-<code>
+```java
  AllocateAddressResult 	allocateAddress()
  AllocateAddressResult 	allocateAddress(AllocateAddressRequest allocateAddressRequest)
  AssociateAddressResult 	associateAddress(AssociateAddressRequest associateAddressRequest)
@@ -105,9 +105,9 @@ reference this key pair when launching new instances.
  StartInstancesResult 	startInstances(StartInstancesRequest startInstancesRequest)
  StopInstancesResult 	stopInstances(StopInstancesRequest stopInstancesRequest)
  TerminateInstancesResult 	terminateInstances(TerminateInstancesRequest terminateInstancesRequest)
-</code>
+```
 == Currently Unsupported Functionality ==
-<code>
+```java
   void 	activateLicense(ActivateLicenseRequest activateLicenseRequest)
  void 	assignPrivateIpAddresses(AssignPrivateIpAddressesRequest assignPrivateIpAddressesRequest)
  void 	associateDhcpOptions(AssociateDhcpOptionsRequest associateDhcpOptionsRequest)
@@ -220,11 +220,11 @@ reference this key pair when launching new instances.
  void 	resetSnapshotAttribute(ResetSnapshotAttributeRequest resetSnapshotAttributeRequest)
  void 	unassignPrivateIpAddresses(UnassignPrivateIpAddressesRequest unassignPrivateIpAddressesRequest)
  UnmonitorInstancesResult 	unmonitorInstances(UnmonitorInstancesRequest unmonitorInstancesRequest)
-</code>
+```
 
 = IAM =
 '''to be classified'''
-</code>
+```java
   void 	addRoleToInstanceProfile(AddRoleToInstanceProfileRequest addRoleToInstanceProfileRequest)
  void 	addUserToGroup(AddUserToGroupRequest addUserToGroupRequest)
  void 	changePassword(ChangePasswordRequest changePasswordRequest)
@@ -312,14 +312,14 @@ reference this key pair when launching new instances.
  void 	updateUser(UpdateUserRequest updateUserRequest)
  UploadServerCertificateResult 	uploadServerCertificate(UploadServerCertificateRequest uploadServerCertificateRequest)
  UploadSigningCertificateResult 	uploadSigningCertificate(UploadSigningCertificateRequest uploadSigningCertificateRequest)
-</code>
+```
  
 = STS =
 '''to be classified'''
-<code>
+```java
  GetFederationTokenResult 	getFederationToken(GetFederationTokenRequest getFederationTokenRequest)
  GetSessionTokenResult 	getSessionToken()
  GetSessionTokenResult 	getSessionToken(GetSessionTokenRequest getSessionTokenRequest)
-</code>
+```
 ----
 [[tag:rls-3.3]]
