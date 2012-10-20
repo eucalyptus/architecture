@@ -1,21 +1,19 @@
-[[Tag:3.3]]
 = Service Level Support =
-* supported AWS services in AWS SDK for Java & Eucalyptus
+== Supported AWS services in Eucalyptus 3.2 ==
 * S3:  Simple Storage Service
 * EC2
 * IAM:  Identity and Access Management
 * STS:  Simple Token Service
 
-* forthcoming AWS service support in Eucalyptus
+==  Unsupported AWS services in Eucalyptus 3.2 ==
 * ELB:  Elastic Load Balancing
 * CloudWatch
 * Autoscaling
-
-* AWS services unsupported in Eucalyptus
-* Dynamo
-* SimpleDB
+* CloudFormation
 * SQS:  Simple Queueing Service
 * SNS:  Simple Notification Service
+* Dynamo
+* SimpleDB
 * RDS:  Relational Database Service
 * Route 53
 * SWS:  Simple Workflow Service
@@ -23,7 +21,6 @@
 * SES:  Simple Email Service
 * CloudSearch
 * CloudFront
-* CloudFormation
 * Elastic Beanstalk
 * Import/Export
 * SGS:  Storage Gateway Service
@@ -224,6 +221,7 @@ reference this key pair when launching new instances.
 
 
 = IAM =
+'''to be classified'''
   void 	addRoleToInstanceProfile(AddRoleToInstanceProfileRequest addRoleToInstanceProfileRequest)
  void 	addUserToGroup(AddUserToGroupRequest addUserToGroupRequest)
  void 	changePassword(ChangePasswordRequest changePasswordRequest)
@@ -314,6 +312,10 @@ reference this key pair when launching new instances.
  
  
 = STS =
+'''to be classified'''
  GetFederationTokenResult 	getFederationToken(GetFederationTokenRequest getFederationTokenRequest)
  GetSessionTokenResult 	getSessionToken()
  GetSessionTokenResult 	getSessionToken(GetSessionTokenRequest getSessionTokenRequest)
+
+----
+[[tag:3.3]]
