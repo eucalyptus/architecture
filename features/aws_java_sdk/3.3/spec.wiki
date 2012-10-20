@@ -322,4 +322,4 @@ reference this key pair when launching new instances.
  GetSessionTokenResult 	getSessionToken(GetSessionTokenRequest getSessionTokenRequest)
 </code>
 ----
-[[tag:3.3]]
+[[tag:rls-3.3]]
