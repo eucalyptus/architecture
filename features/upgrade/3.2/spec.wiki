@@ -82,12 +82,12 @@ Note that this incremental and versioned application of the upgrade (data migrat
 ===== Computing Deltas =====
 Computing deltas can be done using Hibernate to generate the expected schema update script.
 For example
-<code java>
+```java
 Dialect dialect = Dialect.getDialect(props);
 Connection connection = dataSource.getConnection();
 DatabaseMetadata meta = new DatabaseMetadata(connection, dialect);
 String[] createSQL = config.generateSchemaUpdateScript(dialect, meta);
-</code>
+```
 
 ===== Schema Changes =====
 Broadly, the default SchemaUpdate has support for the following kinds of changes:
@@ -136,10 +136,10 @@ Then, in the above step '''do upgrade: run @Upgrades''', this becomes:
 The upgrade process can easily be run off-line
 Hibernate's SchemaUpdate will serve as the initial basis for handling updates.  It is capable of being run off-line.  The limitation has to do with which types of schema updates are possible.  
 For example
-<code java>
+```java
 Ejb3Configuration conf = new Ejb3Configuration().configure("persistence-unit-name", props);
 new SchemaUpdate(conf.getHibernateConfiguration()).execute(true, false);
-</code>
+```
 
 ===== Past Upgrade =====
 # Ensure @Column annotations are present on all members (or @Transient)
