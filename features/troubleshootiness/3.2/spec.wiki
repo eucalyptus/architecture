@@ -77,9 +77,10 @@ A second prong is to enable people who know how to troubleshoot the system get t
 ===Architectural Constraints===
 
 # Documentation: fault-class information must have a corresponding written description which can be incorporated into documentation including, but not limited to:unique identifier, related identifiers (AWS fault code), 
-# Compatibility:AWS fault codes should be used over fault-class identifiers when a fault-class message must be reported back to client tools (i.e., as a web-services response).AWS fault codes relationship to internal unique identifiers must be recorded in both fault logs and documentation.
-# Modifiability:fault-class log messages can be modified w/o rebuilding the software.Document how to make changes.
-# Configurability:common logging configuration parameters can be altered at runtime following a uniform procedure/method (not component specific!)
+# Compatibility: AWS fault codes should be used over fault-class identifiers when a fault-class message must be reported back to client tools (i.e., as a web-services response).AWS fault codes relationship to internal unique identifiers must be recorded in both fault logs and documentation.
+# Modifiability: fault-class log messages can be modified w/o rebuilding the software.Document how to make changes.
+# Modularity/Extensibility: faults must be co-locatable with the component generating the fault.  Physically, there is no central repository of faults -- that is strictly a logical concept. 
+# # Configurability: common logging configuration parameters can be altered at runtime following a uniform procedure/method (not component specific!)
 # Extensibility: account for future need for integration of 3rd-party logging systems (e.g., splunk, syslogd, snmpd)
 # Testability:evaluation of approach and end result will include determining level of coverage for issues in the support/SE data set.
 # Internationalization: support will be needed to allow for future localization requirements.the scope of this constraint is restricted to only customer/tool facing.
