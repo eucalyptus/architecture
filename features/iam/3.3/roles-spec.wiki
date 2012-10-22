@@ -84,3 +84,6 @@ $ iam-instanceprofilecreate -s s3access -r s3access arn:aws:iam::111111111111:in
 == euca2ools Changes ==
 * run-instance support for  -p, --iam-profile arn|name
 *: The IAM instance profile to associate with the launched instance(s). IAM instance profiles enable you to manage permissions for applications running on EC2. This is either the Amazon Resource Name (ARN) of the instance profile (e.g., arn:aws:iam::111111111111:instance-profile/s3access) or the name of the role (e.g., s3access).
+
+----
+[[tag:rls-3.3]]
