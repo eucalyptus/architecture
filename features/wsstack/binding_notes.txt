@@ -1,0 +1,24 @@
+Eucalyptus uses JiBX to handle marshalling/unmarshalling requests.  The input that determines how JiBX processes a request document is the binding file.  For every API version Eucalyptus supports there is a corresponding binding file.  
+
+It is possible to update the message bindings used by Eucalyptus without rebuilding the software.  The way this works is at start up time we look for all *-binding.xml files which are on the classpath and build/compile a class cache of properly prepared message classes (it is in /var/run/eucalyptus/classcache).
+
+So, the steps for taking an existing install and updating it to include bindings for API versions released after we shipped the software can be done using the following steps (I've annotated these with the commands I used to update one of my installs to include support for the 2012-10-01 API version of EC2.
+
+## 1. Dump one of the existing EC2 binding files into /etc/eucalyptus/cloud.d 
+## Here I am using 2012-05-01-binding.xml (the latest version in that install)
+## Note the output file has a name corresponding to the version being added
+[root@eucahost-51-108 ~]# unzip -p /usr/share/eucalyptus/eucalyptus-msgs-3.2.0.jar 2012-05-01-binding.xml > /etc/eucalyptus/cloud.d/2012-10-01-binding.xml
+
+## 2. Adjust the dates which are in the binding file to reflect the new API version
+## Note the sed statement is replacing dates with both '-' and '_' as they appear in both forms
+[root@eucahost-51-108 ~]# sed -i 's/2012-05-01/2012-10-01/g;s/2012_05_01/2012_10_01/g' /etc/eucalyptus/cloud.d/2012-10-01-binding.xml
+
+## 3. Restart the cloud process to allow for the binding to occur at startup
+[root@eucahost-51-108 ~]# /etc/init.d/eucalyptus-cloud restart
+
+## 4. Wait for the system to finish binding; approximated by waiting for it to respond 
+[root@eucahost-51-108 ~]# euca-describe-services 
+
+## 5. Confirm that the BaseMessage class has the _unmarshal method for the newly added API version
+[root@eucahost-51-108 ~]# javap -classpath /var/run/eucalyptus/classcache/ edu.ucsb.eucalyptus.msgs.BaseMessage | grep 2012_10_01_unmarshal
+    public static edu.ucsb.eucalyptus.msgs.BaseMessage JiBX_ec2_amazonaws_com_doc_2012_10_01_unmarshal_1_0(edu.ucsb.eucalyptus.msgs.BaseMessage, org.jibx.runtime.impl.UnmarshallingContext)       throws org.jibx.runtime.JiBXException;
