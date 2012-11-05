@@ -1,17 +1,100 @@
+= Networking =
+	•	The next generation of networking must 
+	–	preserve support for the existing AWS network semantics 
+	–	accommodate expansion to other AWS semantics
+	–	
+	•	Pending AWS semantics
+	–	Security Groups
+	•	VM participation in multiple security groups (membership vs. firewall groups)
+	–	VPC
+	•	Dynamic definition of private subnets
+	•	Dynamic configuration of DHCP per private subnet
+	•	Static private address control for private subnets
+	–	IPv6
+	
+== Basics ==
+	•	Current Semantics
+	–	Security Groups
+	–	Private addressing for participating VMs
+	–	Network level isolation of security groups
+	–	Internet traffic ingress/egress firewalling
+	–	Cross-group ingress/egress firewalling
+	–	Dynamic reconfiguration of the above types of rules
+	–	Elastic IPs
+	•	Pending AWS semantics
+	–	Security Groups
+	•	VM participation in multiple security groups (membership vs. firewall groups)
+	–	VPC
+	•	Dynamic definition of private subnets
+	•	Dynamic configuration of DHCP per private subnet
+	•	Static private address control for private subnets
+	–	IPv6
+
+== VPC ==
+	•	Overview
+	–	Logically isolated environment 
+	–	Your private IP range 
+	–	Internet or Hardware VPN connectivity options 
+	•	Capabilities
+	–	User-defined address space up to /16
+	–	Up to 20* user-defined, per AZ subnets up to /16
+	–	User-defined:
+	•	Virtual Routing, DHCP options, and NAT instances
+	•	Internet Gateways, Private/Customer Gateways, and VPN tunnels
+	–	Private IPs stable once assigned 
+	–	Elastic Network Interfaces
+		•	Enhanced Security Capabilities
+	–	Network topology, routing, and subnet ACLs
+	–	Security group enhancements
+	•	Egress control
+	•	dynamic (re)assignment
+	•	richer protocol support
+	–	Multiple network interfaces per instance 
+	–	Completely private networking via VPN 
+	–	Support for dedicated instances
+	
+=== Use Cases ===
+	•	Mixing public and private resources
+	–	E.g., web-facing hosts with DMZ subnets, control plane subnets
+	•	Workloads that expect fixed IPs and/or multiple NICs
+	•	AWS cloud as private extension of on- premises network
+	–	Accessible from on-premises hosts
+	–	No change to addressing
+	–	No change to Internet threat/risk posture
+	
+=== Limits ===
+	•	5 VPCs per Region
+	•	20 Subnets per VPC
+	•	10 Network ACLs per VPC 
+	•	20 rules/ACL
+	•	10 Route Tables per VPC 
+	•	20 entries/Route Table
+	•	50 Security Groups per VPC 
+	•	50 rules/Security Group
+	•	http://docs.amazonwebservices.com/AmazonVPC/latest/UserGuide/VPC_Appendix_Limits.html
+
+=== Constraints ===
+	•	Gateways require unique public IP addresses
+	•	Non-overlapping IP Ranges w/ internal networks
+	•	Inability to change CIDR/Subnet address ranges
+	•	Can’t move instances from one subnet to another
+	–	Relaunch for different VPC or AZ
+	
+= Other Notes =
 https://eucalyptus.atlassian.net/secure/IssueNavigator.jspa?requestId=12211&mode=hide
 
-- true edge networking
-- turn node controller into the router
-- split CC into CC and NS
-- extensibility ==> SDN
-- ipsets/ebtables  ==> ovs
-- NC/edge networking ==> customer delight
-- convolution w/ network architecture
-- cloudstack virtual router situation
-- even fewer network configuration dependencies to get full AWS functionality
-- refactorization analysis
-- what about public address routing
-- ELB/multi-warlus implications
+* true edge networking
+* turn node controller into the router
+* split CC into CC and NS
+* extensibility ==> SDN
+* ipsets/ebtables  ==> ovs
+* NC/edge networking ==> customer delight
+* convolution w/ network architecture
+* cloudstack virtual router situation
+* even fewer network configuration dependencies to get full AWS functionality
+* refactorization analysis
+* what about public address routing
+* ELB/multi-warlus implications
 
 ----
 [[tag:rls-3.3]]
