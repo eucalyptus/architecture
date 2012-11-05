@@ -1,37 +1,95 @@
-- software f5; software big ip
-- impl details related to zone coverage
--- e.g., zone goes down elb can cross zones to continue service
-- identification of things we need (to change) in existing APIs 
--- list needed to consider scheduling
-- versions of protocols we support HTTP,HTTPS,TLSv?,SSLv?
-- types of session management wrt load balancing 
--- affinities, stickinesses,
--- ssl termination (at lb?)
-- ipv6 - out of scope? guessing yes.
-- initially a eucalyptus component
--- software reference implementation
--- support for hardware future requirement
-- configuration, esp. compared to what can be configured in AWS (e.g., http connections time outs)
-- candidates for reference software implementation
--- ha proxy
--- nginx
--- glassfish plugin: probably doesn't work for us
--- squid
--- linux virtual server
--- momentum si?
-- future hardware support expected:
--- big ip f5
-- preconfigured load balancing rules
+= Overview =
+* In-Region Load Balancing Service
+* Distributes traffic across multiple Availability Zones 
+** HTTP/S, TCP/S
+* Built-in Health Check
+* Fully fault-tolerant 
+* Can span multiple AZs
 
-=== Questions ===
-- what is the functional spec/use cases 
--- implications on deployment (e.g., backup power, network hardware/topology)
-- survey of customer load balancing use cases, infrastructure?
-- hybrid use case/story? importance?
-- tightly coupled with autoscaling? is that use case central?
-- use cases are satisfied by elb?
--- is there any case which is not satisfiable by ELB?
-- 
+== Requirements ==
+* SSL termination
+* Runtime reconfiguration of the service (i.e., no restarting allowed)
+* Multi-tenancy (i.e., possible to configure multiple load balancing inbounds with seperate pools of outbound endpoints)
+* Arbitrary TCP load balancing
+* HTTP/HTTPs Session stickiness (both application level and load balancer level)
+* DNS vhosting
+* Endpoint health monitoring
+* Metric collection
+** Latency
+** RequestCount
+** HTTP Response code counts (e.g., 400, 404, 500, etc.)
+
+== Considerations ==
+* ELB is a service but runs on EC2
+* The IP Addresses will change over time
+* Use CNAME records in DNS or Route 53 “Alias” records 
+* SSL is supported
+* Client SSL Termination 
+* Backend ELB-to-Server mutual SSL 
+* Sticky sessions
+
+= ELB Spikes =
+The purpose of this investigation is to evaluate viable software based load balancers and vet their conformance to fundamental requirements for ELB.  These are:
+* Fundamental ELB requirements
+** SSL termination
+** Runtime reconfiguration of the service (i.e., no restarting allowed)
+** Multi-tenancy (i.e., possible to configure multiple load balancing inbounds with seperate pools of outbound endpoints)
+** Arbitrary TCP load balancing
+** HTTP/HTTPs Session stickiness (both application level and load balancer level)
+** DNS vhosting
+** Endpoint health monitoring
+** Metric collection
+*** Latency
+*** RequestCount
+*** HTTP Response code counts (e.g., 400, 404, 500, etc.)
+
+== Load Balancers ==
+For each of the below listed load balancers:
+# Evaluate and report on
+## The support for functionality in the above listed requirements.
+## The availability in distributions.
+## A simple performance experiment comparing native execution vs. execution in a virtual machine.
+=== Software Load Balancers === 
+# nginx - http://wiki.nginx.org/Main
+# HA proxy - http://haproxy.1wt.eu/
+# Zen - http://sourceforge.net/projects/zenloadbalancer/
+# pound - http://www.apsis.ch/pound/
+
+= Other =
+* software f5; software big ip
+* impl details related to zone coverage
+** e.g., zone goes down elb can cross zones to continue service
+* identification of things we need (to change) in existing APIs 
+** list needed to consider scheduling
+* versions of protocols we support HTTP,HTTPS,TLSv?,SSLv?
+* types of session management wrt load balancing 
+** affinities, stickinesses,
+** ssl termination (at lb?)
+* ipv6 - out of scope? guessing yes.
+* initially a eucalyptus component
+** software reference implementation
+** support for hardware future requirement
+* configuration, esp. compared to what can be configured in AWS (e.g., http connections time outs)
+* candidates for reference software implementation
+** ha proxy
+** nginx
+** glassfish plugin: probably doesn't work for us
+** squid
+** linux virtual server
+** momentum si?
+* future hardware support expected:
+** big ip f5
+* preconfigured load balancing rules
+
+= Questions =
+* what is the functional spec/use cases 
+** implications on deployment (e.g., backup power, network hardware/topology)
+* survey of customer load balancing use cases, infrastructure?
+* hybrid use case/story? importance?
+* tightly coupled with autoscaling? is that use case central?
+* use cases are satisfied by elb?
+** is there any case which is not satisfiable by ELB?
+* 
 
 ----
 [[tag:rls-3.3]]
