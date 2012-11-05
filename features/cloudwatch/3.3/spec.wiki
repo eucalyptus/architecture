@@ -145,3 +145,6 @@ http://docs.amazonwebservices.com/AmazonCloudWatch/latest/DeveloperGuide/CW_Supp
 * Set alarms on any of your metrics to receive notifications or take other automated actions when your metric crosses your specified threshold.
 * OUT: View graphs and statistics for any of your metrics, and get a quick overview of all your alarms and monitored AWS resources in one location on the CloudWatch dashboard.
 * Use Auto Scaling to add or remove Amazon EC2 instances dynamically based on your CloudWatch metrics.
+
+----
+[[tag:rls-3.3]]

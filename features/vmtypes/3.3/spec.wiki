@@ -100,3 +100,6 @@ Actions
 New Feature 	EUCA-348 	Allow regular user read access to instance type defs 	
 Actions
 New Feature 	EUCA-1719 	Define more than 5 VM types
+
+----
+[[tag:rls-3.3]]

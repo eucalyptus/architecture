@@ -29,3 +29,5 @@ Auto Scaling guarantees execution order for scheduled actions within the same gr
 - scheduled scale-out use case (
 - triggered scale-{out,in} use case (cloud watch, sns maybe?)
   
+----
+[[tag:rls-3.3]]

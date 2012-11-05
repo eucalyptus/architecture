@@ -1,0 +1,155 @@
+= Keywords =
+There are several keywords which are used to identify the ''deliverable'' for each spike:
+* '''Document''' means produce a document which records the relevant information, references, and unresolved questions.
+* '''Evaluate''' means to define an experimental scenario which is focused on evaluating the exact characteristic under study, describing the experiment, performing the experiment, and documenting the procedures, outcomes, and obstacles.
+* '''Prototype''' means to produce a quick-and-dirty implementation which serves only the purpose of the given evaluation.
+
+In all cases these spikes are for the purpose of information gathering and investigation.  They are not for the purpose of deciding, designing, or building a solution to the given problem -- we do not need to overcome problems. We need to investigate whether ''what are'' problems and ''whether we can'' overcome them in a reasonable amount of time in the future.  The spikes are meant to be achievable w/in no more than a day and, to that end, their definition is (perhaps artificially) constrained.
+
+
+= Maintenance Mode =
+The main questions we must evaluate have to do with the management of devices and data which are managed by Eucalyptus and '''may not be understood''' by virtualization management system (KVM/libvirt, VCenter/ESXi).
+* Bridges
+* Ephemeral storage
+* File backed console log
+* Best-friend EBS: iSCSI-backed root filesystem
+* Volume attachments: dynamically attached iSCSI devices
+
+== General ==
+For both KVM/libvirt and VMware we need to evaluate:
+# Status evaluation of live migration in the following scenarios
+## Note: these evaluations should be using as close as possible of a libvirt.xml as Eucalyptus uses as possible, but done '''outside''' Eucalyptus. Their purpose is to evaluate the state of the union of KVM and not to evaluate integration with Eucalyptus.
+## Trivial configuration:  no ephemeral, no network device, no console log, file backed virtual machine, etc.
+### Here the focus is on evaluating the basics of migration along with the failure characteristics.
+## Limited Instance-store configuration:  file backed root file system, network device, console log but without ephemeral
+### Here the focus is on the handling of basic devices essential for an instance.
+## Ephemeral configuration:  file backed root file system, network device, console log, and ephemeral
+### Like the previous one, but adds ephemeral storage into the equation.
+## Volume Attached configuration:  file backed root file system, with attached iscsi volume but without network device, console log, ephemeral
+### Here the focus is on evaluating the handling of dynamically attached iscsi devices.
+## Limited Best-friend EBS configuration:  iscsi backed root file system without network device, console log, etc.
+### Here the focus is on having the root filesystem device be backed by iscsi
+
+== KVM/libvirt ==
+www.linux-kvm.org/page/Migration
+blog.allanglesit.com/2011/08/linux-kvm-management-live-migration-without-shared-storage/
+blog.allanglesit.com/2011/08/linux-kvm-management-offline-migration/
+wiki.qemu.org/Features/LiveBlockMigration
+# Stages of live migration
+## Document the steps involved in VM migration.
+## Special focus on understanding the possible integration points for external operations (e.g., some kind of hooks).
+## Evaluate and report on the feasibility of using hooks in CentOS 6.3, if such a thing exists.
+# Support for VM pause/snapshot
+## Document the support for pausing a VM
+### What is possible to do to a paused VM? (e.g., detach block devices?) 
+### Can we snapshot a VM to disk?  If so 
+## Evaluate and report on the procedures and characteristics of the above in CentOS 6.3.
+# Live migration
+## Evaluate and report on the support for the above listed scenarios
+
+== VMware 5.0 and before ==
+Here we assume that a user who wishes to use migration mode does so because they are already setup to do VMotion.  That means that the evaluation setup must presume shared storage.
+# VMotion 
+## Document the deployment and configuration requirements to support VMotion
+## Evaluate and report on the support for the above listed scenarios
+
+== VMware 5.1 ==
+Here we are interested only in direct node-to-node migration w/o shared storage.
+blogs.vmware.com/performance/2012/08/vmware-vsphere-5-1-vmotion-architecture-performance-and-best-practices.html
+# VMotion 
+## Document the deployment and configuration requirements to support VMotion
+## Evaluate and report on the support for the above listed scenarios.
+
+
+= Enterprise: the next generation of networking =
+The next generation of networking must preserve support for the existing AWS network semantics and accommodate expansion to 
+* Current AWS semantics
+** Security Groups
+*** Private addressing for participating VMs ('''note:''' this ''does not'' imply a subnet restriction)
+*** Network level isolation of security groups
+*** Internet traffic ingress/egress firewalling
+*** Cross-group ingress/egress firewalling 
+*** Dynamic reconfiguration of the above types of rules
+** Elastic IPs
+* Pending AWS semantics
+** Security Groups
+*** VM participation in multiple security groups (membership vs. firewall groups)
+** VPC
+*** Dynamic definition of private subnets
+*** Dynamic configuration of DHCP per private subnet
+*** Static private address control for private subnets 
+** IPv6
+
+== Edge ==
+# Revive eucanetd
+## Evaluate and report on the state of eucanetd.
+## Evaluate and report on the conformance of eucanetd to the above set of requirements.
+# openvswitch - http://openvswitch.org/
+## Evaluate and report on 
+### The state of openvswitch in distributions.  Identify the recommended install procedure.
+### The configuration modes available in the current version on CentOS 6.3.
+### The functionality and characteristics of each of the available configuration modes above in light of the above network requirements.
+
+== SDNs ==
+For each of the below referenced SDN technologies the following 
+# Document the support for the above set of AWS semantics.
+# Document the logical model
+## Control interfaces
+## Logical abstractions, their behaviours, their lifecycles
+## API overview
+# Document the physical model 
+## What pieces need to get installed, where?
+## How are they connected to each other?
+## What is the recommended deployment model?
+## What are the environmental assumptions?
+# Document the functional characteristics
+## What is the failure behaviour when the control plane components have failed?
+## What is the failure behaviour when the data plane components have failed?
+## Is there support for high availability in the control plane?
+# Evaluate and report on 
+## The installation, administration, and control options which are available.
+## The feasibility of transitioning existing networking modes to use this system
+## The feasibility of integration with our existing automated QA system.
+
+=== SDN List ===
+# nicira - http://nicira.com/en/network-virtualization-platform
+# midokura - http://www.midokura.com/midonet/
+# floodlight - http://floodlight.openflowhub.org/
+# trema - http://trema.github.com/trema/
+# beacon - https://openflow.stanford.edu/display/Beacon/Home
+# maestro - http://code.google.com/p/maestro-platform/
+
+
+= AWS java sdk =
+The purpose of this investigation is to determine what obstacles exist to pursuing support for the AWS Java SDK.
+# AWS Java SDK testing
+## Prototype HMACv4 support in Eucalyptus to the extent needed for evaluating AWS Java SDK.  This does not need to be a committable prototype and serves this evaluation.
+## Evaluate and report on changes needed to the current version of the AWS Java SDK to point it at a Eucalyptus install.
+## Evaluate and report on other obstacles to using AWS Java SDK after the above changes are made. 
+
+= ELB =
+The purpose of this investigation is to evaluate viable software based load balancers and vet their conformance to fundamental requirements for ELB.  These are:
+* Fundamental ELB requirements
+** SSL termination
+** Runtime reconfiguration of the service (i.e., no restarting allowed)
+** Multi-tenancy (i.e., possible to configure multiple load balancing inbounds with seperate pools of outbound endpoints)
+** Arbitrary TCP load balancing
+** HTTP/HTTPs Session stickiness (both application level and load balancer level)
+** DNS vhosting
+** Endpoint health monitoring
+** Metric collection
+*** Latency
+*** RequestCount
+*** HTTP Response code counts (e.g., 400, 404, 500, etc.)
+
+== Load Balancers ==
+For each of the below listed load balancers:
+# Evaluate and report on
+## The support for functionality in the above listed requirements.
+## The availability in distributions.
+## A simple performance experiment comparing native execution vs. execution in a virtual machine.
+=== Software Load Balancers === 
+# nginx - http://wiki.nginx.org/Main
+# HA proxy - http://haproxy.1wt.eu/
+# Zen - http://sourceforge.net/projects/zenloadbalancer/
+# pound - http://www.apsis.ch/pound/
