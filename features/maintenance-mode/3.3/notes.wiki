@@ -22,3 +22,4 @@
 * Least common denominator masking for CPU types
 * What do we have to do wrt w/ concurrency
 ** Handle only one operation at a time in 3.3
+* Support for multiple network interfaces
