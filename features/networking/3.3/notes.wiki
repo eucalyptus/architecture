@@ -1,0 +1,4 @@
+* Jeff needs 2nd NIC wired in data center machines
+** ACTION: Chris to get Tim
+* Rich talks about MVP
+* Talk with Tim about actions: openvswitch, vmware, eucanetd

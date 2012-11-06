@@ -1,0 +1,24 @@
+* MVP is a larger number of vm types
+** Having an arbitrary number is an MVP
+** Create and Delete become optional if the number of VMTypes are fixed
+* MVP precludes requiring admin to login via to adjust the VMTypes
+* MVP includes an admin API for controlling vm type definitions
+** Create and Delete are optional
+** Don't allow for removal of default AWS types
+* Deleting would involve invalidating existing references
+* 
+* t1.micro doesn't have instance store option
+* MVP includes a euca-describe-vmtypes
+* Ephemeral disk configurations
+* UserConsole changes related to removing config file for vmtypes
+** Use the new UI instead
+** Change the presentation to accommodate the larger number of vmtypes
+** Changing ephemeral configuration changes the 
+* Admin UI 
+** Presentation of existing types
+** Create and delete mutable types
+* Changing 
+** 
+* Authorization and authentication are required in 
+* Constraints on legitimate values
+* Restrict naming to [:alnum:] period

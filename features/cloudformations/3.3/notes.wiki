@@ -1,0 +1,51 @@
+= ELB = 
+== Support =
+CreateLoadBalancer
+DeleteLoadBalancer
+DescribeLoadBalancers
+
+ApplySecurityGroupsToLoadBalancer
+
+DisableAvailabilityZonesForLoadBalancer
+EnableAvailabilityZonesForLoadBalancer
+
+DeregisterInstancesFromLoadBalancer
+ConfigureHealthCheck
+DescribeInstanceHealth
+RegisterInstancesWithLoadBalancer
+
+== Policy Junk ==
+CreateLoadBalancerListeners
+DeleteLoadBalancerListeners
+SetLoadBalancerListenerSSLCertificate
+SetLoadBalancerPoliciesOfListener 
+
+CreateLoadBalancerPolicy
+DeleteLoadBalancerPolicy
+DescribeLoadBalancerPolicies
+DescribeLoadBalancerPolicyTypes
+SetLoadBalancerPoliciesForBackendServer
+
+=== HTTP "Routing" Junk ===
+CreateAppCookieStickinessPolicy
+CreateLBCookieStickinessPolicy
+
+
+= Unsupport =
+AttachLoadBalancerToSubnets
+DetachLoadBalancerFromSubnets
+
+= IAM Implication =
+Need to be able to manage server certificates using the 
+
+= TODOs =
+* Sang-min evals nginx/ha-proxy
+* Chris pushes his gena2ools
+* Steve/Ken look at Chris' gena2ools
+* Vic will make a testing strategy strawman
+* Jenny will make a ui strategy strawman
+* Everyone looks at the IAM Roles stuff
+* Matt releasability review
+* Garret reports on tools status for:
+** ELB, CW, AS, IAM, STS
+** euca2ools, eutester/ui/boto, aws java sdk, aws default tools

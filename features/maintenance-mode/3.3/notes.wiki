@@ -1,0 +1,24 @@
+* Support for vmware 5.0 and 5.1
+* There is a clear overhead to setting up the environment for vmware setup
+* Are there conditions under which evacuation can fail?
+** What is the behaviour in the resource exhaustion case?
+*** Defragging?  Over-committing?
+* What are the expected performance characteristics?
+* Planned hardware migration is the fundamental use case
+* Failure feedback:
+** Immediate -- it is possible to, i will reserve resources for, and then perform migration
+** Batched/Eventual -- keep trying to do migration until it succeeds
+* Administrator can quarantine resources for future when current usage levels prevent immediate evacuation
+* Choosing the destination node is not a part of the MVP for 3.3
+* Vast majority not using shared storage
+** Trending towards commodity storage
+* Best practice? Reserved resources for the purposes of supporting migration
+** Would require support for marking resources as reserved
+* Three scenarios
+** Resources available
+** Resource over-committing needed
+*** Additional over-commiting factors to support maintenance emergencies?
+** Resources not available
+* Least common denominator masking for CPU types
+* What do we have to do wrt w/ concurrency
+** Handle only one operation at a time in 3.3
