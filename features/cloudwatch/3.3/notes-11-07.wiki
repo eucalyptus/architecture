@@ -1,0 +1,20 @@
+= CloudWatch =
+
+== Metric Basics ==
+GetMetricStatistics
+ListMetrics
+PutMetricData
+
+== Alarms ==
+DeleteAlarms
+DescribeAlarms
+DescribeAlarmsForMetric
+PutMetricAlarm
+SetAlarmState 
+
+=== History ===
+DescribeAlarmHistory
+
+=== Actions ===
+DisableAlarmActions
+EnableAlarmActions

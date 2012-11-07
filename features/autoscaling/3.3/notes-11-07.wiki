@@ -1,0 +1,55 @@
+= Auto Scaling =
+
+== Scaling Group Control ==
+CreateAutoScalingGroup
+DeleteAutoScalingGroup
+DescribeAutoScalingGroups
+DescribeAutoScalingInstances
+
+SetDesiredCapacity
+SetInstanceHealth
+TerminateInstanceInAutoScalingGroup
+UpdateAutoScalingGroup 
+
+== Launch Configurations ==
+CreateLaunchConfiguration
+DeleteLaunchConfiguration
+DescribeLaunchConfigurations
+
+== Scaling Metric Collection == 
+DescribeMetricCollectionTypes
+DisableMetricsCollection
+EnableMetricsCollection
+
+== Tags ==
+CreateOrUpdateTags
+DeleteTags
+DescribeTags
+
+== Scaling Policies ==
+DeletePolicy
+DescribePolicies
+ExecutePolicy
+PutScalingPolicy
+DescribeTerminationPolicyTypes
+DescribeAdjustmentTypes
+
+
+== Scaling Event Notifications ==
+DeleteNotificationConfiguration
+DescribeAutoScalingNotificationTypes
+DescribeNotificationConfigurations
+PutNotificationConfiguration
+
+== Scheduled Policy Control ==
+DeleteScheduledAction
+DescribeScheduledActions
+PutScheduledUpdateGroupAction
+
+
+== Scaling Processes ==
+DescribeScalingActivities
+ResumeProcesses
+SuspendProcesses
+DescribeScalingProcessTypes
+

@@ -1,0 +1,10 @@
+= Reports =
+* Sang-min
+** Measured nginx performance characteristics natively vs. virtualized
+** 
+* 
+*** Adjustmenets
+**** Control for apache host placement
+**** HTTP characteristics (keep alive)
+**** KVM ergonomics
+**** SSL termination performance (native vs. virtualized)

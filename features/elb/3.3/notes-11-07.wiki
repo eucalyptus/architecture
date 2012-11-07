@@ -1,0 +1,59 @@
+= ELB = 
+
+== Notes ==
+# SSL priority ordering
+## SSL from client to LB
+## LB to service instance using SSL
+## non-ssl on either LB side
+# Error conditions
+# TCP load balancing
+# Metrics
+
+== Quality Attributes ==
+# Availability
+# Fault tolerance
+# Horizonatally scaling LBs
+# Maintainability
+## How does the cloud admin control the deployment of load balancers
+## 
+
+== Load Balancer Control ==
+CreateLoadBalancer
+DeleteLoadBalancer
+DescribeLoadBalancers
+
+== Instance LB Registration ==
+DeregisterInstancesFromLoadBalancer
+RegisterInstancesWithLoadBalancer
+
+== LB Listeners ==
+CreateLoadBalancerListeners
+DeleteLoadBalancerListeners
+
+== Your Service (on Instance) Health Checking ==
+ConfigureHealthCheck
+DescribeInstanceHealth
+
+== Load Balancer Policies ==
+CreateLoadBalancerPolicy
+DeleteLoadBalancerPolicy
+DescribeLoadBalancerPolicies
+DescribeLoadBalancerPolicyTypes
+
+=== Load Balancer Listeners ===
+SetLoadBalancerListenerSSLCertificate
+SetLoadBalancerPoliciesOfListener 
+SetLoadBalancerPoliciesForBackendServer
+
+=== HTTP Session Stickiness ===
+CreateAppCookieStickinessPolicy
+CreateLBCookieStickinessPolicy
+
+== LB Zone Control ==
+DisableAvailabilityZonesForLoadBalancer
+EnableAvailabilityZonesForLoadBalancer
+
+= Unsupport =
+AttachLoadBalancerToSubnets - VPC
+DetachLoadBalancerFromSubnets - VPC
+ApplySecurityGroupsToLoadBalancer - VPC
