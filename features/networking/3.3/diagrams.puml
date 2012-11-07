@@ -1,0 +1,48 @@
+@startuml network-flows.png
+interface "Border Gateway" as gateway
+package Zone1 {
+  package Group1 {
+    package VM1 {
+      interface "VM1 Private Address" as vm1priv
+      interface "VM1 Public Address" as vm1pub
+    }
+    package VM2 {
+      interface "VM2 Private Address" as vm2priv
+      interface "VM2 Public Address" as vm2pub
+    }
+    vm1priv -left-> vm2priv : unrestricted
+    vm1pub -left-> vm2pub : unrestricted
+  }
+  package Group2 {
+    component VM3
+    package VM3 {
+      interface "VM3 Private Address" as vm3priv
+    }
+  }
+  interface "Group1 to\nGroup2 Rules" as g1g2rules
+  note right of g1g2rules
+    Ingress/Egress Rules
+    between Group1 and Group2
+  end note
+  vm1priv -- g1g2rules
+  vm3priv -- g1g2rules
+}
+package Zone2 {
+  package "Group1 in Zone2" {
+    package VM4 {
+      interface "VM4 Private Address" as vm4priv
+    }
+    vm1priv --> vm4priv : unrestricted across zones
+  }
+}
+package Internet {
+  component "Internet Destination" as dest
+  component "Internet Source" as source
+}
+vm1priv ..> gateway : using private address
+vm1pub ..> gateway : using private address
+gateway --> dest
+source --> gateway : to VM1 public address
+gateway --> vm1pub : from 
+
+@enduml

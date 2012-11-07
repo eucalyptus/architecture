@@ -1,4 +1,23 @@
 * Jeff needs 2nd NIC wired in data center machines
-** ACTION: Chris to get Tim
 * Rich talks about MVP
 * Talk with Tim about actions: openvswitch, vmware, eucanetd
+* MVP
+** No requirement for a CC type thing in the data path
+** Minimize the dependence on support from network administration
+*** This boils down to L3
+** Eliminate restriction on VLAN tag limitations
+** Future direction involves SDN integrations
+** Future direction for supporting AWS semantics vis a vis VPC 
+** VMware support
+** Encapuslation of traffic from the hosting network
+* OVS/OpenFlow approach as marketing play
+* Pending Questions
+** Look at both VMware and openvswitch for these questions:
+** Programmable layer 3, four flows:
+*** vm1-to-vm2 in same group1 (dump to L2 network)
+*** vm1-group1 to vm2-group2 (layer 3 netfiltering)
+*** vm1-to-internet via gateway 
+*** vm1-to-vm2 over public
+*** internet-to-vm1 
+*** able to dynamically reconfigure
+** border between tunnel and 

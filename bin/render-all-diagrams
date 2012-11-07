@@ -1,0 +1,5 @@
+#!/bin/bash
+for f in $(find $(git rev-parse --show-toplevel) -name \*.puml); do
+  echo $f
+  java -server -Xmx1g -Djava.awt.headless=true -jar ${PWD}/$(dirname ${0})/../lib/plantuml.jar ${@} $f
+done
