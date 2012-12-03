@@ -1,0 +1,24 @@
+* Vasya:  VMware 5.0 vMotion worked
+** Orchestrating virtual resources during migration
+*** VM (memory, cpu state, rootfs)
+*** Ephemeral disks
+*** Networking
+**** Our network resource naming scheme needs to be stable -- it might already be
+**** Managed requires creation of the port group
+**** vSwitch configuration needs to be moved over from Host #1 to Host #2 before vMotion can be started
+**** There may be further considerations for the upcoming networking modes
+**** Investigate the relevance of a distributed vSwitch
+*** iSCSI attachments
+**** Same target is attached to the destination ESXi host
+**** Need to test the functionality of vMotion against the supported SAN devices
+**** SAN devices allow for 
+* euca-node-evacuate NODEID
+** Determines whether evacuation can be performed given resource availability
+** Returns commitment to user which is viable in the absence of failures
+* Cancellation is NOT possible in VMware 5.0 GUI
+* TODO
+** Testing plans for maintenance mode
+** EBS backed rootfs
+** Reporting changes needed during the migration
+** Need API and client tooling
+** 

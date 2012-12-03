@@ -15,7 +15,7 @@
 # Horizonatally scaling LBs
 # Maintainability
 ## How does the cloud admin control the deployment of load balancers
-## 
+
 
 == Load Balancer Control ==
 CreateLoadBalancer
@@ -40,6 +40,7 @@ DeleteLoadBalancerPolicy
 DescribeLoadBalancerPolicies
 DescribeLoadBalancerPolicyTypes
 
+= Nice to have =
 === Load Balancer Listeners ===
 SetLoadBalancerListenerSSLCertificate
 SetLoadBalancerPoliciesOfListener 

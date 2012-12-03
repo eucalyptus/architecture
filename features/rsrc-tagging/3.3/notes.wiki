@@ -1,3 +1,7 @@
 * Possibly add vmtype tags
 * UI should allow for /changing/ of tags for things which are taggable
-* 
+* TODO
+** Using filters in place of user admin cruft (e.g., admin.verbose=true)
+** Test plan for resource tagging and attributes
+** 
+** Check up on client tools
