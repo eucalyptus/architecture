@@ -40,15 +40,15 @@ DeleteLoadBalancerPolicy
 DescribeLoadBalancerPolicies
 DescribeLoadBalancerPolicyTypes
 
-= Nice to have =
+= 2nd Step =
+=== HTTP Session Stickiness ===
+CreateAppCookieStickinessPolicy
+CreateLBCookieStickinessPolicy
+
 === Load Balancer Listeners ===
 SetLoadBalancerListenerSSLCertificate
 SetLoadBalancerPoliciesOfListener 
 SetLoadBalancerPoliciesForBackendServer
-
-=== HTTP Session Stickiness ===
-CreateAppCookieStickinessPolicy
-CreateLBCookieStickinessPolicy
 
 == LB Zone Control ==
 DisableAvailabilityZonesForLoadBalancer
