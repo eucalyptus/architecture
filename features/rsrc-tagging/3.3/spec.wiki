@@ -34,7 +34,7 @@ You can tag public or shared resources, but the tags you assign are available on
 ** resource-id (e.g., i-XXXXXXXX which is associated w/ the tag)
 ** key
 ** value
-* 
+
 = Filtering =
 You can search and filter resources based on the above described tags (e.g., --filter tag:Owner=TeamA)
 * tag-key
@@ -69,7 +69,7 @@ You can search and filter resources based on the above described tags (e.g., --f
 * region-name: The Region the Availablity Zone is in (for example, us-east-1). Type: String
 * state: The state of the Availability Zone. Type: String; Valid values: available
 * zone-name: The name of the zone. Type: String
-  
+
 === DescribeAddresses ===
 * domain: Indicates whether the address is a EC2 address, or a VPC address. Type: String; Valid values: standard | vpc
 * instance-id:  The instance the address is associated with (if any). Type: String
@@ -79,7 +79,7 @@ You can search and filter resources based on the above described tags (e.g., --f
 * network-interface-id: The network interface (if any) that the address is associated with. (for VPC addresses only). Type: String
 * network-interface-owner-id: The owner IID.
 * private-ip-address: The private IP address associated with the Elastic IP address (for VPC addresses only). Type: String
-  
+
 === DescribeBundleTasks ===
 * bundle-id: The ID of the bundle task. Type: String
 * error-code: If the task failed, the error code returned. Type: String
@@ -184,7 +184,7 @@ You can search and filter resources based on the above described tags (e.g., --f
 === DescribeRegions ===
 * endpoint: The endpoint of the Region (for example, ec2.us-east-1.amazonaws.com). Type: String
 * region-name: The name of the Region. Type: String
-  
+
 === DescribeSecurityGroups ===
 * description: The description of the security group. Type: String
 * group-id: The ID of the security group. Type: String
