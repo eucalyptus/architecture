@@ -1,0 +1,109 @@
+= Overview =
+This design covers changes to the following areas.
+
+== Resource Attributes ==
+Implement or update (when noted) resource attributes for the following:
+
+* Images (update)
+* Instances 
+* Snapshots
+* Volumes
+
+Resource attribute names are strings, values (can be) structured data. When updating an attribute with a structured value, the caller specifies which part of the value will be updated.
+
+== Launch Permissions ==
+The API for launch permissions attribute will be updated.
+
+== Product Codes ==
+Product codes will be propagated to volumes and snapshots.
+
+== Instance Termination ==
+We will add support for the following instance attributes:
+
+* DisableApiTermination
+* InstanceInitiatedShutdownBehavior
+
+== Snapshot Permissions ==
+We will add support for snapshot create volume permissions (similar to launch permissions)
+
+= Design =
+== Resource Attributes ==
+Resource attributes are already implemented for Images. As part of this feature we should clean up this implementation.
+
+=== Permissions ===
+IAM / resource ownership (account) dictate which attributes can be read or updated. Users in the eucalyptus account can access all resource attributes.
+
+=== Attribute Describe ===
+Read of attributes can be implemented using a Map:
+
+  Map<String,AttributeGetter<R,V>>
+
+Where '''R''' is the response message type and '''V''' is the resource value.
+
+For each attribute there will be an AttributeGetter in the map that knows how to populate the value.
+
+  AttributeGetter
+  - get( R, V ) // Populate R from V
+
+=== Attribute Modify ===
+Update of attributes can be implemented with a collection of setters:
+
+  Collection<AttributeSetter<R,V>>
+
+Where '''R''' is the request message, and '''V''' is the resource value.
+
+Each setter would be matched against the requests message, only one setting is allowed to match (only one attribute update per request).
+
+The matched setter is then invoked to (perhaps partially) update the attribute value.
+
+  AttributeSetter
+  - bool match( R )
+  - bool set( R, V ) // Set value on V from R
+
+The success of the setter is reflected in the success of the overall operation.
+
+=== Attribute Reset ===
+Reset of attributes can be implemented using a Map:
+
+  Map<String,AttributeResetter<V>>
+
+Where '''V''' is the resource value.
+
+For each attribute there will be an AttributeResetter in the map that knows how to reset the value.
+
+  AttributeResetter
+  - bool reset( V ) // Populate R from V
+
+'''TODO''' or just use a Predicate for this.
+
+The success of the setter is reflected in the success of the overall operation.
+
+=== Instances ===
+For instances, some attributes may only be updated when the instance is stopped. When this precondition is violated the correct error should be returned.
+
+Restrictions on instance attributes that can be modifed when running mean that it is not required to keep a (readonly) copy of the instance configuration. Instance attributes that can be modified when running are:
+
+* disableApiTermination
+* instanceInitiatedShutdownBehavior
+* blockDeviceMapping delete on terminate setting (multiple)
+
+== Launch Permissions ==
+'''TODO''' if in scope
+
+== Product Codes ==
+'''TODO''' if in scope
+
+== Instance Termination ==
+'''TODO''' if in scope
+
+== Snapshot Permissions ==
+'''TODO''' if in scope
+
+== Integration Areas ==
+IAM: operations access controlled via IAM policies
+
+= References =
+* [[features/rsrc-attributes/3.3/spec | Resource Attributes specification]]
+
+[[tag:rls-3.3]]
+

@@ -1,0 +1,395 @@
+= Overview =
+
+== Related functional areas not supported ==
+* VPC
+
+== Related functional areas needing work ==
+* Add ID to security groups
+
+
+= Tagging =
+
+== Tag Model ==
+We reserve the additional prefix '''euca''' for tag names and values
+
+== Integration Areas ==
+IAM: tag operations access controlled via IAM policies
+AS: Auto scaling groups can propagate tags to instances
+UI: Interface for tag CRUD
+
+= Filtering =
+Filtering should be done by the DB where possible for efficiency. Since filters can have multiple values query by example is not a good approach (better to use criteria?)
+
+== Terminated Instances ==
+Filtering of terminated instances may require caching instances in their original form (not translated to API types)
+
+== Tags ==
+'''TODO'''
+
+== Filter Details ==
+{|
+! Type !! Name !! Supported !! DB Support !! Notes
+|-
+| Address (Elastic IP) || domain || Y || - || Hardcoded domain '''standard''' (no '''vpc''')<ref name="notvpc"/>
+|-
+| '' || instance-id || Y || - ||
+|-
+| '' || public-ip || Y || - ||
+|-
+| '' || allocation-id || - || - || N/A <ref name="notvpc">Eucalyptus does not support VPC</ref>
+|-
+| '' || association-id || - || - || N/A <ref name="notvpc"/>
+|-
+| '' || network-interface-id || - || - || N/A <ref name="notvpc"/>
+|-
+| '' || network-interface-owner-id || - || - || N/A <ref name="notvpc"/>
+|-
+| '' || private-ip-address || - || - || N/A <ref name="notvpc"/>
+|-
+| Availability Zone || message || - || - || N/A <ref name="notsupported">Eucalyptus does not support this field</ref>
+|-
+| '' || region-name || - || - || N/A <ref name="notsupported"/>
+|-
+| '' || state || - || - || Not compatible <ref name="notaws">Eucalyptus uses this field for other purposes</ref>
+|-
+| '' || zone-name || Y || - ||
+|-
+| Bundle Tasks || bundle-id || Y || - ||
+|-
+| '' || error-code || Y || - ||
+|-
+| '' || error-message || Y || - ||
+|-
+| '' || instance-id || Y || - ||
+|-
+| '' || progress || Y || - ||
+|-
+| '' || s3-bucket || Y || - ||
+|-
+| '' || s3-prefix || Y || - ||
+|-
+| '' || start-time || Y || - ||
+|-
+| '' || state || Y || - ||
+|-
+| '' || update-time || Y || - ||
+|-
+| Image || architecture || Y || Y ||
+|-
+| '' || block-device-mapping.delete-on-termination || Y || Y ||
+|-
+| '' || block-device-mapping.device-name || Y || Y ||
+|-
+| '' || block-device-mapping.snapshot-id || Y || Y ||
+|-
+| '' || block-device-mapping.volume-size || Y || Y ||
+|-
+| '' || block-device-mapping.volume-type || Y || Y || Hardcoded type '''standard''' (no '''io1''')
+|-
+| '' || description || Y || Y ||
+|-
+| '' || image-id || Y || Y ||
+|-
+| '' || image-type || Y || Y ||
+|-
+| '' || is-public || Y || Y ||
+|-
+| '' || kernel-id || Y || Y ||
+|-
+| '' || manifest-location || Y || Y ||
+|-
+| '' || name || Y || Y ||
+|-
+| '' || owner-alias || Y || - || DB filtering could be possible <ref name="perhapsdbfilter">DB filtering could be possible</ref>
+|-
+| '' || owner-id || Y || Y || Account ID
+|-
+| '' || platform || Y || Y || As per AWS ''windows'' or empty
+|-
+| '' || product-code || Y || Y ||
+|-
+| '' || product-code.type || - || - || '''devpay''' / '''marketplace''', probably not relevant for us <ref name="needmoreinfo">Investigation required</ref>
+|-
+| '' || ramdisk-id || Y || Y ||
+|-
+| '' || root-device-name || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+|-
+| '' || root-device-type || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+|-
+| '' || state || Y || Y || 
+|-
+| '' || state-reason-code || - || - || N/A <ref name="notsupported">Eucalyptus does not support this field</ref>
+|-
+| '' || state-reason-message || - || - || N/A <ref name="notsupported">Eucalyptus does not support this field</ref>
+|-
+| '' || tag-key || Y || - ||
+|-
+| '' || tag-value || Y || - ||
+|-
+| '' || tag:'''key''' || Y || - ||
+|-
+| '' || virtualization-type || - || - || Differ from AWS here <ref name="needmoreinfo">Investigation required</ref>
+|-
+| '' || hypervisor || - || - || Differ from AWS here <ref name="needmoreinfo">Investigation required</ref>
+|-
+| Instance || architecture || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+|-
+| '' || availability-zone || Y || Y ||
+|-
+| '' || block-device-mapping.attach-time || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+|-
+| '' || block-device-mapping.delete-on-termination || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+|-
+| '' || block-device-mapping.device-name || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+|-
+| '' || block-device-mapping.status || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+|-
+| '' || block-device-mapping.volume-id || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+|-
+| '' || client-token || - || - || N/A <ref name="notsupported">Eucalyptus does not support this field</ref>
+|-
+| '' || dns-name || Y || Y || Public name
+|-
+| '' || group-id || - || - || N/A <ref name="notsupported">Eucalyptus does not support this field</ref>
+|-
+| '' || group-name || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+|-
+| '' || image-id || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+|-
+| '' || instance-id || Y || Y ||
+|-
+| '' || instance-lifecycle || Y || Y || Hardcoded with no value (no '''spot''') <ref name="nospot">Eucalyptus does not support spot instances</ref>
+|-
+| '' || instance-state-code || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+|-
+| '' || instance-state-name || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+|-
+| '' || instance-type || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+|-
+| '' || instance.group-id || - || - || N/A <ref name="notvpc"/>
+|-
+| '' || instance.group-name || - || - || N/A <ref name="notvpc"/>
+|-
+| '' || ip-address || Y || Y || Public IP
+|-
+| '' || kernel-id || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+|-
+| '' || key-name || Y || - || DB filtering could be possible (full key in DB) <ref name="perhapsdbfilter"/>
+|-
+| '' || launch-index || Y || Y || DB no wildcard <ref name="dbnowild"/>
+|-
+| '' || launch-time || Y || Y || DB no wildcard <ref name="dbnowild"/>
+|-
+| '' || monitoring-state || - || - || N/A <ref name="notsupported">Eucalyptus does not support this field</ref>
+|-
+| '' || owner-id || Y || Y || Account ID
+|-
+| '' || placement-group-name || - || - || N/A <ref name="notsupported">Eucalyptus does not support this field</ref>
+|-
+| '' || platform || Y || Y ||
+|-
+| '' || private-dns-name || Y || Y ||
+|-
+| '' || private-ip-address || Y || Y ||
+|-
+| '' || product-code || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+|-
+| '' || product-code.type || - || - || N/A <ref name="notsupported">Eucalyptus does not support this field</ref>
+|-
+| '' || ramdisk-id || Y || - || DB filtering could be possible (full key in DB) <ref name="perhapsdbfilter"/>
+|-
+| '' || reason || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+|-
+| '' || requester-id || - || - || N/A <ref name="notsupported">Eucalyptus does not support this field</ref>
+|-
+| '' || reservation-id || Y || Y ||
+|-
+| '' || root-device-name || - || - || TODO
+|-
+| '' || root-device-type || - || - || TODO
+|-
+| '' || source-dest-check || - || - || TODO
+|-
+| '' || spot-instance-request-id || - || - || N/A <ref name="nospot">
+|-
+| '' || state-reason-code || - || - || TODO
+|-
+| '' || state-reason-message || - || - || TODO
+|-
+| '' || subnet-id || - || - || N/A <ref name="notvpc"/>
+|-
+| '' || tag-key || Y || - ||
+|-
+| '' || tag-value || Y || - ||
+|-
+| '' || tag:'''key''' || Y || - ||
+|-
+| '' || virtualization-type || - || - || TODO
+|-
+| '' || vpc-id || - || - || N/A <ref name="notvpc"/>
+|-
+| '' || hypervisor || - || - || TODO
+|-
+| '' || network-interface.description || - || - || N/A <ref name="notvpc"/>
+|-
+| '' || network-interface.subnet-id || - || - || N/A <ref name="notvpc"/>
+|-
+| '' || network-interface.vpc-id || - || - || N/A <ref name="notvpc"/>
+|-
+| '' || network-interface.network-interface.id || - || - || N/A <ref name="notvpc"/>
+|-
+| '' || network-interface.owner-id || - || - || N/A <ref name="notvpc"/>
+|-
+| '' || network-interface.availability-zone || - || - || N/A <ref name="notvpc"/>
+|-
+| '' || network-interface.requester-id || - || - || N/A <ref name="notvpc"/>
+|-
+| '' || network-interface.requester-managed || - || - || N/A <ref name="notvpc"/>
+|-
+| '' || network-interface.status || - || - || N/A <ref name="notvpc"/>
+|-
+| '' || network-interface.mac-address || - || - || N/A <ref name="notvpc"/>
+|-
+| '' || network-interface-private-dns-name || - || - || N/A <ref name="notvpc"/>
+|-
+| '' || network-interface.source-destination-check || - || - || N/A <ref name="notvpc"/>
+|-
+| '' || network-interface.group-id || - || - || N/A <ref name="notvpc"/>
+|-
+| '' || network-interface.group-name || - || - || N/A <ref name="notvpc"/>
+|-
+| '' || network-interface.attachment.attachment-id || - || - || N/A <ref name="notvpc"/>
+|-
+| '' || network-interface.attachment.instance-id || - || - || N/A <ref name="notvpc"/>
+|-
+| '' || network-interface.attachment.instance-owner-id || - || - || N/A <ref name="notvpc"/>
+|-
+| '' || network-interface.addresses.private-ip-address || - || - || N/A <ref name="notvpc"/>
+|-
+| '' || network-interface.attachment.device-index || - || - || N/A <ref name="notvpc"/>
+|-
+| '' || network-interface.attachment.status || - || - || N/A <ref name="notvpc"/>
+|-
+| '' || network-interface.attachment.attach-time || - || - || N/A <ref name="notvpc"/>
+|-
+| '' || network-interface.attachment.delete-on-termination || - || - || N/A <ref name="notvpc"/>
+|-
+| '' || network-interface.addresses.primary || - || - || N/A <ref name="notvpc"/>
+|-
+| '' || network-interface.addresses.association.public-ip || - || - || N/A <ref name="notvpc"/>
+|-
+| '' || network-interface.addresses.association.ip-owner-id || - || - || N/A <ref name="notvpc"/>
+|-
+| '' || association.public-ip || - || - || N/A <ref name="notvpc"/>
+|-
+| '' || association.ip-owner-id || - || - || N/A <ref name="notvpc"/>
+|-
+| '' || association.allocation-id || - || - || N/A <ref name="notvpc"/>
+|-
+| '' || association.association-id || - || - || N/A <ref name="notvpc"/>
+|-
+| Key Pair || fingerprint || Y || Y ||
+|-
+| '' || key-name || Y || Y ||
+|-
+| Region || endpoint || Y || - ||
+|-
+| '' || region-name || Y || - || 
+|-
+| Security Group || description || Y || Y ||
+|-
+| '' || group-id || - || - || N/A <ref name="notsupported"/>
+|-
+| '' || group-name || Y || Y ||
+|-
+| '' || ip-permission.cidr || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+|-
+| '' || ip-permission.from-port || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+|-
+| '' || ip-permission.group-name || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+|-
+| '' || ip-permission.protocol || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+|-
+| '' || ip-permission.to-port || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+|-
+| '' || ip-permission.user-id || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+|-
+| '' || owner-id || Y || Y || Account ID
+|-
+| '' || tag-key || Y || - ||
+|-
+| '' || tag-value || Y || - ||
+|-
+| '' || tag:'''key''' || Y || - ||
+|-
+| Snapshot || description || Y || Y ||
+|-
+| '' || owner-alias || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+|-
+| '' || owner-id || Y || Y || Account ID
+|-
+| '' || progress || Y || Y ||
+|-
+| '' || snapshot-id || Y || Y ||
+|-
+| '' || start-time || Y || Y || DB no wildcard <ref name="dbnowild">Non string DB type, wildcards not supported for DB filter</ref>
+|-
+| '' || status || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+|-
+| '' || tag-key || Y || - ||
+|-
+| '' || tag-value || Y || - ||
+|-
+| '' || tag:'''key''' || Y || - ||
+|-
+| '' || volume-id || Y || Y ||
+|-
+| '' || volume-size || Y || Y || DB no wildcard <ref name="dbnowild"/>
+|-
+| Tag || key || Y || Y ||
+|-
+| '' || resource-id || Y || Y ||
+|-
+| '' || resource-type || Y || Y ||
+|-
+| '' || value || Y || Y ||
+|-
+| Volume || attachment.attach-time || Y || - ||
+|-
+| '' || attachment.delete-on-termination || Y || - || 
+|-
+| '' || attachment.device || Y || - ||
+|-
+| '' || attachment.instance-id || Y || - ||
+|-
+| '' || attachment.status || Y || - ||
+|-
+| '' || availability-zone || Y || Y ||
+|-
+| '' || create-time || Y || Y || DB no wildcard <ref name="dbnowild"/>
+|-
+| '' || size || Y || Y || DB no wildcard <ref name="dbnowild"/>
+|-
+| '' || snapshot-id || Y || Y ||
+|-
+| '' || status || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+|-
+| '' || tag-key || Y || - ||
+|-
+| '' || tag-value || Y || - ||
+|-
+| '' || tag:'''key''' || Y || - ||
+|-
+| '' || volume-id || Y || Y ||
+|-
+| '' || volume-type || Y || Y || Hardcoded type '''standard''' (no '''io1''')
+|}
+
+
+<references />
+
+= References =
+* [[features/rsrc-tagging/3.3/spec | Resource Tagging and Filtering specification]]
+* [http://docs.amazonwebservices.com/AWSEC2/latest/UserGuide/Using_Tags.html Using Tags (amazonwebservices.com)]
+
+[[tag:rls-3.3]]

@@ -1,2 +1,136 @@
-----
+= Resource Attributes Overview =
+EC2 resource attributes allow reading and (some) updates of the following resources:
+
+* Image
+* Instance
+* NetworkInterface <ref name="notvpc">Eucalyptus does not support VPC</ref>
+* Snapshot
+* Volume
+
+== Related functional areas not supported ==
+* VPC
+
+== Related functional areas needing work ==
+* Launch permissions: API update
+* Product codes: should propagate via snapshots and volumes
+
+== Related functional areas to implement ==
+* Instance termination settings
+** DisableApiTermination
+** InstanceInitiatedShutdownBehavior
+* Snapshot create volume permissions (similar to launch permissions)
+
+= Required Functionality =
+== User Console ==
+The user console should support display and update of supported attributes.
+
+== Commands ==
+Command to update:
+* euca-describe-image-attribute <ref name="tool-description">Exists but missing description attribute</ref>
+* euca-modify-image-attribute <ref name="tool-description"/>
+
+Commands to implement:
+* euca-describe-instance-attribute
+* euca-describe-snapshot-attribute
+* euca-describe-volume-attribute
+* euca-modify-instance-attribute
+* euca-modify-snapshot-attribute
+* euca-reset-instance-attribute
+* euca-reset-snapshot-attribute
+
+== Operations by API ==
+* EC2 (2012-10-01)
+** DescribeImageAttribute 
+** DescribeInstanceAttribute
+** DescribeNetworkInterfaceAttribute <ref name="notvpc"/>
+** DescribeSnapshotAttribute
+** DescribeVolumeAttribute
+** ModifyImageAttribute
+** ModifyInstanceAttribute
+** ModifyNetworkInterfaceAttribute <ref name="notvpc"/>
+** ModifySnapshotAttribute
+** ModifyVolumeAttribute <ref name="nofunc">Non functional, no updatable attributes supported</ref>
+** ResetImageAttribute
+** ResetInstanceAttribute
+** ResetNetworkInterfaceAttribute <ref name="notvpc"/>
+** ResetSnapshotAttribute
+
+For modification of an instance attribute an IncorrectInstanceState error can be returned if the instance is running (see table below for these attributes)
+
+== Attributes by type ==
+From the 2012-10-01 EC2 API documentation.
+
+'''TODO''' Add attribute reset to this table.
+
+{|
+! Type !! Name !! Read Supported !! Update Supported !! Notes
+|-
+| Image || description || Y || Y ||
+|-
+| '' || kernel || Y || '' ||
+|-
+| '' || ramdisk || Y || '' ||
+|-
+| '' || launchPermission || Y || Y ||
+|-
+| '' || productCodes || Y || Y ||
+|-
+| '' || blockDeviceMapping || Y || '' ||
+|-
+| Instance || instanceType || Y || Y || When stopped <ref name="mustbestopped">The instance must be stopped to modify this attribute</ref>
+|-
+| '' || kernel || Y || Y || When stopped <ref name="mustbestopped">The instance must be stopped to modify this attribute</ref>
+|-
+| '' || ramdisk || Y || Y || When stopped <ref name="mustbestopped">The instance must be stopped to modify this attribute</ref>
+|-
+| '' || userData || Y || Y || When stopped <ref name="mustbestopped">The instance must be stopped to modify this attribute</ref>
+|-
+| '' || disableApiTermination || Y || Y ||
+|-
+| '' || instanceInitiatedShutdownBehavior || Y || Y ||
+|-
+| '' || rootDeviceName || Y || '' ||
+|-
+| '' || blockDeviceMapping || Y || Y || Modifies delete on terminate only
+|-
+| '' || sourceDestCheck || - || - || VPC<ref name="notvpc"/>
+|-
+| '' || groupSet || Y || - || Update is for VPC only<ref name="notvpc"/>
+|-
+| '' || productCodes || Y || '' ||
+|-
+| '' || ebsOptimized || - || - || N/A
+|-
+| Network Interface || description || - || - || VPC<ref name="notvpc"/>
+|-
+| '' || groupSet || - || - || VPC<ref name="notvpc"/>
+|-
+| '' || sourceDestCheck || - || - || VPC<ref name="notvpc"/>
+|-
+| '' || attachment || - || - || VPC<ref name="notvpc"/>
+|-
+| Snapshot || createVolumePermission || Y || Y || Similar to launch permissions for images
+|-
+| '' || productCodes || Y ||  || Propagate from image
+|-
+| Volume || autoEnableIO || - || - || N/A
+|-
+| '' || productCodes || Y || '' || Propagate from image
+|}
+
+= References =
+* [[features/rsrc-tagging/3.3/spec | Resource Tagging and Filtering]]
+* [http://docs.amazonwebservices.com/AWSEC2/latest/CommandLineReference/Welcome.html EC2 Command Line Reference (amazonwebservices.com)]
+* [http://docs.amazonwebservices.com/AWSEC2/latest/APIReference/Welcome.html EC2 API Reference (amazonwebservices.com)]
+* [http://docs.amazonwebservices.com/AWSEC2/latest/APIReference/ApiReference-query-DescribeImageAttribute.html Describe Image Attribute EC2 API Reference (amazonwebservices.com)]
+* [http://docs.amazonwebservices.com/AWSEC2/latest/APIReference/ApiReference-query-DescribeInstanceAttribute.html Describe Instance Attribute EC2 API Reference (amazonwebservices.com)]
+* [http://docs.amazonwebservices.com/AWSEC2/latest/APIReference/ApiReference-query-DescribeNetworkInterfaceAttribute.html Describe Network Interface Attribute EC2 API Reference (amazonwebservices.com)]
+* [http://docs.amazonwebservices.com/AWSEC2/latest/APIReference/ApiReference-query-DescribeSnapshotAttribute.html Describe Snapshot Attribute EC2 API Reference (amazonwebservices.com)]
+* [http://docs.amazonwebservices.com/AWSEC2/latest/APIReference/ApiReference-query-DescribeVolumeAttribute.html Describe Volume Attribute EC2 API Reference (amazonwebservices.com)]
+
+= Notes =
+<references />
+
 [[tag:rls-3.3]]
+
+
