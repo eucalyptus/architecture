@@ -23,11 +23,22 @@
   }
 
   cloud User {
-    [User Workload]<<User>> --> cwapimetrics : put custom metrics
-    component "Service User" <<User>> as u
+    component "User Console/Proxy" <<Development>> as ui
+    component "euca2ools" <<Development>> as euca2ools
+    component "eutester" <<Development>> as eutester
+    component "boto" as u
+    component "AWS Java SDK" as awsjavasdk
+    [VM Workload]<<User>> --> cwapimetrics : put custom metrics
+    ui --> u
+    euca2ools --> u
+    eutester --> u
+    
     u --> cwapimetrics : put/list metric
     u --> cwapistats : get statistics
     u --> cwapialarms : define/interrogate alarms 
+    awsjavasdk --> cwapimetrics
+    awsjavasdk --> cwapistats
+    awsjavasdk --> cwapialarms
   }
   
   
@@ -38,16 +49,16 @@
     [Walrus Metrics]<<Service>> --> cwapimetrics
     [SC Metrics]<<Service>> --> cwapimetrics
     [ELB Metrics]<<Development>> --> cwapimetrics
-    [Internal Metrics]<<Future>> --> cwapimetrics
+'    [Internal Metrics]<<Future>> --> cwapimetrics
   }
   
    
-  node "???\nPhysical Resources" as physical {
-    [Process Metrics]<<Future>> --> cwapimetrics
-    [Host Metrics]<<Future>> --> cwapimetrics
-    [Storage Metrics]<<Future>>  --> cwapimetrics
-    [Network Metrics]<<Future>> --> cwapimetrics
-  }
+'  node "???\nPhysical Resources" as physical {
+'    [Process Metrics]<<Future>> --> cwapimetrics
+'    [Host Metrics]<<Future>> --> cwapimetrics
+'    [Storage Metrics]<<Future>>  --> cwapimetrics
+'    [Network Metrics]<<Future>> --> cwapimetrics
+'  }
       
   frame "Action Targets" {
     interface "AS" <<Development>> as asapi
