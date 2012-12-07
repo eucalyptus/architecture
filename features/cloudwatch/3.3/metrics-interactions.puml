@@ -63,7 +63,7 @@
   frame "Action Targets" {
     interface "AS" <<Development>> as asapi
     interface SNS <<Future>> as snsapi
-    interface "???\nNagios" <<Future>> as nagiosapi
+'    interface "???\nNagios" <<Future>> as nagiosapi
   }
   alarms -right-> asapi
   alarms -right-> snsapi
