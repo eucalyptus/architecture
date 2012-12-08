@@ -7,18 +7,24 @@ EC2 resource attributes allow reading and (some) updates of the following resour
 * Snapshot
 * Volume
 
-== Related functional areas not supported ==
+== Out of Scope ==
+Any attributes related to the following features are out of scope:
+
 * VPC
 
-== Related functional areas needing work ==
-* Launch permissions: API update
-* Product codes: should propagate via snapshots and volumes
+== Feature Dependencies ==
+Attributes related to the following features may be included if these features are part of the release:
 
-== Related functional areas to implement ==
-* Instance termination settings
+* Product codes: should propagate via snapshots and volumes '''TODO:JIRA'''
+* Instance termination settings [https://eucalyptus.atlassian.net/browse/EUCA-2056 EUCA-2056 (atlassian.net)]
 ** DisableApiTermination
 ** InstanceInitiatedShutdownBehavior
-* Snapshot create volume permissions (similar to launch permissions)
+* Snapshot create volume permissions (similar to launch permissions) [https://eucalyptus.atlassian.net/browse/EUCA-23 EUCA-23 (atlassian.net)]
+
+== Other Dependencies ==
+Functionality in this feature requires that the following issues be addressed:
+
+* Launch permissions: API update [https://eucalyptus.atlassian.net/browse/EUCA-4270 EUCA-4270 (atlassian.net)]
 
 = Required Functionality =
 == User Console ==
@@ -55,67 +61,65 @@ Commands to implement:
 ** ResetNetworkInterfaceAttribute <ref name="notvpc"/>
 ** ResetSnapshotAttribute
 
-For modification of an instance attribute an IncorrectInstanceState error can be returned if the instance is running (see table below for these attributes)
+For modification of an instance attribute an '''IncorrectInstanceState''' error can be returned if the instance is running (see table below for these attributes)
 
 == Attributes by type ==
 From the 2012-10-01 EC2 API documentation.
 
-'''TODO''' Add attribute reset to this table.
-
 {|
-! Type !! Name !! Read Supported !! Update Supported !! Notes
+! Type !! Name !! Read Supported !! Update Supported !! Reset Supported !! Notes
 |-
-| Image || description || Y || Y ||
+| Image || description || Y || Y ||  ||
 |-
-| '' || kernel || Y || '' ||
+|  || kernel || Y ||  ||  ||
 |-
-| '' || ramdisk || Y || '' ||
+|  || ramdisk || Y ||  ||  ||
 |-
-| '' || launchPermission || Y || Y ||
+|  || launchPermission || Y || Y || Y ||
 |-
-| '' || productCodes || Y || Y ||
+|  || productCodes || Y || Y ||  ||
 |-
-| '' || blockDeviceMapping || Y || '' ||
+|  || blockDeviceMapping || Y ||  ||  ||
 |-
-| Instance || instanceType || Y || Y || When stopped <ref name="mustbestopped">The instance must be stopped to modify this attribute</ref>
+| Instance || instanceType || Y || Y ||  || When stopped <ref name="mustbestopped">The instance must be stopped to modify this attribute</ref>
 |-
-| '' || kernel || Y || Y || When stopped <ref name="mustbestopped">The instance must be stopped to modify this attribute</ref>
+|  || kernel || Y || Y || Y || When stopped <ref name="mustbestopped">The instance must be stopped to modify this attribute</ref>
 |-
-| '' || ramdisk || Y || Y || When stopped <ref name="mustbestopped">The instance must be stopped to modify this attribute</ref>
+|  || ramdisk || Y || Y || Y || When stopped <ref name="mustbestopped">The instance must be stopped to modify this attribute</ref>
 |-
-| '' || userData || Y || Y || When stopped <ref name="mustbestopped">The instance must be stopped to modify this attribute</ref>
+|  || userData || Y || Y ||  || When stopped <ref name="mustbestopped">The instance must be stopped to modify this attribute</ref>
 |-
-| '' || disableApiTermination || Y || Y ||
+|  || disableApiTermination || Y || Y ||  ||
 |-
-| '' || instanceInitiatedShutdownBehavior || Y || Y ||
+|  || instanceInitiatedShutdownBehavior || Y || Y ||  ||
 |-
-| '' || rootDeviceName || Y || '' ||
+|  || rootDeviceName || Y ||  ||  ||
 |-
-| '' || blockDeviceMapping || Y || Y || Modifies delete on terminate only
+|  || blockDeviceMapping || Y || Y ||  || Modifies delete on terminate only
 |-
-| '' || sourceDestCheck || - || - || VPC<ref name="notvpc"/>
+|  || sourceDestCheck || - || - || - || VPC<ref name="notvpc"/>
 |-
-| '' || groupSet || Y || - || Update is for VPC only<ref name="notvpc"/>
+|  || groupSet || Y || - ||  || Update is for VPC only<ref name="notvpc"/>
 |-
-| '' || productCodes || Y || '' ||
+|  || productCodes || Y ||  ||  ||
 |-
-| '' || ebsOptimized || - || - || N/A
+|  || ebsOptimized || - || - ||  || N/A
 |-
-| Network Interface || description || - || - || VPC<ref name="notvpc"/>
+| Network Interface || description || - || - ||  || VPC<ref name="notvpc"/>
 |-
-| '' || groupSet || - || - || VPC<ref name="notvpc"/>
+|  || groupSet || - || - ||  || VPC<ref name="notvpc"/>
 |-
-| '' || sourceDestCheck || - || - || VPC<ref name="notvpc"/>
+|  || sourceDestCheck || - || - || - || VPC<ref name="notvpc"/>
 |-
-| '' || attachment || - || - || VPC<ref name="notvpc"/>
+|  || attachment || - || - ||  || VPC<ref name="notvpc"/>
 |-
-| Snapshot || createVolumePermission || Y || Y || Similar to launch permissions for images
+| Snapshot || createVolumePermission || Y || Y || Y || Similar to launch permissions for images
 |-
-| '' || productCodes || Y ||  || Propagate from image
+|  || productCodes || Y ||  ||  || Propagate from image
 |-
-| Volume || autoEnableIO || - || - || N/A
+| Volume || autoEnableIO || - || - ||  || N/A
 |-
-| '' || productCodes || Y || '' || Propagate from image
+|  || productCodes || Y ||  ||  || Propagate from image
 |}
 
 = References =

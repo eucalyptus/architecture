@@ -1,7 +1,4 @@
 = Overview =
-This design covers changes to the following areas.
-
-== Resource Attributes ==
 Implement or update (when noted) resource attributes for the following:
 
 * Images (update)
@@ -11,24 +8,31 @@ Implement or update (when noted) resource attributes for the following:
 
 Resource attribute names are strings, values (can be) structured data. When updating an attribute with a structured value, the caller specifies which part of the value will be updated.
 
-== Launch Permissions ==
-The API for launch permissions attribute will be updated.
-
-== Product Codes ==
-Product codes will be propagated to volumes and snapshots.
-
-== Instance Termination ==
-We will add support for the following instance attributes:
-
-* DisableApiTermination
-* InstanceInitiatedShutdownBehavior
-
-== Snapshot Permissions ==
-We will add support for snapshot create volume permissions (similar to launch permissions)
-
 = Design =
 == Resource Attributes ==
 Resource attributes are already implemented for Images. As part of this feature we should clean up this implementation.
+
+=== Service Impact ===
+Messages, Query/SOAP bindings and services will need some updates (no major changes anticipated)
+
+The required attribute operations (some of Describe, Modify, Reset) will have placement as follows:
+
+{|
+! Type !! Manager 
+|-
+| Image || com.eucalyptus.images.ImageManager (existing methods updated)
+|-
+| Instance || com.eucalyptus.vm.VmControl (has stubs)
+|-
+| Snapshot || com.eucalyptus.blockstorage.SnapshotManager (has stubs)
+|-
+| Volume || com.eucalyptus.blockstorage.VolumeManager
+|}
+
+'''NOTE:''' Snapshot and volume operations depend on inclusion of other features (Snaphost launch permission, product code propagation)
+
+==== SOAP Binding ====
+A client tool is required for testing SOAP bindings (older AWS SDK?)
 
 === Permissions ===
 IAM / resource ownership (account) dictate which attributes can be read or updated. Users in the eucalyptus account can access all resource attributes.
@@ -87,20 +91,23 @@ Restrictions on instance attributes that can be modifed when running mean that i
 * instanceInitiatedShutdownBehavior
 * blockDeviceMapping delete on terminate setting (multiple)
 
-== Launch Permissions ==
-'''TODO''' if in scope
-
-== Product Codes ==
-'''TODO''' if in scope
-
-== Instance Termination ==
-'''TODO''' if in scope
-
-== Snapshot Permissions ==
-'''TODO''' if in scope
-
 == Integration Areas ==
 IAM: operations access controlled via IAM policies
+
+= Upgrade =
+No upgrade impact noted.
+
+= Packaging =
+No specific packaging requirements.
+
+= Documentation =
+No specific documentation items noted.
+
+= Security =
+No specific security concerns are noted for this design.
+
+= Testing =
+Testing should cover SOAP and Query APIs
 
 = References =
 * [[features/rsrc-attributes/3.3/spec | Resource Attributes specification]]
