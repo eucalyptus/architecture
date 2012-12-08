@@ -69,57 +69,57 @@ From the 2012-10-01 EC2 API documentation.
 {|
 ! Type !! Name !! Read Supported !! Update Supported !! Reset Supported !! Notes
 |-
-| Image || description || Y || Y ||  ||
+| Image || description || Y || Y || &nbsp; ||
 |-
-|  || kernel || Y ||  ||  ||
+| &nbsp; || kernel || Y || &nbsp; || &nbsp; ||
 |-
-|  || ramdisk || Y ||  ||  ||
+| &nbsp; || ramdisk || Y || &nbsp; || &nbsp; ||
 |-
-|  || launchPermission || Y || Y || Y ||
+| &nbsp; || launchPermission || Y || Y || Y ||
 |-
-|  || productCodes || Y || Y ||  ||
+| &nbsp; || productCodes || Y || Y || &nbsp; ||
 |-
-|  || blockDeviceMapping || Y ||  ||  ||
+| &nbsp; || blockDeviceMapping || Y || &nbsp; || &nbsp; ||
 |-
-| Instance || instanceType || Y || Y ||  || When stopped <ref name="mustbestopped">The instance must be stopped to modify this attribute</ref>
+| Instance || instanceType || Y || Y || &nbsp; || When stopped <ref name="mustbestopped">The instance must be stopped to modify this attribute</ref>
 |-
-|  || kernel || Y || Y || Y || When stopped <ref name="mustbestopped">The instance must be stopped to modify this attribute</ref>
+| &nbsp; || kernel || Y || Y || Y || When stopped <ref name="mustbestopped">The instance must be stopped to modify this attribute</ref>
 |-
-|  || ramdisk || Y || Y || Y || When stopped <ref name="mustbestopped">The instance must be stopped to modify this attribute</ref>
+| &nbsp; || ramdisk || Y || Y || Y || When stopped <ref name="mustbestopped">The instance must be stopped to modify this attribute</ref>
 |-
-|  || userData || Y || Y ||  || When stopped <ref name="mustbestopped">The instance must be stopped to modify this attribute</ref>
+| &nbsp; || userData || Y || Y || &nbsp; || When stopped <ref name="mustbestopped">The instance must be stopped to modify this attribute</ref>
 |-
-|  || disableApiTermination || Y || Y ||  ||
+| &nbsp; || disableApiTermination || Y || Y || &nbsp; ||
 |-
-|  || instanceInitiatedShutdownBehavior || Y || Y ||  ||
+| &nbsp; || instanceInitiatedShutdownBehavior || Y || Y || &nbsp; ||
 |-
-|  || rootDeviceName || Y ||  ||  ||
+| &nbsp; || rootDeviceName || Y || &nbsp; || &nbsp; ||
 |-
-|  || blockDeviceMapping || Y || Y ||  || Modifies delete on terminate only
+| &nbsp; || blockDeviceMapping || Y || Y || &nbsp; || Modifies delete on terminate only
 |-
-|  || sourceDestCheck || - || - || - || VPC<ref name="notvpc"/>
+| &nbsp; || sourceDestCheck || - || - || - || VPC<ref name="notvpc"/>
 |-
-|  || groupSet || Y || - ||  || Update is for VPC only<ref name="notvpc"/>
+| &nbsp; || groupSet || Y || - || &nbsp; || Update is for VPC only<ref name="notvpc"/>
 |-
-|  || productCodes || Y ||  ||  ||
+| &nbsp; || productCodes || Y || &nbsp; || &nbsp; ||
 |-
-|  || ebsOptimized || - || - ||  || N/A
+| &nbsp; || ebsOptimized || - || - || &nbsp; || N/A
 |-
-| Network Interface || description || - || - ||  || VPC<ref name="notvpc"/>
+| Network Interface || description || - || - || &nbsp; || VPC<ref name="notvpc"/>
 |-
-|  || groupSet || - || - ||  || VPC<ref name="notvpc"/>
+| &nbsp; || groupSet || - || - || &nbsp; || VPC<ref name="notvpc"/>
 |-
-|  || sourceDestCheck || - || - || - || VPC<ref name="notvpc"/>
+| &nbsp; || sourceDestCheck || - || - || - || VPC<ref name="notvpc"/>
 |-
-|  || attachment || - || - ||  || VPC<ref name="notvpc"/>
+| &nbsp; || attachment || - || - || &nbsp; || VPC<ref name="notvpc"/>
 |-
 | Snapshot || createVolumePermission || Y || Y || Y || Similar to launch permissions for images
 |-
-|  || productCodes || Y ||  ||  || Propagate from image
+| &nbsp; || productCodes || Y || &nbsp; || &nbsp; || Propagate from image
 |-
-| Volume || autoEnableIO || - || - ||  || N/A
+| Volume || autoEnableIO || - || - || &nbsp; || N/A
 |-
-|  || productCodes || Y ||  ||  || Propagate from image
+| &nbsp; || productCodes || Y || &nbsp; || &nbsp; || Propagate from image
 |}
 
 = References =
