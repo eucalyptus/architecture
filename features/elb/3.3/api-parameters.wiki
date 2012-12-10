@@ -1,0 +1,135 @@
+= API parameters = 
+
+== CreateLoadBalancer ==
+=== WILL SUPPORT ===
+  * AvailabilityZones.member.N        
+    - A list of Availability Zones. 
+    - Type: String list
+    - Required: no
+  * Listeners.member.N
+    - A list of the following tuples: LoadBalancerPort, InstancePort, and Protocol.
+    - Type: Listener list
+    - Required: no
+  * LoadBalancerName
+    - The name associated with the LoadBalancer. The name must be unique within your set of LoadBalancers.
+    - Type: String
+    - Required: Yes
+
+=== WILL NOT SUPPORT ===
+  * Scheme
+    - The type of a LoadBalancer. This option is only available for LoadBalancers attached to an Amazon VPC.
+    - Type: String
+    - Required: No
+  * SecurityGroups.member.N
+    - The security groups assigned to your LoadBalancer within your VPC.
+    - Type: String list
+    - Required: No
+  * Subnets.member.N
+    - A list of subnet IDs in your VPC to attach to your LoadBalancer.
+    - Type: String list
+    - Required: No
+
+== DeleteLoadBalancer == 
+=== WILL SUPPORT === 
+  * LoadBalancerName
+    - The name associated with the LoadBalancer. 
+    - Type: String
+    - Required: Yes
+
+== DescribeLoadBalancers ==
+=== WILL SUPPORT === 
+  * LoadBalancerNames.member.N
+    - A list of names associated with the LoadBalancers at creation time.
+    - Type: String list
+    - Required: No
+
+=== WILL NOT SUPPORT ===
+  * Marker
+    - An optional parameter reserved for future use.
+    - Type: String
+    - Required: No
+
+== DeregisterInstancesFromLoadBalancer ==
+=== WILL SUPPORT ===
+  * Instances.member.N
+    - A list of EC2 instance IDs consisting of all instances to be deregistered.
+    - Type: Instance list
+    - Required: Yes
+
+  * LoadBalancerName
+    - The name associated with the LoadBalancer. The name must be unique within the client AWS account.
+    - Type: String
+    - Required: Yes
+
+
+== RegisterInstancesWithLoadBalancer ==
+=== WILL SUPPORT ===
+  * Instances.member.N
+    - A list of instance IDs that should be registered with the LoadBalancer.
+    - Type: Instance list
+    - Required: Yes
+
+  * LoadBalancerName
+    - The name associated with the LoadBalancer. The name must be unique within the client AWS account.
+    - Type: String
+    - Required: Yes
+
+
+== CreateLoadBalancerListeners ==
+=== WILL SUPPORT ===
+  * Listeners.member.N
+    - A list of LoadBalancerPort, InstancePort, Protocol, and SSLCertificateId items.
+    - Type: Listener list
+    - Required: Yes
+
+  * LoadBalancerName
+    - The name of the LoadBalancer.
+    - Type: String
+    - Required: Yes
+
+== DeleteLoadBalancerListeners ==
+=== WILL SUPPORT ===
+  * LoadBalancerName
+    - The mnemonic name associated with the LoadBalancer.
+    - Type: String
+    - Required: Yes
+
+  * LoadBalancerPorts.member.N
+    - The client port number(s) of the LoadBalancerListener(s) to be removed.
+    - Type: Integer list
+    - Required: Yes
+
+== ConfigureHealthCheck ==
+=== WILL SUPPORT ===
+  * HealthCheck
+    - A structure containing the configuration information for the new healthcheck.
+    - Type: HealthCheck
+    - Required: Yes
+
+  * LoadBalancerName
+    - The mnemonic name associated with the LoadBalancer. This name must be unique within the client AWS account.
+    - Type: String
+    - Required: Yes
+
+== DescribeInstanceHealth ==
+
+== CreateLoadBalancerPolicy == 
+== DeleteLoadBalancerPolicy ==
+== DescribeLoadBalancerPolicies ==
+== DescribeLoadBalancerPolicyTypes ==
+
+= 2nd Step =
+== CreateAppCookieStickinessPolicy ==
+== CreateLBCookieStickinessPolicy ==
+
+== SetLoadBalancerListenerSSLCertificate ==
+== SetLoadBalancerPoliciesOfListener ==
+== SetLoadBalancerPoliciesForBackendServer ==
+
+== DisableAvailabilityZonesForLoadBalancer ==
+== EnableAvailabilityZonesForLoadBalancer ==
+
+= Unsupport =
+== AttachLoadBalancerToSubnets - VPC ==
+== DetachLoadBalancerFromSubnets - VPC ==
+== ApplySecurityGroupsToLoadBalancer - VPC ==
