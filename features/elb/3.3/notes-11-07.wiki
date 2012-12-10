@@ -34,25 +34,25 @@ DeleteLoadBalancerListeners
 ConfigureHealthCheck
 DescribeInstanceHealth
 
-== Load Balancer Policies ==
+= 2nd Step =
+== LB Zone Control ==
+DisableAvailabilityZonesForLoadBalancer
+EnableAvailabilityZonesForLoadBalancer
+
+== HTTP Session Stickiness ==
+CreateAppCookieStickinessPolicy
+CreateLBCookieStickinessPolicy
+
+=== SSL Support ===
+SetLoadBalancerListenerSSLCertificate
+
+=== Load Balancer Policies ===
 CreateLoadBalancerPolicy
 DeleteLoadBalancerPolicy
 DescribeLoadBalancerPolicies
 DescribeLoadBalancerPolicyTypes
-
-= 2nd Step =
-=== HTTP Session Stickiness ===
-CreateAppCookieStickinessPolicy
-CreateLBCookieStickinessPolicy
-
-=== Load Balancer Listeners ===
-SetLoadBalancerListenerSSLCertificate
 SetLoadBalancerPoliciesOfListener 
 SetLoadBalancerPoliciesForBackendServer
-
-== LB Zone Control ==
-DisableAvailabilityZonesForLoadBalancer
-EnableAvailabilityZonesForLoadBalancer
 
 = Unsupport =
 AttachLoadBalancerToSubnets - VPC
