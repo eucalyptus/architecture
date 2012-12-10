@@ -86,62 +86,62 @@ Parameters may be required that are not required in AWS due to alternatives that
 |-
 | &nbsp;    || AvailabilityZones.member.N || Y<ref name="novpc">VPC is not supported</ref> || Y ||
 |-
-| &nbsp;    || DefaultCooldown ||  || ? ||
+| &nbsp;    || DefaultCooldown || &nbsp; || ? ||
 |-
-| &nbsp;    || DesiredCapacity ||  || Y ||
+| &nbsp;    || DesiredCapacity || &nbsp; || Y ||
 |-
-| &nbsp;    || HealthCheckGracePeriod ||  || ? ||
+| &nbsp;    || HealthCheckGracePeriod || &nbsp; || ? ||
 |-
 | &nbsp;    || HealthCheckType || Y || ? ||
 |-
 | &nbsp;    || LaunchConfigurationName || Y || ? ||
 |-
-| &nbsp;    || LoadBalancerNames.member.N ||  || ? ||
+| &nbsp;    || LoadBalancerNames.member.N || &nbsp; || ? ||
 |-
 | &nbsp;    || MaxSize || Y || Y ||
 |-
 | &nbsp;    || MinSize || Y || Y ||
 |-
-| &nbsp;    || PlacementGroup ||  || ? ||
+| &nbsp;    || PlacementGroup || &nbsp; || ? ||
 |-
-| &nbsp;    || Tags.member.N ||  || Y ||
+| &nbsp;    || Tags.member.N || &nbsp; || Y ||
 |-
-| &nbsp;    || TerminationPolicies.member.N ||  || ? ||
+| &nbsp;    || TerminationPolicies.member.N || &nbsp; || ? ||
 |-
-| &nbsp;    || VPCZoneIdentifier ||  || - || VPC<ref name="novpc"/>
+| &nbsp;    || VPCZoneIdentifier || &nbsp; || - || VPC<ref name="novpc"/>
 |-
 | [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_DeleteAutoScalingGroup.html DeleteAutoScalingGroup (amazonwebservices.com)]
 |              AutoScalingGroupName || Y || Y ||
 |-
-| &nbsp;    || ForceDelete ||  || Y ||
+| &nbsp;    || ForceDelete || &nbsp; || Y ||
 |-
 | [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_DescribeAutoScalingGroups.html DescribeAutoScalingGroups (amazonwebservices.com)]
-|              AutoScalingGroupNames.member.N ||  || Y ||
+|              AutoScalingGroupNames.member.N || &nbsp; || Y ||
 |-
-| &nbsp;    || MaxRecords ||  || Y ||
+| &nbsp;    || MaxRecords || &nbsp; || Y ||
 |-
-| &nbsp;    || NextToken ||  || Y ||
+| &nbsp;    || NextToken || &nbsp; || Y ||
 |-
 | [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_DescribeAutoScalingInstances.html DescribeAutoScalingInstances (amazonwebservices.com)]
-|              InstanceIds.member.N ||  || Y ||
+|              InstanceIds.member.N || &nbsp; || Y ||
 |-
-| &nbsp;    || MaxRecords ||  || Y ||
+| &nbsp;    || MaxRecords || &nbsp; || Y ||
 |-
-| &nbsp;    || NextToken ||  || Y ||
+| &nbsp;    || NextToken || &nbsp; || Y ||
 |-
 | [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_SetDesiredCapacity.html SetDesiredCapacity (amazonwebservices.com)]
 |              AutoScalingGroupName || Y || Y ||
 |-
 | &nbsp;    || DesiredCapacity || Y || Y ||
 |-
-| &nbsp;    || HonorCooldown ||  || ? ||
+| &nbsp;    || HonorCooldown || &nbsp; || ? ||
 |-
 | [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_SetInstanceHealth.html SetInstanceHealth (amazonwebservices.com)]
 |              HealthStatus || Y || Y ||
 |-
 | &nbsp;    || InstanceId || Y || Y ||
 |-
-| &nbsp;    || ShouldRespectGracePeriod ||  || ? ||
+| &nbsp;    || ShouldRespectGracePeriod || &nbsp; || ? ||
 |-
 | [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_TerminateInstanceInAutoScalingGroup.html TerminateInstanceInAutoScalingGroup (amazonwebservices.com)]
 |              InstanceId || Y || Y ||
