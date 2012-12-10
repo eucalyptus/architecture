@@ -84,69 +84,69 @@ Parameters may be required that are not required in AWS due to alternatives that
 | [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_CreateAutoScalingGroup.html CreateAutoScalingGroup (amazonwebservices.com)]
 |              AutoScalingGroupName || Y || Y ||
 |-
-|           || AvailabilityZones.member.N || Y<ref name="novpc">VPC is not supported</ref> || Y ||
+| &nbsp;    || AvailabilityZones.member.N || Y<ref name="novpc">VPC is not supported</ref> || Y ||
 |-
-|           || DefaultCooldown ||  || ? ||
+| &nbsp;    || DefaultCooldown ||  || ? ||
 |-
-|           || DesiredCapacity ||  || Y ||
+| &nbsp;    || DesiredCapacity ||  || Y ||
 |-
-|           || HealthCheckGracePeriod ||  || ? ||
+| &nbsp;    || HealthCheckGracePeriod ||  || ? ||
 |-
-|           || HealthCheckType || Y || ? ||
+| &nbsp;    || HealthCheckType || Y || ? ||
 |-
-|           || LaunchConfigurationName || Y || ? ||
+| &nbsp;    || LaunchConfigurationName || Y || ? ||
 |-
-|           || LoadBalancerNames.member.N ||  || ? ||
+| &nbsp;    || LoadBalancerNames.member.N ||  || ? ||
 |-
-|           || MaxSize || Y || Y ||
+| &nbsp;    || MaxSize || Y || Y ||
 |-
-|           || MinSize || Y || Y ||
+| &nbsp;    || MinSize || Y || Y ||
 |-
-|           || PlacementGroup ||  || ? ||
+| &nbsp;    || PlacementGroup ||  || ? ||
 |-
-|           || Tags.member.N ||  || Y ||
+| &nbsp;    || Tags.member.N ||  || Y ||
 |-
-|           || TerminationPolicies.member.N ||  || ? ||
+| &nbsp;    || TerminationPolicies.member.N ||  || ? ||
 |-
-|           || VPCZoneIdentifier ||  || - || VPC<ref name="novpc"/>
+| &nbsp;    || VPCZoneIdentifier ||  || - || VPC<ref name="novpc"/>
 |-
 | [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_DeleteAutoScalingGroup.html DeleteAutoScalingGroup (amazonwebservices.com)]
 |              AutoScalingGroupName || Y || Y ||
 |-
-|           || ForceDelete ||  || Y ||
+| &nbsp;    || ForceDelete ||  || Y ||
 |-
 | [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_DescribeAutoScalingGroups.html DescribeAutoScalingGroups (amazonwebservices.com)]
 |              AutoScalingGroupNames.member.N ||  || Y ||
 |-
-|           || MaxRecords ||  || Y ||
+| &nbsp;    || MaxRecords ||  || Y ||
 |-
-|           || NextToken ||  || Y ||
+| &nbsp;    || NextToken ||  || Y ||
 |-
 | [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_DescribeAutoScalingInstances.html DescribeAutoScalingInstances (amazonwebservices.com)]
 |              InstanceIds.member.N ||  || Y ||
 |-
-|           || MaxRecords ||  || Y ||
+| &nbsp;    || MaxRecords ||  || Y ||
 |-
-|           || NextToken ||  || Y ||
+| &nbsp;    || NextToken ||  || Y ||
 |-
 | [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_SetDesiredCapacity.html SetDesiredCapacity (amazonwebservices.com)]
 |              AutoScalingGroupName || Y || Y ||
 |-
-|           || DesiredCapacity || Y || Y ||
+| &nbsp;    || DesiredCapacity || Y || Y ||
 |-
-|           || HonorCooldown ||  || ? ||
+| &nbsp;    || HonorCooldown ||  || ? ||
 |-
 | [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_SetInstanceHealth.html SetInstanceHealth (amazonwebservices.com)]
 |              HealthStatus || Y || Y ||
 |-
-|           || InstanceId || Y || Y ||
+| &nbsp;    || InstanceId || Y || Y ||
 |-
-|           || ShouldRespectGracePeriod ||  || ? ||
+| &nbsp;    || ShouldRespectGracePeriod ||  || ? ||
 |-
 | [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_TerminateInstanceInAutoScalingGroup.html TerminateInstanceInAutoScalingGroup (amazonwebservices.com)]
 |              InstanceId || Y || Y ||
 |-
-|           || ShouldDecrementDesiredCapacity || Y || Y ||
+| &nbsp;    || ShouldDecrementDesiredCapacity || Y || Y ||
 |}
 
 === Operation Errors ===
@@ -156,12 +156,12 @@ Parameters may be required that are not required in AWS due to alternatives that
 | [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_CreateAutoScalingGroup.html CreateAutoScalingGroup (amazonwebservices.com)]
 |              AlreadyExists || Y ||
 |-
-|           || LimitExceeded || Y ||
+| &nbsp;    || LimitExceeded || Y ||
 |-
 | [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_DeleteAutoScalingGroup.html DeleteAutoScalingGroup (amazonwebservices.com)]
 |              ResourceInUse || Y ||
 |-
-|           || ScalingActivityInProgress || Y ||
+| &nbsp;    || ScalingActivityInProgress || Y ||
 |-
 | [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_DescribeAutoScalingGroups.html DescribeAutoScalingGroups (amazonwebservices.com)]
 |              InvalidNextToken || Y ||
