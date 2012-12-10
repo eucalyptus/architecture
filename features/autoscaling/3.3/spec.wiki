@@ -74,6 +74,109 @@ Gives the system time to perform and adjust to before executing a new scaling ac
 Suspend/Resume Processes
 Allows you to manually suspend and resume Auto Scaling activities
 
+== Autoscaling Operations ==
+=== Operation Parameters ===
+Parameters may be required that are not required in AWS due to alternatives that we do not implement (as noted)
+
+{|
+! Operation !! Parameter !! Required !! Supported !! Notes
+|-
+| [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_CreateAutoScalingGroup.html CreateAutoScalingGroup (amazonwebservices.com)]
+|              AutoScalingGroupName || Y || Y ||
+|-
+|           || AvailabilityZones.member.N || Y<ref name="novpc">VPC is not supported</ref> || Y ||
+|-
+|           || DefaultCooldown ||  || ? ||
+|-
+|           || DesiredCapacity ||  || Y ||
+|-
+|           || HealthCheckGracePeriod ||  || ? ||
+|-
+|           || HealthCheckType || Y || ? ||
+|-
+|           || LaunchConfigurationName || Y || ? ||
+|-
+|           || LoadBalancerNames.member.N ||  || ? ||
+|-
+|           || MaxSize || Y || Y ||
+|-
+|           || MinSize || Y || Y ||
+|-
+|           || PlacementGroup ||  || ? ||
+|-
+|           || Tags.member.N ||  || Y ||
+|-
+|           || TerminationPolicies.member.N ||  || ? ||
+|-
+|           || VPCZoneIdentifier ||  || - || VPC<ref name="novpc"/>
+|-
+| [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_DeleteAutoScalingGroup.html DeleteAutoScalingGroup (amazonwebservices.com)]
+|              AutoScalingGroupName || Y || Y ||
+|-
+|           || ForceDelete ||  || Y ||
+|-
+| [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_DescribeAutoScalingGroups.html DescribeAutoScalingGroups (amazonwebservices.com)]
+|              AutoScalingGroupNames.member.N ||  || Y ||
+|-
+|           || MaxRecords ||  || Y ||
+|-
+|           || NextToken ||  || Y ||
+|-
+| [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_DescribeAutoScalingInstances.html DescribeAutoScalingInstances (amazonwebservices.com)]
+|              InstanceIds.member.N ||  || Y ||
+|-
+|           || MaxRecords ||  || Y ||
+|-
+|           || NextToken ||  || Y ||
+|-
+| [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_SetDesiredCapacity.html SetDesiredCapacity (amazonwebservices.com)]
+|              AutoScalingGroupName || Y || Y ||
+|-
+|           || DesiredCapacity || Y || Y ||
+|-
+|           || HonorCooldown ||  || ? ||
+|-
+| [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_SetInstanceHealth.html SetInstanceHealth (amazonwebservices.com)]
+|              HealthStatus || Y || Y ||
+|-
+|           || InstanceId || Y || Y ||
+|-
+|           || ShouldRespectGracePeriod ||  || ? ||
+|-
+| [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_TerminateInstanceInAutoScalingGroup.html TerminateInstanceInAutoScalingGroup (amazonwebservices.com)]
+|              InstanceId || Y || Y ||
+|-
+|           || ShouldDecrementDesiredCapacity || Y || Y ||
+|}
+
+=== Operation Errors ===
+{|
+! Operation !! Error !! Supported !! Notes
+|-
+| [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_CreateAutoScalingGroup.html CreateAutoScalingGroup (amazonwebservices.com)]
+|              AlreadyExists || Y ||
+|-
+|           || LimitExceeded || Y ||
+|-
+| [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_DeleteAutoScalingGroup.html DeleteAutoScalingGroup (amazonwebservices.com)]
+|              ResourceInUse || Y ||
+|-
+|           || ScalingActivityInProgress || Y ||
+|-
+| [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_DescribeAutoScalingGroups.html DescribeAutoScalingGroups (amazonwebservices.com)]
+|              InvalidNextToken || Y ||
+|-
+| [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_DescribeAutoScalingInstances.html DescribeAutoScalingInstances (amazonwebservices.com)]
+|              InvalidNextToken || Y ||
+|-
+| [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_SetDesiredCapacity.html SetDesiredCapacity (amazonwebservices.com)]
+|               ScalingActivityInProgress  || Y ||
+|-
+| [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_TerminateInstanceInAutoScalingGroup.html TerminateInstanceInAutoScalingGroup (amazonwebservices.com)]
+|               ScalingActivityInProgress  || Y ||
+|}
+
+
 = IAM IMPLICATION =
 * IAM needs updating to reflect the added keys, actions, resource types from this service
 * autoscaling allocates resources on behalf of the user
@@ -99,6 +202,9 @@ Auto Scaling guarantees execution order for scheduled actions within the same gr
 
     A scheduled action must have a unique time value. If you attempt to schedule an activity at a time when another existing activity is already scheduled, the call will be rejected with an error message noting the conflict.
     
+= Footnotes =
+<references/>
+
 = Questions =
 * workload examples; esp. for testing, user story creation
 * survival group use case (no dependency)
