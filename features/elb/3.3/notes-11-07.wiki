@@ -18,43 +18,43 @@
 
 
 == Load Balancer Control ==
-CreateLoadBalancer
-DeleteLoadBalancer
-DescribeLoadBalancers
+=== CreateLoadBalancer ===
+=== DeleteLoadBalancer ===
+=== DescribeLoadBalancers ===
 
 == Instance LB Registration ==
-DeregisterInstancesFromLoadBalancer
-RegisterInstancesWithLoadBalancer
+=== DeregisterInstancesFromLoadBalancer ===
+=== RegisterInstancesWithLoadBalancer ===
 
 == LB Listeners ==
-CreateLoadBalancerListeners
-DeleteLoadBalancerListeners
+=== CreateLoadBalancerListeners ===
+=== DeleteLoadBalancerListeners ===
 
 == Your Service (on Instance) Health Checking ==
-ConfigureHealthCheck
-DescribeInstanceHealth
+=== ConfigureHealthCheck ===
+=== DescribeInstanceHealth ===
 
 = 2nd Step =
 == LB Zone Control ==
-DisableAvailabilityZonesForLoadBalancer
-EnableAvailabilityZonesForLoadBalancer
+=== DisableAvailabilityZonesForLoadBalancer ===
+=== EnableAvailabilityZonesForLoadBalancer ===
 
 == HTTP Session Stickiness ==
-CreateAppCookieStickinessPolicy
-CreateLBCookieStickinessPolicy
+=== CreateAppCookieStickinessPolicy ===
+=== CreateLBCookieStickinessPolicy ===
 
-=== SSL Support ===
-SetLoadBalancerListenerSSLCertificate
+== SSL Support ==
+=== SetLoadBalancerListenerSSLCertificate ===
 
-=== Load Balancer Policies ===
-CreateLoadBalancerPolicy
-DeleteLoadBalancerPolicy
-DescribeLoadBalancerPolicies
-DescribeLoadBalancerPolicyTypes
-SetLoadBalancerPoliciesOfListener 
-SetLoadBalancerPoliciesForBackendServer
+== Load Balancer Policies == 
+=== CreateLoadBalancerPolicy ===
+=== DeleteLoadBalancerPolicy ===
+=== DescribeLoadBalancerPolicies ===
+=== DescribeLoadBalancerPolicyTypes ===
+=== SetLoadBalancerPoliciesOfListener ===
+=== SetLoadBalancerPoliciesForBackendServer ===
 
 = Unsupport =
-AttachLoadBalancerToSubnets - VPC
-DetachLoadBalancerFromSubnets - VPC
-ApplySecurityGroupsToLoadBalancer - VPC
+=== AttachLoadBalancerToSubnets - VPC ===
+=== DetachLoadBalancerFromSubnets - VPC ===
+=== ApplySecurityGroupsToLoadBalancer - VPC ===
