@@ -199,6 +199,9 @@ Parameters may be required that are not required in AWS due to alternatives that
 | &nbsp;    || SpotPrice || N || N ||
 |-
 | &nbsp;    || UserData || N || Y ||
+|-
+| [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_DeleteLaunchConfiguration.html] DeleteLaunchConfiguration (amazonwebservices.com)]
+|              LaunchConfigurationName || Y || Y || 
 |}
 
 === Operation Errors ===
