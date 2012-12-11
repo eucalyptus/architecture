@@ -112,22 +112,32 @@
     - Required: Yes
 
 == DescribeInstanceHealth ==
+=== WILL SUPPORT ===
+  * Instances.member.N
+    - A list of instance IDs whose states are being queried.
+    - Type: Instance list
+    - Required: No 
 
-== CreateLoadBalancerPolicy == 
-== DeleteLoadBalancerPolicy ==
-== DescribeLoadBalancerPolicies ==
-== DescribeLoadBalancerPolicyTypes ==
+  * LoadBalancerName
+    - The name associated with the LoadBalancer. The name must be unique within the client AWS account.
+    - Type: String
+    - Required: Yes 
 
 = 2nd Step =
+== DisableAvailabilityZonesForLoadBalancer ==
+== EnableAvailabilityZonesForLoadBalancer ==
+
 == CreateAppCookieStickinessPolicy ==
 == CreateLBCookieStickinessPolicy ==
 
 == SetLoadBalancerListenerSSLCertificate ==
+
+== CreateLoadBalancerPolicy ==
+== DeleteLoadBalancerPolicy ==
+== DescribeLoadBalancerPolicies ==
+== DescribeLoadBalancerPolicyTypes ==
 == SetLoadBalancerPoliciesOfListener ==
 == SetLoadBalancerPoliciesForBackendServer ==
-
-== DisableAvailabilityZonesForLoadBalancer ==
-== EnableAvailabilityZonesForLoadBalancer ==
 
 = Unsupport =
 == AttachLoadBalancerToSubnets - VPC ==
