@@ -174,7 +174,6 @@ Parameters may be required that are not required in AWS due to alternatives that
 | &nbsp;    || HealthCheckType  || N || Y ||
 |- 
 | [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_CreateLaunchConfiguration.html CreateLaunchConfiguration (amazonwebservices.com)]
-|-
 |              BlockDeviceMappings.member.N || N || Y ||
 |-
 | &nbsp;    || EbsOptimized || N || N ||
