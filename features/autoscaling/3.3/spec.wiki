@@ -147,6 +147,31 @@ Parameters may be required that are not required in AWS due to alternatives that
 |              InstanceId || Y || Y ||
 |-
 | &nbsp;    || ShouldDecrementDesiredCapacity || Y || Y ||
+|-
+| [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_UpdateAutoScalingGroup.html UpdateAutoScalingGroup (amazonwebservices.com)]
+|			   AutoScalingGroupName || Y || Y ||
+|-
+| &nbsp;    || AvailabilityZones.member.N || N || Y ||
+|-
+| &nbsp;    || DesiredCapacity || N || Y ||
+|-
+| &nbsp;    || DefaultCooldown || N || Y ||
+|-
+| &nbsp;    || HealthCheckGracePeriod || N || Y ||
+|- 
+| &nbsp;    ||  LaunchConfigurationName   || N || Y ||
+|- 
+| &nbsp;    ||  MaxSize   || N || Y ||
+|- 
+| &nbsp;    ||  MinSize   || N || Y ||
+|- 
+| &nbsp;    ||  PlacementGroup   || N || Y ||
+|- 
+| &nbsp;    ||  TerminationPolicies.member.N   || N || Y ||
+|- 
+| &nbsp;    ||  VPCZoneIdentifier   || N || N ||
+|- 
+| &nbsp;    || HealthCheckType  || N || Y ||
 |}
 
 === Operation Errors ===
