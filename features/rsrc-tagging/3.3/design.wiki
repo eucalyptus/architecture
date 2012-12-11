@@ -20,9 +20,16 @@ This feature relates to the following features in this release:
 * CloudWatch
 * Resource Attributes
 
+= Analysis =
+== Open Issues ==
+* How will the eucalyptus account manage tags?, there is no place to add the usual '''verbose''' pseudoselector.
+* With filters, does '''.''' match newline?
+* Does a tag delete operation succeed if any tag was deleted? (or all tags, or just if there is no error)
+
 = Design =
 
 == Tagging ==
+=== Eucalyptus Extensions ===
 We will reserve the additional prefix '''euca''' for tag names and values. We will support the standard '''aws''' prefixes, the '''euca''' prefix is for use where there is no '''aws''' equivalent (Eucalyptus extensions)
 
 === Entity Model ===
@@ -45,8 +52,6 @@ Tag functionality must be tested with both SOAP and Query APIs.
 === Tag Operations ===
 The tag manager implements the following operations.
 
-'''TODO''' How will the eucalyptus account manage tags, there is no place to add the usual '''verbose''' pseudoselector.
-
 ==== CreateTags ====
 Tag creation enforces the following:
 
@@ -63,7 +68,7 @@ Tag deletion deletes all matching tags from all specified resources.
 
 Tag values are optional, if specified the value must match. 
 
-The operation succeeds if any tag was deleted ('''TODO''' confirm this)
+The operation succeeds if any tag was deleted
 
 ==== DescribeTags ====
 Describe tags for the account with possible filters as outlined below.
@@ -74,7 +79,13 @@ You can tag public or shared resources, but the tags you assign are available on
 IAM: tag operations access controlled via IAM policies
 
 == Filtering ==
-Filtering should be done by the DB where possible for efficiency. Since filters can have multiple values query by example is not a good approach (better to use criteria?)
+Filtering should be done by the DB where possible for efficiency. Since filters can have multiple values query by example is not a good fit and criteria will be used.
+
+=== Modularity ===
+Filtering is an EC2 concept but the implementation should be flexible enough for use with other APIs. Other APIs will often allow a subset of information to be returned from an operation based on some selection parameters.
+
+=== Discovery ===
+Filters should be discovered, whether individually, per type or per API.
 
 === Terminated Instances ===
 Filtering of terminated instances may require caching instances in their original form (not translated to API types)
@@ -85,12 +96,112 @@ Filtering will be peformed at query time where possible. It is not always possib
 * Type mismatch - Where the DB type differs from the filter type wildard filtering is not possible (e.g. Volume '''size''' is an integer in the DB)
 * Translated values - Some values are translated from internal to EC2 (e.g. Volume '''status''')
 
-'''TODO''' complete this section
+Database filtering is an optimization, it will be used to restrict the results to the extent possible, but will not reliably filter out all non-matching resources.
+
+==== Filtering via Hibernate Criterion ====
+Hibernate criterion can be used to filter database listings. A new '''Entities''' method is required to support this:
+
+  List<T> query( T example, 
+                 Bool readOnly, 
+                 Criterion criterion,
+                 Map aliases )
+
+The aliases are required in the case of filters on related entities.
+
+Filters can be translated to criterion as follows:
+
+  conjunction // And
+  - disjunction // Or
+    - filter restriction 1
+    - filter restriction 2
+  - disjunction // Or
+    - filter restriction 3
+
+The top level criterion is a conjunction ('''Restrictions.conjunction()'''), containing a disjuction for each filter with all the permitted values. 
+
+==== Wildcard Translation ====
+Filters support the following wildcards:
+
+* '''*''': Matches zero or more characters
+* '''?''': Matches exactly one character
+
+Hibernate supports the following wildcards when using ''like'':
+
+* '''%''' : Matches zero or more characters
+* '''_''': Matches exactly one character
+
+In both cases wildcards can be escaped (to allow literal values) with a backslash ('''\''').
+
+Translation of wildcards for direct DB filtering must support literal values from each grammar.
+
+==== Example for Security Groups ====
+An example of using criterion for restriction of query results is:
+
+  final Junction filters = Restrictions.conjunction();
+  final Junction nameFilter = Restrictions.disjunction();
+  final Junction ruleTypeFilter = Restrictions.disjunction();
+  filters.add( nameFilter );
+  filters.add( ruleTypeFilter );
+  nameFilter.add( Restrictions.like( "displayName", "A%" ) );
+  nameFilter.add( Restrictions.like( "displayName", "B%" ) );
+  ruleTypeFilter.add( Restrictions.like( "networkRules.protocol", NetworkRule.Protocol.tcp ) ); // Enum type
+
+In this case the resulting (Hibernate generated) query is:
+
+  select 
+       this_.id as id10_5_, this_.creation_timestamp as creation2_10_5_, this_.last_update_timestamp as last3_10_5_, this_.metadata_perm_uuid as metadata4_10_5_, this_.version as version10_5_, this_.metadata_display_name as metadata6_10_5_, this_.metadata_last_state as metadata7_10_5_, this_.metadata_state as metadata8_10_5_, this_.metadata_state_change_stack as metadata9_10_5_, this_.metadata_account_name as metadata10_10_5_, this_.metadata_account_id as metadata11_10_5_, this_.metadata_unique_name as metadata12_10_5_, this_.metadata_user_id as metadata13_10_5_, this_.metadata_user_name as metadata14_10_5_, this_.metadata_network_group_description as metadata15_10_5_, this_.vm_network_index as vm16_10_5_, extantnetw3_.id as id9_0_, extantnetw3_.creation_timestamp as creation2_9_0_, extantnetw3_.last_update_timestamp as last3_9_0_, extantnetw3_.metadata_perm_uuid as metadata4_9_0_, extantnetw3_.version as version9_0_, extantnetw3_.metadata_display_name as metadata6_9_0_, extantnetw3_.metadata_last_state as metadata7_9_0_, extantnetw3_.metadata_state as metadata8_9_0_, extantnetw3_.metadata_state_change_stack as metadata9_9_0_, extantnetw3_.metadata_account_name as metadata10_9_0_, extantnetw3_.metadata_account_id as metadata11_9_0_, extantnetw3_.metadata_unique_name as metadata12_9_0_, extantnetw3_.metadata_user_id as metadata13_9_0_, extantnetw3_.metadata_user_name as metadata14_9_0_, extantnetw3_.networkGroup_id as network16_9_0_, extantnetw3_.metadata_extant_network_tag as metadata15_9_0_, indexes4_.metadata_extant_network_index_fk as metadata18_9_7_, indexes4_.id as id7_, indexes4_.id as id12_1_, indexes4_.creation_timestamp as creation2_12_1_, indexes4_.last_update_timestamp as last3_12_1_, indexes4_.metadata_perm_uuid as metadata4_12_1_, indexes4_.version as version12_1_, indexes4_.metadata_display_name as metadata6_12_1_, indexes4_.metadata_last_state as metadata7_12_1_, indexes4_.metadata_state as metadata8_12_1_, indexes4_.metadata_state_change_stack as metadata9_12_1_, indexes4_.metadata_account_name as metadata10_12_1_, indexes4_.metadata_account_id as metadata11_12_1_, indexes4_.metadata_unique_name as metadata12_12_1_, indexes4_.metadata_user_id as metadata13_12_1_, indexes4_.metadata_user_name as metadata14_12_1_, indexes4_.metadata_network_index_bogus_id as metadata15_12_1_, indexes4_.metadata_network_index_extant_network_fk as metadata17_12_1_, indexes4_.metadata_network_index as metadata16_12_1_, extantnetw5_.id as id9_2_, extantnetw5_.creation_timestamp as creation2_9_2_, extantnetw5_.last_update_timestamp as last3_9_2_, extantnetw5_.metadata_perm_uuid as metadata4_9_2_, extantnetw5_.version as version9_2_, extantnetw5_.metadata_display_name as metadata6_9_2_, extantnetw5_.metadata_last_state as metadata7_9_2_, extantnetw5_.metadata_state as metadata8_9_2_, extantnetw5_.metadata_state_change_stack as metadata9_9_2_, extantnetw5_.metadata_account_name as metadata10_9_2_, extantnetw5_.metadata_account_id as metadata11_9_2_, extantnetw5_.metadata_unique_name as metadata12_9_2_, extantnetw5_.metadata_user_id as metadata13_9_2_, extantnetw5_.metadata_user_name as metadata14_9_2_, extantnetw5_.networkGroup_id as network16_9_2_, extantnetw5_.metadata_extant_network_tag as metadata15_9_2_, networkgro6_.id as id10_3_, networkgro6_.creation_timestamp as creation2_10_3_, networkgro6_.last_update_timestamp as last3_10_3_, networkgro6_.metadata_perm_uuid as metadata4_10_3_, networkgro6_.version as version10_3_, networkgro6_.metadata_display_name as metadata6_10_3_, networkgro6_.metadata_last_state as metadata7_10_3_, networkgro6_.metadata_state as metadata8_10_3_, networkgro6_.metadata_state_change_stack as metadata9_10_3_, networkgro6_.metadata_account_name as metadata10_10_3_, networkgro6_.metadata_account_id as metadata11_10_3_, networkgro6_.metadata_unique_name as metadata12_10_3_, networkgro6_.metadata_user_id as metadata13_10_3_, networkgro6_.metadata_user_name as metadata14_10_3_, networkgro6_.metadata_network_group_description as metadata15_10_3_, networkgro6_.vm_network_index as vm16_10_3_, networkrul1_.id as id11_4_, networkrul1_.creation_timestamp as creation2_11_4_, networkrul1_.last_update_timestamp as last3_11_4_, networkrul1_.metadata_perm_uuid as metadata4_11_4_, networkrul1_.version as version11_4_, networkrul1_.metadata_network_rule_high_port as metadata6_11_4_, networkrul1_.metadata_network_rule_low_port as metadata7_11_4_, networkrul1_.metadata_network_rule_protocol as metadata8_11_4_ 
+  from 
+       metadata_network_group this_ left outer join metadata_extant_network extantnetw3_ on this_.vm_network_index=extantnetw3_.id 
+           left outer join metadata_network_indices indexes4_ on extantnetw3_.id=indexes4_.metadata_extant_network_index_fk 
+           left outer join metadata_extant_network extantnetw5_ on indexes4_.metadata_network_index_extant_network_fk=extantnetw5_.id 
+           left outer join metadata_network_group networkgro6_ on extantnetw5_.networkGroup_id=networkgro6_.id 
+           inner join metadata_network_rule networkrul1_ on this_.id=networkrul1_.metadata_network_group_rule_fk 
+  where 
+       (this_.metadata_account_id like ?) and 
+       ((this_.metadata_display_name like ? or 
+         this_.metadata_display_name like ?) and 
+       (networkrul1_.metadata_network_rule_protocol like ?))
 
 === Collection Filtering ===
-Filtering on collections of items must be possible for either internal for EC2 formats. 
+Filtering on collections of items must be possible for either internal for EC2 formats ('''TODO''' pick one format) 
 
-'''TODO''' complete this section
+Filtering should be implemented using Predicates (Guava)
+
+Similarly to database filter construction we can contruct a Predicate for a given set of filters:
+
+  Predicates.and
+  - Predicates.or
+    - filter restriction 1
+    - filter restriction 2
+  - Predicates.or
+    - filter restriction 3
+
+Each predicate will extract the list of values for that filter and check against a distinct given value (or wildcard).
+
+==== Wildcard Translation ====
+Filters support the following wildcards:
+
+* '''*''': Matches zero or more characters
+* '''?''': Matches exactly one character
+
+These can be translated to regular expression wildcards:
+
+* '''.*''': Matches zero or more characters
+* '''.''': Matches exactly one character
+
+Other regular expression syntax from the filter value must be escaped (e.g. '''Pattern.quote''')
+
+=== Filter Generation ===
+It should be possible to generate a filter from a request message (or filter set? though this rules out using the same API for non EC2 filtering).
+
+  Filter Filters.generate( R )
+  
+  Filter
+  - Map<String,String> getAliases()  // For DB filtering
+  - Criterion asCriterion()          // For DB filtering
+  - Predicate asPredicate()          // For collection filtering
+
+Support for DB filtering is optional, in this case aliases will be an empty Map and the Criterion will be a no-op (e.g. '''Restrictions.conjunction()''')
 
 === Filter Details ===
 {|
@@ -451,7 +562,6 @@ Filtering on collections of items must be possible for either internal for EC2 f
 | &nbsp; || volume-type || Y || Y || Hardcoded type '''standard''' (no '''io1''')
 |}
 
-
 <references />
 
 = Upgrade =
@@ -472,5 +582,7 @@ Testing should cover SOAP and Query APIs
 = References =
 * [[features/rsrc-tagging/3.3/spec | Resource Tagging and Filtering specification]]
 * [http://docs.amazonwebservices.com/AWSEC2/latest/UserGuide/Using_Tags.html Using Tags (amazonwebservices.com)]
+* [http://docs.guava-libraries.googlecode.com/git-history/v9.0/javadoc/index.html Guava v9 (googlecode.com)]
+* [https://eucalyptus.atlassian.net/browse/EUCA-2117 JIRA Task EUCA-2117 - Resource tagging  (atlassian.net)]
 
 [[tag:rls-3.3]]
