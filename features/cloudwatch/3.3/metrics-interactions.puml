@@ -49,23 +49,27 @@
     [Walrus Metrics]<<Service>> --> cwapimetrics
     [SC Metrics]<<Service>> --> cwapimetrics
     [ELB Metrics]<<Development>> --> cwapimetrics
-'    [Internal Metrics]<<Future>> --> cwapimetrics
+    [Internal Metrics]<<Future>> --> cwapimetrics
+    [???\nInternal SNMP]<<Future>> --> cwapimetrics
   }
   
    
-'  node "???\nPhysical Resources" as physical {
-'    [Process Metrics]<<Future>> --> cwapimetrics
-'    [Host Metrics]<<Future>> --> cwapimetrics
-'    [Storage Metrics]<<Future>>  --> cwapimetrics
-'    [Network Metrics]<<Future>> --> cwapimetrics
-'  }
+  node "???\nPhysical Resources" as physical {
+    [Process Metrics]<<Future>> --> cwapimetrics
+    [Host Metrics]<<Future>> --> cwapimetrics
+    [Storage Metrics]<<Future>>  --> cwapimetrics
+    [Network Metrics]<<Future>> --> cwapimetrics
+    [???\nExternal SNMP]<<Future>> --> cwapimetrics
+  }
       
   frame "Action Targets" {
     interface "AS" <<Development>> as asapi
     interface SNS <<Future>> as snsapi
-'    interface "???\nNagios" <<Future>> as nagiosapi
+    interface "???\nNagios" <<Future>> as nagiosapi
+    interface "???\nSNMP Traps" <<Future>> as snmptraps
   }
   alarms -right-> asapi
   alarms -right-> snsapi
   alarms -right-> nagiosapi
+  alarms -right-> snmptraps
 @enduml
