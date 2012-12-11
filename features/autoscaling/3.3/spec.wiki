@@ -202,6 +202,13 @@ Parameters may be required that are not required in AWS due to alternatives that
 |-
 | [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_DeleteLaunchConfiguration.html DeleteLaunchConfiguration (amazonwebservices.com)]
 |              LaunchConfigurationName || Y || Y || 
+|-
+| [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_DescribeLaunchConfigurations.html DescribeLaunchConfigurations (amazonwebservices.com)]
+|              LaunchConfigurationNames.member.N || N || Y ||
+|-
+| &nbsp;    || MaxRecords || N || Y ||
+|-
+| &nbsp;    || NextToken || N || Y ||
 |}
 
 === Operation Errors ===
