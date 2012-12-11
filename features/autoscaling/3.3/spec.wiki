@@ -236,6 +236,20 @@ Parameters may be required that are not required in AWS due to alternatives that
 |-
 | [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_TerminateInstanceInAutoScalingGroup.html TerminateInstanceInAutoScalingGroup (amazonwebservices.com)]
 |               ScalingActivityInProgress  || Y ||
+|-
+| [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_DescribeLaunchConfigurations.html DescribeLaunchConfigurations (amazonwebservices.com)]
+|               InvalidNextToken || Y ||
+|- 
+| [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_DeleteLaunchConfiguration.html DeleteLaunchConfiguration (amazonwebservices.com)]
+|               ResourceInUse || Y ||
+|-
+| [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_CreateLaunchConfiguration.html CreateLaunchConfiguration (amazonwebservices.com)]
+|               AlreadyExists || Y ||
+|-
+| &nbsp;     || LimitExceeded || Y ||
+|-
+| [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_UpdateAutoScalingGroup.html UpdateAutoScalingGroup (amazonwebservices.com)]
+|               ScalingActivityInProgress || Y ||              
 |}
 
 
