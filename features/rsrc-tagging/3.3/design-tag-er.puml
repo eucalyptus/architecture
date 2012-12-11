@@ -1,0 +1,45 @@
+@startuml
+Tag <|-- ImageInfoTag
+ImageInfoTag *-- ImageInfo
+
+Tag <|-- VmInstanceTag
+VmInstanceTag *-- VmInstance
+
+Tag <|-- NetworkGroupTag
+NetworkGroupTag *-- NetworkGroup
+
+Tag <|-- SnapshotTag
+SnapshotTag *-- Snapshot
+
+Tag <|-- VolumeTag
+VolumeTag *-- Volume
+
+abstract class Tag {
+ key string
+ value string
+ resourceType string
+}
+
+class ImageInfoTag {
+ image ImageInfo
+}
+
+class VmInstanceTag {
+ instance VmInstance
+}
+
+class NetworkGroupTag {
+ group NetworkGroup
+}
+
+class SnapshotTag {
+ snapshot Snapshot
+}
+
+class VolumeTag {
+ volume Volume
+}
+
+@enduml
+
+
