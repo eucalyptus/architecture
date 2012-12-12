@@ -147,6 +147,68 @@ Parameters may be required that are not required in AWS due to alternatives that
 |              InstanceId || Y || Y ||
 |-
 | &nbsp;    || ShouldDecrementDesiredCapacity || Y || Y ||
+|-
+| [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_UpdateAutoScalingGroup.html UpdateAutoScalingGroup (amazonwebservices.com)]
+|			   AutoScalingGroupName || Y || Y ||
+|-
+| &nbsp;    || AvailabilityZones.member.N || N || Y ||
+|-
+| &nbsp;    || DesiredCapacity || N || Y ||
+|-
+| &nbsp;    || DefaultCooldown || N || Y ||
+|-
+| &nbsp;    || HealthCheckGracePeriod || N || Y ||
+|- 
+| &nbsp;    ||  LaunchConfigurationName   || N || Y ||
+|- 
+| &nbsp;    ||  MaxSize   || N || Y ||
+|- 
+| &nbsp;    ||  MinSize   || N || Y ||
+|- 
+| &nbsp;    ||  PlacementGroup   || N || Y ||
+|- 
+| &nbsp;    ||  TerminationPolicies.member.N   || N || Y ||
+|- 
+| &nbsp;    ||  VPCZoneIdentifier   || N || N ||
+|- 
+| &nbsp;    || HealthCheckType  || N || Y ||
+|- 
+| [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_CreateLaunchConfiguration.html CreateLaunchConfiguration (amazonwebservices.com)]
+|              BlockDeviceMappings.member.N || N || Y ||
+|-
+| &nbsp;    || EbsOptimized || N || N ||
+|-
+| &nbsp;    || IamInstanceProfile || N || N ||
+|-
+| &nbsp;    || ImageId || Y || Y ||
+|-
+| &nbsp;    || InstanceMonitoring || N || Y ||
+|-
+| &nbsp;    || InstanceType || Y || Y ||
+|-
+| &nbsp;    || KernelId || N || Y ||
+|-
+| &nbsp;    || KeyName || N || Y ||
+|-
+| &nbsp;    || LaunchConfigurationName || Y || Y ||
+|-
+| &nbsp;    || RamdiskId || N || Y ||
+|-
+| &nbsp;    || SecurityGroups.member.N || N || Y ||
+|-
+| &nbsp;    || SpotPrice || N || N ||
+|-
+| &nbsp;    || UserData || N || Y ||
+|-
+| [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_DeleteLaunchConfiguration.html DeleteLaunchConfiguration (amazonwebservices.com)]
+|              LaunchConfigurationName || Y || Y || 
+|-
+| [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_DescribeLaunchConfigurations.html DescribeLaunchConfigurations (amazonwebservices.com)]
+|              LaunchConfigurationNames.member.N || N || Y ||
+|-
+| &nbsp;    || MaxRecords || N || Y ||
+|-
+| &nbsp;    || NextToken || N || Y ||
 |}
 
 === Operation Errors ===
@@ -174,6 +236,20 @@ Parameters may be required that are not required in AWS due to alternatives that
 |-
 | [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_TerminateInstanceInAutoScalingGroup.html TerminateInstanceInAutoScalingGroup (amazonwebservices.com)]
 |               ScalingActivityInProgress  || Y ||
+|-
+| [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_DescribeLaunchConfigurations.html DescribeLaunchConfigurations (amazonwebservices.com)]
+|               InvalidNextToken || Y ||
+|- 
+| [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_DeleteLaunchConfiguration.html DeleteLaunchConfiguration (amazonwebservices.com)]
+|               ResourceInUse || Y ||
+|-
+| [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_CreateLaunchConfiguration.html CreateLaunchConfiguration (amazonwebservices.com)]
+|               AlreadyExists || Y ||
+|-
+| &nbsp;     || LimitExceeded || Y ||
+|-
+| [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_UpdateAutoScalingGroup.html UpdateAutoScalingGroup (amazonwebservices.com)]
+|               ScalingActivityInProgress || Y ||              
 |}
 
 

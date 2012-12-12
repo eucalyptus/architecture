@@ -112,12 +112,18 @@
     - Required: Yes
 
 == DescribeInstanceHealth ==
-
 == CreateLoadBalancerPolicy == 
 == DeleteLoadBalancerPolicy ==
 == DescribeLoadBalancerPolicies ==
-== DescribeLoadBalancerPolicyTypes ==
 
+== DescribeLoadBalancerPolicyTypes ==
+=== WILL SUPPORT ===
+  * PolicyTypeNames.member.N
+  - Specifies the name of the policy types.
+  - Type: String
+  - Required: No
+  - Error: PolicyTypeNotFound
+   
 = 2nd Step =
 == CreateAppCookieStickinessPolicy ==
 == CreateLBCookieStickinessPolicy ==
