@@ -1,0 +1,216 @@
+CloudWatch
+== GetMetricStatistics ==
+Description:
+  - Gets statistics for the specified metric.
+  - Note: The maximum number of data points returned from a single GetMetricStatistics request is 1,440. 
+  - Note: The maximum number of data points that can be queried is 50,850; whereas the maximum number of data points returned is 1,440.
+
+Request Parameters :
+Will Support :
+*Dimensions.member.N  
+  - A list of dimensions describing qualities of the metric.
+  - Type: Dimension list (See definition of Dimension below)
+  - Length constraints: Minimum of 0 item(s) in the list. Maximum of 10 item(s) in the list.
+  - Required: No
+
+*EndTime  
+  - The time stamp to use for determining the last datapoint to return.   The value specified is exclusive; results will include datapoints up to the time stamp specified.
+  - Type: DateTime
+  - Required: Yes
+
+*MetricName 
+  - The name of the metric, with or without spaces.
+  - Type: String
+  - Length constraints: Minimum length of 1. Maximum length of 255.
+  - Required: Yes
+
+*Namespace  
+  - The namespace of the metric, with or without spaces.
+  - Type: String
+  - Length constraints: Minimum length of 1. Maximum length of 255.
+  - Required: Yes
+
+*Period 
+  - The granularity, in seconds, of the returned datapoints. Period must be at least 60 seconds and must be a multiple of 60. The default value is 60.
+  - Type: Integer
+  - Required: Yes
+
+  ???: How does period work in the calculation?  (sample size?) (i.e. isn't period = endTime - startTime)
+
+*StartTime  
+  - The time stamp to use for determining the first datapoint to return. The value specified is inclusive; results include datapoints with the time stamp specified.
+  - Note:  The specified start time is rounded down to the nearest value. Datapoints are returned for start times up to two weeks in the past. Specified start times that are more than two weeks in the past will not return datapoints for metrics that are older than two weeks.
+  - Type: DateTime
+  - Required: Yes
+
+*Statistics.member.N  
+  - The metric statistics to return. 
+  - Valid Values: Average | Sum | SampleCount | Maximum | Minimum
+  - Type: String list
+  - Length constraints: Minimum of 1 item(s) in the list. Maximum of 5 item(s) in the list.
+  - Required: Yes
+
+*Unit 
+  - The unit for the metric.
+  - Type: String
+  - Valid Values: Seconds | Microseconds | Milliseconds | Bytes | Kilobytes | Megabytes | Gigabytes | Terabytes | Bits | Kilobits | Megabits | Gigabits | Terabits | Percent | Count | Bytes/Second | Kilobytes/Second | Megabytes/Second | Gigabytes/Second | Terabytes/Second | Bits/Second | Kilobits/Second | Megabits/Second | Gigabits/Second | Terabits/Second | Count/Second | None
+  - Required: No
+  ??? : What if the unit entered in PutMetricData is different?
+
+Response : 
+*GetMetricStatisticsResult
+  - Type: GetMetricStatisticsResult
+
+Errors : 
+*InternalService  
+  - Indicates that the request processing has failed due to some unknown error, exception, or failure.
+  - HttpResponseCode: 500
+*InvalidParameterCombination  
+  - Parameters that must not be used together were used together.
+  - HttpResponseCode: 400
+*InvalidParameterValue  
+  - Bad or out-of-range value was supplied for the input parameter.
+  - HttpResponseCode: 400
+*MissingRequiredParameter 
+  - HttpResponseCode: An input parameter that is mandatory for processing the request is not supplied.
+  - HttpResponseCode: 400
+
+== ListMetrics ==
+
+Description :
+  - Returns a list of valid metrics stored for the AWS account owner. Returned metrics can be used with GetMetricStatistics to obtain statistical data for a given metric.
+  - Note: Up to 500 results are returned for any one call. To retrieve further results, use returned NextToken values with subsequent ListMetrics operations.
+  - Note: If you create a metric with the PutMetricData action, allow up to fifteen minutes for the metric to appear in calls to the ListMetrics action. Statistics about the metric, however, are available sooner using GetMetricStatistics.
+Request Parameters:
+
+Request Parameters :
+Will Support :
+*Dimensions.member.N  
+  - A list of dimensions to filter against.
+  - Type: DimensionFilter list
+  - Length constraints: Minimum of 0 item(s) in the list. Maximum of 10 item(s) in the list.
+  - Required: No
+
+*MetricName
+  - The name of the metric to filter against.
+  - Type: String
+  - Length constraints: Minimum length of 1. Maximum length of 255.
+  - Required: No
+
+*Namespace  
+  - The namespace to filter against.
+  - Type: String
+  - Length constraints: Minimum length of 1. Maximum length of 255.
+  - Required: No
+
+*NextToken  
+  - The token returned by a previous call to indicate that there is more data available.
+  - Type: String
+  - Required: No
+ ??? Should we support nexttoken?
+
+Response : 
+*ListMetricsResult
+  - Type: ListMetricsResult
+
+Errors : 
+*InternalService  
+  - Indicates that the request processing has failed due to some unknown error, exception, or failure.
+  - HttpResponseCode: 500
+*InvalidParameterValue  
+  - Bad or out-of-range value was supplied for the input parameter.
+  - HttpResponseCode: 400
+
+
+== PutMetricData ==
+
+Request Parameters :
+Will Support :
+
+Description
+  - Publishes metric data points, which are associated specified metric. If the specified metric does not exist, it is created.
+  - Note: If you create a metric with the PutMetricData action, allow up to fifteen minutes for the metric to appear in calls to the ListMetrics action.
+  - The size of a request is limited to 8 KB for HTTP GET requests and 40 KB for HTTP POST requests.
+  - Important: Although the Value parameter accepts numbers of type Double, Amazon CloudWatch truncates values with very large exponents. Values with base-10 exponents greater than 126 (1 x 10^126) are truncated. Likewise, values with base-10 exponents less than -130 (1 x 10^-130) are also truncated.
+
+Request Parameters :
+Will Support :
+
+*MetricData.member.N  
+  - A list of data describing the metric.
+  - Type: MetricDatum list
+  - Required: Yes
+
+*Namespace  
+  - The namespace for the metric data.
+  - Note: You cannot specify a namespace that begins with "AWS/". Namespaces that begin with "AWS/" are reserved for other Amazon Web Services products that send metrics to Amazon CloudWatch.
+  - Type: String
+  - Length constraints: Minimum length of 1. Maximum length of 255.
+  - Required: Yes
+
+Errors : 
+*InternalService  
+  - Indicates that the request processing has failed due to some unknown error, exception, or failure.
+  - HttpResponseCode: 500
+*InvalidParameterCombination  
+  - Parameters that must not be used together were used together.
+  - HttpResponseCode: 400
+*InvalidParameterValue  
+  - Bad or out-of-range value was supplied for the input parameter.
+  - HttpResponseCode: 400
+*MissingRequiredParameter
+  - An input parameter that is mandatory for processing the request is not supplied.
+  - HttpResponseCode: 400
+
+Data Types :
+"GetMetricStatisticsResult"
+*Datapoints   
+  - The datapoints for the specified metric.
+  - Type: Datapoint list
+*Label  
+  - A label describing the specified metric.
+  - Type: String
+
+"ListMetricsResult"
+*Metrics  
+   - A list of metrics used to generate statistics for an AWS account.
+   - Type: Metric list
+*NextToken  
+   - A string that marks the start of the next batch of returned results.
+   - Type: String
+
+"Datapoint"
+*Average  
+  - The average of metric values that correspond to the datapoint.
+  - Type: Double
+*Maximum  
+  - The maximum of the metric value used for the datapoint.
+  - Type: Double
+*Minimum  
+  - The minimum metric value used for the datapoint.
+  - Type: Double
+*SampleCount  
+  - The number of metric values that contributed to the aggregate value of this datapoint.
+  - Type: Double
+*Sum  
+  - The sum of metric values used for the datapoint.
+  - Type: Double
+*Timestamp  
+  - The time stamp used for the datapoint. Amazon CloudWatch uses Coordinated Universal Time (UTC) when returning time stamps, which do not accommodate seasonal adjustments such as daylight savings time.
+  - Type: DateTime
+*Unit 
+  - The standard unit used for the datapoint.
+  - Type: String 
+  - Valid Values: Seconds | Microseconds | Milliseconds | Bytes | Kilobytes | Megabytes | Gigabytes | Terabytes | Bits | Kilobits | Megabits | Gigabits | Terabits | Percent | Count | Bytes/Second | Kilobytes/Second | Megabytes/Second | Gigabytes/Second | Terabytes/Second | Bits/Second | Kilobits/Second | Megabits/Second | Gigabits/Second | Terabits/Second | Count/Second | None
+
+"Dimension"
+*Name 
+  - The name of the dimension.
+  - Type: String
+  - Length constraints: Minimum length of 1. Maximum length of 255.
+*Value  
+  - The value representing the dimension measurement
+  - Type: String
+  - Length constraints: Minimum length of 1. Maximum length of 255.
+
+
