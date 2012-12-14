@@ -79,6 +79,10 @@ Suspend/Resume Processes
 Allows you to manually suspend and resume Auto Scaling activities
 
 == Autoscaling Operations ==
+=== Common Required Parameters ===
+* The **MaxRecords** and **NextToken** values are required whereever they are present.
+
+
 === Operation Parameters ===
 Parameters may be required that are not required in AWS due to alternatives that we do not implement (as noted)
 
