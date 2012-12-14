@@ -30,7 +30,7 @@ For 3.3 we only consider two kinds of scaling:
 ** Running and health checking an instance in the group
 ** 
 = Service Interactions =
-[[autoscaling-3.3-api-overview.png|width=1000px]]
+[[autoscaling-3.3-api-overview-all.png|width=1000px]]
 
 = Client Tools =
 
