@@ -1,9 +1,9 @@
 @startuml
 !include ../../../lib/component.skin
-  skinparam ranksep 100
-'  skinparam nodesep 200
-'  scale 1000 width 
-'  left to right direction
+  skinparam ranksep 50
+  skinparam nodesep 10
+'  scale 1000 height 
+  left to right direction
 
   enum TerminationPolicyType {
     OldestInstance
@@ -168,21 +168,24 @@
     -ScheduledActions
   }
 
-  AutoScalingGroup "1..1" -right- "1..1" LaunchConfiguration : < references configuration
-  AutoScalingGroup "1..*" -up- "1..*" Instance : < has instances
-  Instance "1..1" -right- "1..1" LifecycleState : < has state
-  AutoScalingGroup "1..1" -up- "1..1" HealthCheckType : < instances checked by
-  AutoScalingGroup "1" -up- "*" Tag : < has tags
-  AutoScalingGroup "1" -right- "*" SuspendedProcess : < has suspended processes
-  AutoScalingGroup "1..*" -- "0..*" LoadBalancer : references LoadBalancer > 
-  AutoScalingGroup "1..*" -down- "0..*" MetricAlarm : references MetricAlarm > 
-  Alarm "1" -down- "1" MetricAlarm
-  ScalingPolicy "1..1" -right- "*..0" AutoScalingGroup : applies to >  
-  ScalingPolicy "1" *-down- "many" Alarm : < triggered by
-  ScalingPolicy "1" *-up- "1" AdjustmentType
-  Activity -- ActivityStatusCode
-  Activity "1..*" -down- "0..*" AutoScalingGroup
-  ScalingProcess "1..1" -- "0..1" AutoScalingGroup
+  AutoScalingGroup "1..1" -down- "1..1" LaunchConfiguration : has configuration >
+  AutoScalingGroup "1..*" -up- "1..1" Instance : has instances >
+  Instance "1" -up- "1" LifecycleState : has state >
+  AutoScalingGroup "1" -up- "1" HealthCheckType : instances checked by >
+  AutoScalingGroup "1" *-up- "*" Tag : has tags >
+  AutoScalingGroup "1" *-down- "*" SuspendedProcess : < has suspended processes
+  AutoScalingGroup "1..*" -left- "0..1" LoadBalancer : references LoadBalancer > 
+  AutoScalingGroup "1..*" -down- "1..1" Alarm : has alarms > 
+  AutoScalingGroup "1" *-right- "*" TerminationPolicyType : has policies >
+  Alarm "1" -right- "1" MetricAlarm : references alarm >
+  ScalingPolicy "1..1" -right- "0..*" AutoScalingGroup : applies to >  
+  ScalingPolicy "1" *-down- "many" Alarm : has triggers >
+  ScalingPolicy "1" -left- "1" AdjustmentType
+  Activity "1" -up- "1" ActivityStatusCode
+  Activity "1..1" -down- "0..*" AutoScalingGroup : relates to >
+  ScalingProcess "1..1" -down- "0..1" AutoScalingGroup : relates to > 
+  ScalingProcess "1" -- "1" ProcessType
+  SuspendedProcess "1" -- "1" ScalingProcess
 
   hide members
 @enduml
