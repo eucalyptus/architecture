@@ -6,22 +6,38 @@ Other important characteristics which are essential in serving these use cases a
 # Register/Deregister instances with ELB
 == Types of Scaling ==
 For 3.3 we only consider two kinds of scaling:
-# ''Manual'': user controlled change to sizing of autoscaling group.
+# ''' Manual''' : user controlled change to sizing of autoscaling group.
 ## [[SetDesiredCapacity]] allows the user to explicitly set the group size.
 ## [[ExecutePolicy]] allows the user to trigger the application of a scaling policy by hand.
-# ''Alarm/Policy'' based: user configures metric-based actions which trigger application of a scaling policy.
+# ''' Alarm/Policy'''  based: user configures metric-based actions which trigger application of a scaling policy.
 ## [[MetricAlarms]] configured using [[PutMetricAlarm]] act as triggers.
 ## [[AlarmActions]] reference the [[ScalingPolcicy]] relative to the fully qualified [[AutoScalingGroupARN]].
-# ''Second for 3.3''
+# ''' Second for 3.3''' 
 ## Metric collection
 ## Scaling process control
-# ''Excluded from 3.3''
+# ''' Excluded from 3.3''' 
 ## Notifications
+## Operations requiring VPC support
+## Anything requiring support for spot instances
 ## Schedule based scaling is not part of the 3.3 implementation plan.
 ## Operations needed for schedule based scaling must still be present and Describe operations must successfully return an empty response.  This is needed to avoid breaking client tools.
-== Autoscaling Components ==
+
+= API Operations =
+[[autoscaling-3.3-api-overview.png|width=1000px]]
+* Required operations in topological order
+** Operations for definiton a group
+*** <code>{Create,Describe,Update,Delete}AutoScalingGroup</code>
+** Running and health checking an instance in the group
+** 
+= Service Interactions =
+[[autoscaling-3.3-api-overview.png|width=1000px]]
+
+= Client Tools =
+
+= Components =
 [[autoscaling-3.3-spec-overview.png]]
-=== Launch Configuration ===
+
+== Launch Configuration ==
 * Describes how to add instances  instances
 ** AMI 
 ** Instance Type
@@ -31,7 +47,7 @@ For 3.3 we only consider two kinds of scaling:
 * Auto Scaling will terminate instances with old launch configurations first
 ** Rolling software updates
 
-=== Auto Scaling Group ===
+== Auto Scaling Group == 
 Auto Scaling managed grouping of EC2 instances
 Automatic health check to maintain pool size
 Automatically scale the number of instances by policy 
@@ -40,7 +56,7 @@ Automatic Integration with ELB
 Automatic Integration with AZs
 Automatic distribution & balancing across AZs
 
-=== Auto Scaling Policy ===
+== Auto Scaling Policy == 
 Parameters for performing an Auto Scaling action
 Scale Up/Down
 By how much
@@ -50,7 +66,7 @@ ChangeInPercent (+/- %)
 Cool Down (seconds)
 Policy can be triggered by CloudWatch Events
 
-=== Cloud Watch Alarms ===
+== Cloud Watch Alarms ==
 Monitors a CloudWatch metric 
 Threshold (> 50% CPU)
 Period (for 3 minutes)
@@ -62,7 +78,7 @@ Available Actions
 Trigger Auto Scaling Policy (scale up/down event) 
 Send SNS notification
 
-=== Scaling Activity ===
+== Scaling Activity == 
 Instance Launch
 Instances are launched (not started) from a “gold” image
  Bootstrapping is important! 
@@ -78,188 +94,10 @@ Gives the system time to perform and adjust to before executing a new scaling ac
 Suspend/Resume Processes
 Allows you to manually suspend and resume Auto Scaling activities
 
-== Autoscaling Operations ==
-=== Common Required Parameters ===
-* The **MaxRecords** and **NextToken** values are required whereever they are present.
+= Operation Parameters =
+See [[autoscaling-3.3-api-parameters]]
 
-
-=== Operation Parameters ===
-Parameters may be required that are not required in AWS due to alternatives that we do not implement (as noted)
-
-{|
-! Operation !! Parameter !! Required !! Supported !! Notes
-|-
-| [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_CreateAutoScalingGroup.html CreateAutoScalingGroup (amazonwebservices.com)]
-|              AutoScalingGroupName || Y || Y ||
-|-
-| &nbsp;    || AvailabilityZones.member.N || Y<ref name="novpc">VPC is not supported</ref> || Y ||
-|-
-| &nbsp;    || DefaultCooldown || &nbsp; || ? ||
-|-
-| &nbsp;    || DesiredCapacity || &nbsp; || Y ||
-|-
-| &nbsp;    || HealthCheckGracePeriod || &nbsp; || ? ||
-|-
-| &nbsp;    || HealthCheckType || Y || ? ||
-|-
-| &nbsp;    || LaunchConfigurationName || Y || ? ||
-|-
-| &nbsp;    || LoadBalancerNames.member.N || &nbsp; || ? ||
-|-
-| &nbsp;    || MaxSize || Y || Y ||
-|-
-| &nbsp;    || MinSize || Y || Y ||
-|-
-| &nbsp;    || PlacementGroup || &nbsp; || ? ||
-|-
-| &nbsp;    || Tags.member.N || &nbsp; || Y ||
-|-
-| &nbsp;    || TerminationPolicies.member.N || &nbsp; || ? ||
-|-
-| &nbsp;    || VPCZoneIdentifier || &nbsp; || - || VPC<ref name="novpc"/>
-|-
-| [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_DeleteAutoScalingGroup.html DeleteAutoScalingGroup (amazonwebservices.com)]
-|              AutoScalingGroupName || Y || Y ||
-|-
-| &nbsp;    || ForceDelete || &nbsp; || Y ||
-|-
-| [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_DescribeAutoScalingGroups.html DescribeAutoScalingGroups (amazonwebservices.com)]
-|              AutoScalingGroupNames.member.N || &nbsp; || Y ||
-|-
-| &nbsp;    || MaxRecords || &nbsp; || Y ||
-|-
-| &nbsp;    || NextToken || &nbsp; || Y ||
-|-
-| [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_DescribeAutoScalingInstances.html DescribeAutoScalingInstances (amazonwebservices.com)]
-|              InstanceIds.member.N || &nbsp; || Y ||
-|-
-| &nbsp;    || MaxRecords || &nbsp; || Y ||
-|-
-| &nbsp;    || NextToken || &nbsp; || Y ||
-|-
-| [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_SetDesiredCapacity.html SetDesiredCapacity (amazonwebservices.com)]
-|              AutoScalingGroupName || Y || Y ||
-|-
-| &nbsp;    || DesiredCapacity || Y || Y ||
-|-
-| &nbsp;    || HonorCooldown || &nbsp; || ? ||
-|-
-| [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_SetInstanceHealth.html SetInstanceHealth (amazonwebservices.com)]
-|              HealthStatus || Y || Y ||
-|-
-| &nbsp;    || InstanceId || Y || Y ||
-|-
-| &nbsp;    || ShouldRespectGracePeriod || &nbsp; || ? ||
-|-
-| [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_TerminateInstanceInAutoScalingGroup.html TerminateInstanceInAutoScalingGroup (amazonwebservices.com)]
-|              InstanceId || Y || Y ||
-|-
-| &nbsp;    || ShouldDecrementDesiredCapacity || Y || Y ||
-|-
-| [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_UpdateAutoScalingGroup.html UpdateAutoScalingGroup (amazonwebservices.com)]
-|			   AutoScalingGroupName || Y || Y ||
-|-
-| &nbsp;    || AvailabilityZones.member.N || N || Y ||
-|-
-| &nbsp;    || DesiredCapacity || N || Y ||
-|-
-| &nbsp;    || DefaultCooldown || N || Y ||
-|-
-| &nbsp;    || HealthCheckGracePeriod || N || Y ||
-|- 
-| &nbsp;    ||  LaunchConfigurationName   || N || Y ||
-|- 
-| &nbsp;    ||  MaxSize   || N || Y ||
-|- 
-| &nbsp;    ||  MinSize   || N || Y ||
-|- 
-| &nbsp;    ||  PlacementGroup   || N || Y ||
-|- 
-| &nbsp;    ||  TerminationPolicies.member.N   || N || Y ||
-|- 
-| &nbsp;    ||  VPCZoneIdentifier   || N || N ||
-|- 
-| &nbsp;    || HealthCheckType  || N || Y ||
-|- 
-| [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_CreateLaunchConfiguration.html CreateLaunchConfiguration (amazonwebservices.com)]
-|              BlockDeviceMappings.member.N || N || Y ||
-|-
-| &nbsp;    || EbsOptimized || N || N ||
-|-
-| &nbsp;    || IamInstanceProfile || N || N ||
-|-
-| &nbsp;    || ImageId || Y || Y ||
-|-
-| &nbsp;    || InstanceMonitoring || N || Y ||
-|-
-| &nbsp;    || InstanceType || Y || Y ||
-|-
-| &nbsp;    || KernelId || N || Y ||
-|-
-| &nbsp;    || KeyName || N || Y ||
-|-
-| &nbsp;    || LaunchConfigurationName || Y || Y ||
-|-
-| &nbsp;    || RamdiskId || N || Y ||
-|-
-| &nbsp;    || SecurityGroups.member.N || N || Y ||
-|-
-| &nbsp;    || SpotPrice || N || N ||
-|-
-| &nbsp;    || UserData || N || Y ||
-|-
-| [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_DeleteLaunchConfiguration.html DeleteLaunchConfiguration (amazonwebservices.com)]
-|              LaunchConfigurationName || Y || Y || 
-|-
-| [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_DescribeLaunchConfigurations.html DescribeLaunchConfigurations (amazonwebservices.com)]
-|              LaunchConfigurationNames.member.N || N || Y ||
-|-
-| &nbsp;    || MaxRecords || N || Y ||
-|-
-| &nbsp;    || NextToken || N || Y ||
-|}
-
-=== Operation Errors ===
-{|
-! Operation !! Error !! Supported !! Notes
-|-
-| [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_CreateAutoScalingGroup.html CreateAutoScalingGroup (amazonwebservices.com)]
-|              AlreadyExists || Y ||
-|-
-| &nbsp;    || LimitExceeded || Y ||
-|-
-| [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_DeleteAutoScalingGroup.html DeleteAutoScalingGroup (amazonwebservices.com)]
-|              ResourceInUse || Y ||
-|-
-| &nbsp;    || ScalingActivityInProgress || Y ||
-|-
-| [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_DescribeAutoScalingGroups.html DescribeAutoScalingGroups (amazonwebservices.com)]
-|              InvalidNextToken || Y ||
-|-
-| [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_DescribeAutoScalingInstances.html DescribeAutoScalingInstances (amazonwebservices.com)]
-|              InvalidNextToken || Y ||
-|-
-| [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_SetDesiredCapacity.html SetDesiredCapacity (amazonwebservices.com)]
-|               ScalingActivityInProgress  || Y ||
-|-
-| [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_TerminateInstanceInAutoScalingGroup.html TerminateInstanceInAutoScalingGroup (amazonwebservices.com)]
-|               ScalingActivityInProgress  || Y ||
-|-
-| [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_DescribeLaunchConfigurations.html DescribeLaunchConfigurations (amazonwebservices.com)]
-|               InvalidNextToken || Y ||
-|- 
-| [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_DeleteLaunchConfiguration.html DeleteLaunchConfiguration (amazonwebservices.com)]
-|               ResourceInUse || Y ||
-|-
-| [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_CreateLaunchConfiguration.html CreateLaunchConfiguration (amazonwebservices.com)]
-|               AlreadyExists || Y ||
-|-
-| &nbsp;     || LimitExceeded || Y ||
-|-
-| [http://docs.amazonwebservices.com/AutoScaling/2011-01-01/APIReference/API_UpdateAutoScalingGroup.html UpdateAutoScalingGroup (amazonwebservices.com)]
-|               ScalingActivityInProgress || Y ||              
-|}
-
+= Testing Plan =
 
 = Footnotes =
 <references/>

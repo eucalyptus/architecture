@@ -126,6 +126,10 @@
     String value
   }
 
+  package EC2 {
+    interface RunInstances
+  }
+
   package CloudWatch {
     class MetricAlarm {
       String alarmARN
@@ -186,6 +190,7 @@
   ScalingProcess "1..1" -down- "0..1" AutoScalingGroup : relates to > 
   ScalingProcess "1" -- "1" ProcessType
   SuspendedProcess "1" -- "1" ScalingProcess
+  RunInstances "0..1" -- "1..1" AutoScalingGroup
 
   hide members
 @enduml

@@ -15,7 +15,7 @@ In terms of operations we have:
 # '''Actions'''
 ## DisableAlarmActions
 ## EnableAlarmActions
-
+[[cloudwatch-3.3-metrics-interactions.png]]
 == Metrics / ListMetrics & PutMetricData ==
 * Represents a time-ordered set of data points. 
 * '''Metrics''' are uniquely defined by:
