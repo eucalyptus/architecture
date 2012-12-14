@@ -1,22 +1,26 @@
 = Overview =
-Automatically Scale Server Farms 
-Scale Up/Down
-(Re)Balance Across AZs 
-Add/Remove from ELB
-Scaling Thermostat
+Feature consists of fundamental Autoscaling support implementing the AWS defined API.  There are two primary use cases:
+# Manual auto-scaling
+# Action triggered auto-scaling based on custom metrics
+Other important characteristics which are essential in serving these use cases are:
+# Register/Deregister instances with ELB
 == Types of Scaling ==
-Manual
-Send an API call or use CLI to launch/terminate instances 
-Only need to specify capacity change (+/-)
-By Schedule
-Scale up/down based on date and time
-By Policy
-Scale in response to changing conditions
-Based on user configured real-time monitoring and alerts 
-Health checks and CloudWatch
-Automatic Rebalance
-Instances are automatically launched/terminated to ensure the application is balanced across multiple AZs
+For 3.3 we only consider two kinds of scaling:
+# ''Manual'': user controlled change to sizing of autoscaling group.
+## [[SetDesiredCapacity]] allows the user to explicitly set the group size.
+## [[ExecutePolicy]] allows the user to trigger the application of a scaling policy by hand.
+# ''Alarm/Policy'' based: user configures metric-based actions which trigger application of a scaling policy.
+## [[MetricAlarms]] configured using [[PutMetricAlarm]] act as triggers.
+## [[AlarmActions]] reference the [[ScalingPolcicy]] relative to the fully qualified [[AutoScalingGroupARN]].
+# ''Second for 3.3''
+## Metric collection
+## Scaling process control
+# ''Excluded from 3.3''
+## Notifications
+## Schedule based scaling is not part of the 3.3 implementation plan.
+## Operations needed for schedule based scaling must still be present and Describe operations must successfully return an empty response.  This is needed to avoid breaking client tools.
 == Autoscaling Components ==
+[[autoscaling-3.3-spec-overview.png]]
 === Launch Configuration ===
 * Describes how to add instances  instances
 ** AMI 
