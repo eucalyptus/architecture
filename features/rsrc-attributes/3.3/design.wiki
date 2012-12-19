@@ -8,6 +8,10 @@ Implement or update (when noted) resource attributes for the following:
 
 Resource attribute names are strings, values (can be) structured data. When updating an attribute with a structured value, the caller specifies which part of the value will be updated.
 
+= Analysis =
+== Open Issues ==
+
+
 = Design =
 == Resource Attributes ==
 Resource attributes are already implemented for Images. As part of this feature we should clean up this implementation.

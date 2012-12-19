@@ -25,6 +25,17 @@ This feature relates to the following features in this release:
 * How will the eucalyptus account manage tags?, there is no place to add the usual '''verbose''' pseudoselector.
 * With filters, does '''.''' match newline?
 * Does a tag delete operation succeed if any tag was deleted? (or all tags, or just if there is no error)
+* If using multiple filters are they expected to match the same (sub) item? (persumably not, example below)
+
+  Filters:
+    ip-permission.protocol=tcp
+    ip-permission.to-port=1
+  Match both?:
+    Security Group A
+      Rule 1 = protocol tcp, port 1
+    Security Group B
+      Rule 1 = protocol udp, port 1
+      Rule 2 = protocol tcp, port 2
 
 = Design =
 
@@ -161,6 +172,22 @@ In this case the resulting (Hibernate generated) query is:
        ((this_.metadata_display_name like ? or 
          this_.metadata_display_name like ?) and 
        (networkrul1_.metadata_network_rule_protocol like ?))
+
+==== Testability ====
+As seen in the above example, use of criterion (as opposed to something like the JPA metamodel) result in textual reference to properties such as:
+
+  networkRules.protocol
+
+This is not verifiable at compilation time, so these reference will be extracted to enums for each (filterable) entity and and verified with unit tests, e.g.:
+
+  class NetworkGroups
+    enum Properties 
+      DISPLAY_NAME("displayName")
+      NETWORK_RULES_PROTOCOL("networkRules.protocol")
+  
+  class NetworkGroupsTest
+    testFilterProperties
+      NetworkGroups.Properties.values().each { ...
 
 === Collection Filtering ===
 Filtering on collections of items must be possible for either internal for EC2 formats ('''TODO''' pick one format) 
