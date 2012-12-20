@@ -4,13 +4,10 @@
 ** format
 ** character set
 ** range
-* Use whitelisting for content validation. White list checking means
-  checking for what is allowed (rather than for what is forbidden) and
-  prohibiting everything else.
+* Use whitelisting for content validation. White list checking means checking for what is allowed (rather than for what is forbidden) and prohibiting everything else.
 * Convert data into canonical form data (i.e., convert it to an expected encoding) before processing/validating.
 * Use a centralized library for input validation.
-* Always do input validation on the server-side (where the input is
-  used) regardless of checks on a client-side.
+* Always do input validation on the server-side (where the input is used) regardless of checks on a client-side.
 
 == Output ==
 * Escape all special characters from an output on a change of context. A change of context includes
@@ -30,17 +27,13 @@
 * Use a centralized authentication control implementation.
 * Use a centralized access control implementation.
 * Use whitelisting for access control, i.e., deny all access to a resource unless it's explicitly allowed.
-* Authentication failure responses should not indicate which part of
-the authentication data was incorrect. For example, instead of
-"Invalid username" or "Invalid password", just use "Invalid username
-and/or password" for both.
+* Authentication failure responses should not indicate which part of the authentication data was incorrect. For example, instead of "Invalid username" or "Invalid password", just use "Invalid username and/or password" for both.
 * Perform authentication and authorization checks before resource existence/availability checks.
 ** An error message for an unauthorized user should be the same regardless of the requested resource existence.
 * Re-authenticate users when on a change of privilege level (such as password change).
 
 == Credentials ==
-* Authentication credentials for accessing services external to the
-  system should be encrypted and stored in a protected location.
+* Authentication credentials for accessing services external to the system should be encrypted and stored in a protected location.
 * Do not insert authentication credentials into URL parameters.
 * Do not store any credentials unless absolutely needed.
 * Avoid sending any credentials over the wire unless absolutely necessary. 
