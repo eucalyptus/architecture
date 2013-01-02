@@ -1,0 +1,52 @@
+== Input Processing ==
+* Validate every input should before processing. Validation includes 
+** length 
+** format
+** character set
+** range
+* Use whitelisting for content validation. White list checking means checking for what is allowed (rather than for what is forbidden) and prohibiting everything else.
+* Convert data into canonical form data (i.e., convert it to an expected encoding) before processing/validating.
+* Use a centralized library for input validation.
+* Always do input validation on the server-side (where the input is used) regardless of checks on a client-side.
+
+== Output ==
+* Escape all special characters from an output on a change of context. A change of context includes
+** database query
+** operating system commands
+** XML construction 
+** LDAP query
+** HTML construction
+** etc
+* Use strongly typed parameterized database queries (such as PreparedStatements in Java) whenever possible.
+** Note: Hibernate uses PreparedStatements unless "native" SQL queries are used.
+* Properly encode all output. 
+
+== Authentication and Authorization ==
+* Require authentication for all resources that are not intended to be public.
+* Authentication and authorization controls must be enforced on the server-side regardless of checks on the client-side.
+* Use a centralized authentication control implementation.
+* Use a centralized access control implementation.
+* Use whitelisting for access control, i.e., deny all access to a resource unless it's explicitly allowed.
+* Authentication failure responses should not indicate which part of the authentication data was incorrect. For example, instead of "Invalid username" or "Invalid password", just use "Invalid username and/or password" for both.
+* Perform authentication and authorization checks before resource existence/availability checks.
+** An error message for an unauthorized user should be the same regardless of the requested resource existence.
+* Re-authenticate users when on a change of privilege level (such as password change).
+
+== Credentials ==
+* Authentication credentials for accessing services external to the system should be encrypted and stored in a protected location.
+* Do not insert authentication credentials into URL parameters.
+* Do not store any credentials unless absolutely needed.
+* Avoid sending any credentials over the wire unless absolutely necessary. 
+* Exchange credentials either over encrypted channels or in an encrypted form.
+
+== Logging and Error Handling ==
+* Do not disclose any sensitive information in error responses or logs. This includes, but is not limited to
+** access credentials
+** sensitive personal data
+** encryption keys
+* Restrict access to logs.
+
+== Other ==
+* Remove all unnecessary functionality and files.
+* Restrict access to any files generated/manages by the system.
+* Use principle of least privilege when assigning permissions/privileges to users, processes, files, etc.
