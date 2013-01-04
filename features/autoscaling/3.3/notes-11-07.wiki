@@ -16,12 +16,13 @@ CreateLaunchConfiguration
 DeleteLaunchConfiguration
 DescribeLaunchConfigurations
 
-= 2nd Step =
 == Scaling Policies ==
 DeletePolicy
 DescribePolicies
 ExecutePolicy
 PutScalingPolicy
+
+= 2nd Step =
 DescribeTerminationPolicyTypes
 DescribeAdjustmentTypes
 
