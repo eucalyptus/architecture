@@ -11,7 +11,6 @@ The user-console is designed to be rich ajax client(i.e., rendering is 100% the 
 
 == Framework ==
 We use jquery (1.8.2) as the most fundamental javascript library. In addition, jquery widget factory has been applied as the fundamental building blocks for most JS codes (http://wiki.jqueryui.com/w/page/12138135/Widget%20factory) The primary motivation behind the widget factory is to give the codes a structure that is easy to understand and extend. In particular, widget factory is useful because:
- 
 * It gives a sense of OOP to the javascript language (so widget=class in rough sense). In particular,
 * It allows us to map a end-user function (such as dashboard) to a set of JS variables and methods, which would be considered as an "object", and
 * Such "object" can have a lifecycle, meaning that there is a initialization (_init and _create methods) and destruction (_destroy).
@@ -27,11 +26,12 @@ The bootstrap of the user-console happens with 'index.html', which is the only s
 * To the last point of clean separation, it is often the job of CSS/HTML person to change the templates in the index.html, along with the CSS files that decorates what's defined in the templates. Once the template is defined, JS guys can manipulate it with the data from the proxy and i18n messages. 
 
 == I18N ==
-We use template for supporting i18n of the console texts. Messages{LANG_CODE}.properties files in static/custom defines variable=texts in different languages. 'i18n.js' downloads the messages file appropriate for the configured langauge, and loads the variables=texts pairs into the JS application. The templates in the index.html contains variables (with the enclosing marker, {{!:   }}), which is later substituted with texts by calling  .render() method.
+We use template for supporting i18n of the console texts. Messages{LANG_CODE}.properties files in static/custom defines variable=texts in different languages. 'i18n.js' downloads the messages file appropriate for the configured langauge, and loads the variables=texts pairs into the JS application. The templates in the index.html contains variables (with the enclosing marker, "{{!:   }}"), which is later substituted with texts by calling  .render() method.
 
 == The Basic Code Structure ==
 Many JS codes in the static/js directory has the following format:
-<code>
+
+
 (function($, eucalyptus) {
   $.widget("eucalyptus.FEATURE", {
      var_X : 'true',
@@ -51,7 +51,7 @@ Many JS codes in the static/js directory has the following format:
    });
 }(jQuery,
    window.eucalyptus ? window.eucalyptus : window.eucalyptus = {}));
-</code>
+
 
 * The name given to the widget method, "eucalyptus.FEATURE", is the name by which other JS files will refer to this widget (eucalytpus part won't be needed if the calling widget lives within that namespace). For instance, calling 'element.instance()' will replace the current div (e.g., main area), represented by 'element', to be reloaded with the HTML contents that 'instance' widget will produce.
 
