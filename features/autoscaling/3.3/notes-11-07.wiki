@@ -17,22 +17,22 @@ DeleteLaunchConfiguration
 DescribeLaunchConfigurations
 
 == Scaling Policies ==
-2ndOrder
 DeletePolicy
 DescribePolicies
 ExecutePolicy
 PutScalingPolicy
+
+= 2nd Step =
 DescribeTerminationPolicyTypes
 DescribeAdjustmentTypes
 
 == Tags ==
-2ndOrder
 CreateOrUpdateTags
 DeleteTags
 DescribeTags
 
+= 3rd Step =
 == Scaling Processes ==
-NiceToHave
 DescribeScalingActivities
 ResumeProcesses
 SuspendProcesses

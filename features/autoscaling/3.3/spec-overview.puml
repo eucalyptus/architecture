@@ -1,0 +1,196 @@
+@startuml
+!include ../../../lib/component.skin
+  skinparam ranksep 50
+  skinparam nodesep 10
+'  scale 1000 height 
+  left to right direction
+
+  enum TerminationPolicyType {
+    OldestInstance
+    OldestLaunchConfiguration 
+    NewestInstance
+    ClosestToNextInstanceHour
+    Default
+  }
+
+  enum AdjustmentType {
+    ChangeInCapacity
+    ExactCapacity
+    PercentChangeInCapacity
+  }
+  
+  
+  class Instance {
+    String instanceId
+    String availabilityZone
+    String healthStatus
+    String launchConfigurationName
+    LifecycleState lifecycleState
+  }
+
+  enum LifecycleState {
+    Pending
+    Quarantined
+    InService
+    Terminating
+    Terminated
+  }
+
+  enum HealthCheckType {
+    EC2
+    __policy__
+    ELB
+  }
+
+  class SuspendedProcess {
+'    __optional__
+    String processName
+    String suspensionReason
+  }
+
+  class LaunchConfiguration {
+    Date createdTime
+    String imageId
+    String launchConfigurationARN
+    String launchConfigurationName
+    String kernelId
+    String keyName
+    String ramdiskId
+    List<String> securityGroups
+    String userData
+    String instanceType
+    BlockDeviceMapping blockDeviceMappings
+'    __policy__
+    Boolean instanceMonitoring
+'    __iam-roles__
+    String iamInstanceProfileARN : iam roles
+'    __unsupported__
+    String spotPrice
+    Boolean EbsOptimized
+  }
+
+  enum ActivityStatusCode {
+   +WaitingForInstanceId
+   +PreInService
+   +InProgress
+   +Successful
+   +Failed
+   +Cancelled
+   -WaitingForSpotInstanceRequestId
+   -WaitingForSpotInstanceId
+  }
+
+  class Activity {
+    String activityId 
+    String autoScalingGroupName 
+    String cause
+    String description
+    String details
+    Date startTime
+    Date endTime
+    int progress
+    ActivityStatusCode status
+  }
+
+  class AutoScalingGroup {
+    String groupName
+    String groupARN
+    int maxSize, minSize
+    String launchConfigurationName
+    Date createTime
+    int defaultCooldown
+    int desiredCapacity
+    int healthCheckGracePeriod
+    HealthCheckType healthCheckType
+    String status
+    List<String> availabilityZones
+    List<Instance> instances
+    List<String> terminationPolicies
+'    __policy__
+    List<EnabledMetric> enabledMetrics
+    List<String> loadBalancerNames
+'    __tagging__
+    List<Tag> tags
+'    __optional__
+    List<SuspendedProcess> suspendedProcesses
+'    __unsupported__
+    String placementGroup
+    String vpcZoneIdentifier
+  }
+
+  class Tag {
+    String keyName
+    Boolean propagateAtLaunch
+    String resourceId
+    String resourceType
+    String value
+  }
+
+  package EC2 {
+    interface RunInstances
+  }
+
+  package CloudWatch {
+    class MetricAlarm {
+      String alarmARN
+      String alarmName
+    }
+  }
+  class Alarm {
+    String alarmARN
+    String alarmName
+  }
+  class ScalingPolicy {
+    String policyARN
+    String policyName
+    String autoScalingGroupName
+    int scalingAdjustment
+    int minAdjustmentStep
+    int cooldown
+    int scalingAdjustment
+    AdjustmentType adjustmentType
+    List<Alarm> alarms
+  }
+
+  package ELB {
+    class LoadBalancer {
+      String loadBalancerName
+    }
+  }
+
+  class ScalingProcess {
+    String autoScalingGroupName
+    ProcessType processType
+  }
+
+  enum ProcessType {
+    HealthCheck
+    ReplaceUnhealthy
+    AddToLoadBalancer
+    AZRebalance
+    AlarmNotification
+    -ScheduledActions
+  }
+
+  AutoScalingGroup "1..1" -down- "1..1" LaunchConfiguration : has configuration >
+  AutoScalingGroup "1..*" -up- "1..1" Instance : has instances >
+  Instance "1" -up- "1" LifecycleState : has state >
+  AutoScalingGroup "1" -up- "1" HealthCheckType : instances checked by >
+  AutoScalingGroup "1" *-up- "*" Tag : has tags >
+  AutoScalingGroup "1" *-down- "*" SuspendedProcess : < has suspended processes
+  AutoScalingGroup "1..*" -left- "0..1" LoadBalancer : references LoadBalancer > 
+  AutoScalingGroup "1..*" -down- "1..1" Alarm : has alarms > 
+  AutoScalingGroup "1" *-right- "*" TerminationPolicyType : has policies >
+  Alarm "1" -right- "1" MetricAlarm : references alarm >
+  ScalingPolicy "1..1" -right- "0..*" AutoScalingGroup : applies to >  
+  ScalingPolicy "1" *-down- "many" Alarm : has triggers >
+  ScalingPolicy "1" -left- "1" AdjustmentType
+  Activity "1" -up- "1" ActivityStatusCode
+  Activity "1..1" -down- "0..*" AutoScalingGroup : relates to >
+  ScalingProcess "1..1" -down- "0..1" AutoScalingGroup : relates to > 
+  ScalingProcess "1" -- "1" ProcessType
+  SuspendedProcess "1" -- "1" ScalingProcess
+  RunInstances "0..1" -- "1..1" AutoScalingGroup
+
+ '' hide members
+@enduml

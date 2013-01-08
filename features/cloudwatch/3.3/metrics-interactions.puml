@@ -1,0 +1,75 @@
+@startuml
+!include ../../../lib/component.skin
+  skinparam ranksep 80
+  skinparam nodesep 20
+  scale 1000 width 
+  left to right direction
+  node CW { 
+    frame API { 
+      interface "Metric APIs" as cwapimetrics
+      interface "Statistics APIs" as cwapistats
+      interface "Alarm APIs" as cwapialarms
+    }
+    frame State {
+      component "Metrics" as metrics
+      component "Statistics" as stats
+      component "Alarms" as alarms
+      stats -right-> metrics
+      alarms -left-> stats
+    }
+    cwapialarms -down-> alarms
+    cwapistats -down-> stats
+    cwapimetrics -down-> metrics
+  }
+
+  cloud User {
+    component "User Console/Proxy" <<Development>> as ui
+    component "euca2ools" <<Development>> as euca2ools
+    component "eutester" <<Development>> as eutester
+    component "boto" as u
+    component "AWS Java SDK" as awsjavasdk
+    [VM Workload]<<User>> --> cwapimetrics : put custom metrics
+    ui --> u
+    euca2ools --> u
+    eutester --> u
+    
+    u --> cwapimetrics : put/list metric
+    u --> cwapistats : get statistics
+    u --> cwapialarms : define/interrogate alarms 
+    awsjavasdk --> cwapimetrics
+    awsjavasdk --> cwapistats
+    awsjavasdk --> cwapialarms
+  }
+  
+  
+  node "Eucalyptus Services" as eucaservices {
+    component "Instance Metrics" <<Service>> as clcmetrics
+    clcmetrics --> cwapimetrics
+    [AS Metrics]<<Development>> --> cwapimetrics
+    [Walrus Metrics]<<Service>> --> cwapimetrics
+    [SC Metrics]<<Service>> --> cwapimetrics
+    [ELB Metrics]<<Development>> --> cwapimetrics
+    [Internal Metrics]<<Future>> --> cwapimetrics
+    [???\nInternal SNMP]<<Future>> --> cwapimetrics
+  }
+  
+   
+  node "???\nPhysical Resources" as physical {
+    [Process Metrics]<<Future>> --> cwapimetrics
+    [Host Metrics]<<Future>> --> cwapimetrics
+    [Storage Metrics]<<Future>>  --> cwapimetrics
+    [Network Metrics]<<Future>> --> cwapimetrics
+    [???\nExternal SNMP]<<Future>> --> cwapimetrics
+  }
+      
+  frame "Action Targets" {
+    interface "AS" <<Development>> as asapi
+    interface SNS <<Future>> as snsapi
+    interface "???\nNagios" <<Future>> as nagiosapi
+    interface "???\nSNMP Traps" <<Future>> as snmptraps
+  }
+  alarms -right-> asapi
+  alarms -right-> snsapi
+  alarms -right-> nagiosapi
+  alarms -right-> snmptraps
+@enduml

@@ -6,6 +6,7 @@ GetMetricStatistics
 ListMetrics
 PutMetricData
 
+= Nice to have =
 = Step #2 =
 == Alarms ==
 DeleteAlarms

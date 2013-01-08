@@ -1,0 +1,69 @@
+High-level notes on the current keys/certs in Eucalyptus and potential improvements:
+
+= Current Key Infrastructure =
+
+== In the keystore ==
+- jetty -- admin UI (intended for, but not used)                                                                                                                                            
+- storage -- by SC to encrypt passwords                                                                                                                          
+- bootstrap -- key used to determine group membership name                                                                                                       
+- db -- used to generate a DB passwd and used by DB itself for connections (2 side auth)                                                                         
+- eucalyptus -- cloud cert when encrypting images, signing reqs to CLC (coincidentally the same as one used for CLC and Walrus endpoint) and from CLC, distributed as part of euca credentials bundle                                                                                                                                                                                  
+- walrus -- used by Walrus for ??? is it used for endpoint access?   
+
+== In the db ==
+- CC's and NC's private and public keys in clear text (should be encrypted)
+- password to eucalyptus cert (should be encrypted especially in case of upload by customers)
+- user REST secret keys (should be encrypted)
+- LDAP, VMWare, storage access credentials and such (all of that should be encrypted)
+
+=== Notes on important current functionality that cannot be broken ===
+- eucalyptus cert (distributed with creds bundle) is used to encrypt EMIs. The image is stored on Walrus encrypted with a sym key that is stored in                                                                                            encrypted form in the manifest (user's pub key, eucalyptus pub key), when NC runs an images, it requests a decrypted image from Walrus =>                                                                                           
+  Walrus needs to know the 'eucalyptus' key (or whatever key is going to be used for that)
+
+= Endpoints potentially requiring signed certificates = 
+- clc                                                                                                                                                            
+- walrus                                                                                                                                                         
+- admin ui                                                                                                                                                       
+- user console    
+
+= Security compartmentalization model =
+- If I'm root on CLC, I have access to everything (is there any way around it?)                                                                                                         
+-- all files (=> keys) on FS                                                                                                                                    
+-- db                                                                                                                                                           
+- If I get access to db (eg., db's access control is broken), I shall not be able to view secret data in that                                                                                         
+  => encrypt/decrypt keys should be stored on a filesystem  (with appropriate permissions)                                                                                                       
+  => password to keystores should be stored encrypted      
+- encryption/decryption keys should be protected by different access controls than the encrypted data itself
+-- for example, if data is stored in db, the key should be on an FS 
+-- if the key is on FS, store data in a db or a keystore (eg., if permissions are not set correctly and key is viewable by world, the data is not)
+
+= A new model =
+- create a master key to encrypt all secret data in db (infrastructure components passwords, private keys, and such)                                                                    
+-- key should be stored on a filesystem (or in a keystore)                                                                                                                                                                                            
+-- in theory, master key should have a shorter lifecycle (ec2's cert has 1 year lifetime)                                                                                  
+-- if it's never exposed to an end user, it can have a longer lifecycle                                                                                         
+-- as a result, a key rotation is an internal operation, not visible to users                                                                                                  
+                                                                                                                                                                 
+- use the current euca key in creds bundle to encrypt images uploaded to walrus                                                                                  
+-- in this case, master key is not exposed                                                                                                                      
+                                                                                                                                                                                                                                                                                          
+- if needed, use user's secret key to encrypt sensitive data in transit (iff there is no AWS compatibility issue, but most likely this encryption is not needed and use of SSL is sufficient)                                                            
+-- no issues with key rotation as encryption is only done in transit                                                                                                                               
+                                                                                                                                                                 
+- create a key for each endpoint or allow admin to upload it                                                                                                       
+-- encrypt a password to it with the master key                                                                                                                 
+-- store encrypted pk in db?                                                                                     
+                                                                                                                                                                 
+- create a separate key for each Euca component to uniquely identify a component                                                                                      
+-- private key should be known only to owning component                                                                                                         
+                                                                                                                                                                 
+  => needed types of key:                                                                                                                                             
+- internal use (bootstraping, protection at rest): db, master key, etc. Which components need the master key?       
+-- in keystore?                                        
+- endpoints: public facing services, iam?    
+-- in db?                                                                                                                    
+- component authentication: cc, nc, clc, walrus, sc, vb
+-- on fs?            
+
+
+

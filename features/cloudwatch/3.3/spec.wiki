@@ -1,93 +1,101 @@
 = Overview =
-* SNS?
-* SQS?
-* Which Metrics? Basic vs. "Advanced"
-* Custom Metrics?
+
+In terms of operations we have:
+# '''Metric Basics'''
+## GetMetricStatistics
+## ListMetrics
+## PutMetricData
+# '''Alarms'''
+## DeleteAlarms
+## DescribeAlarms
+## DescribeAlarmsForMetric
+## PutMetricAlarm
+## SetAlarmState 
+## DescribeAlarmHistory
+# '''Actions'''
+## DisableAlarmActions
+## EnableAlarmActions
+[[cloudwatch-3.3-metrics-interactions.png]]
+== Metrics / ListMetrics & PutMetricData ==
+* Represents a time-ordered set of data points. 
+* '''Metrics''' are uniquely defined by:
+** Name
+** Namespace
+** One or more dimensions 
+** Each data point has a time stamp
+** And (optionally) a unit of measure 
+* When you request '''statistics''', the returned data stream is identified by:
+** Namespace
+** Metric name
+** Dimension
+** And (optionally) the unit
+* PutMetricData can be used to create a custom metric and publish data points for it. 
+** '''Data points''':
+*** can be added in any order (i.e., ordering is determined by time)
+*** can be added at any rate
+*** that are fully identical (duplicate values, time stamps, and units) are aggregated at statistic computation time.
+** The '''retention interval''' determines the duration of the history of any kind of data point is stored:  default two weeks of history. 
+* Statistics are computed over a metric's data points during a given time window. 
+* '''Namespaces''' names are strings defined when a metric is created 
+** These names are constrainted to:
+*** Valid XML characters
+*** Fewer than 256 characters in length.
+*** Typically containing the alphanumeric characters "0-9A-Za-z" plus "."(period), "-" (hyphen), "_" (underscore), "/" (slash), "#" (hash), and ":" (colon). 
+** Pre-defined namespaces follow the convention AWS/<service>, such as AWS/and AWS/ELB.
+** There is no default namespace (a namespace must be specified for each data element).
+* '''Dimension''' is a name/value pair that helps you to uniquely identify a metric.
+** Adding a unique dimension in effect creates a new metric.  They are not a separate entity -- they are an attribute.
+** Internal services also attach dimensions to each metric.
+** For internal metrics data points can be aggregated across dimensions.
+** There is a limit on the number of dimensions for a metric: default ten.
+** Each unique combination of dimensions is a separate metric. 
+* '''Time stamps''' marks every metric data point.
+** The time stamp must be within the retention interval defined above.
+** The time stamp can be in the future by up to some time period: default one day.
+** If not specified, a time stamp of the current time will be used when the data element is received.
+** The time stamp is a dateTime object (complete date, plus hours, minutes, and seconds; http://www.w3.org/TR/xmlschema-2/#dateTime). 
+* '''Units'''  represent the unit of measure. 
+** A unit can be specified with custom metrics. 
+** Data published without a unit uses the '''None''' unit.
+** Statistics requested without specifying a unit result in data points which share the same unit being aggregated together according to the given statistic request.
+*** Two metrics with different units will return a data stream for each unit separately.
   
-== Metrics ==
-* A metric is the fundamental concept for CloudWatch and represents a time-ordered set of data points. 
-* Metrics are uniquely defined by a name, a namespace, and one or more dimensions. 
-* Each data point has a time stamp, and (optionally) a unit of measure. 
-* When you request statistics, the returned data stream is identified by namespace, metric name, dimension, and (optionally) the unit.
-* You can use the PutMetricData API (or the mon-put-data command) to create a custom metric and publish data points for it. 
-* You can add the data points in any order, and at any rate you choose. 
-* CloudWatch aggregates data points that are fully identical (duplicate values, time stamps, and units) when you request statistics on them.
-* CloudWatch stores your metric data for two weeks. 
-* You can request statistics on metric data points that occur within a specified time window.
-
-== Namespaces ==
-* CloudWatch namespaces are conceptual containers for metrics. 
-* Metrics in different namespaces are isolated from each other, so that metrics from different applications are not mistakenly aggregated into the same statistics.
-* Namespace names are strings you define when you create a metric. 
-* The names must be valid XML characters, typically containing the alphanumeric characters "0-9A-Za-z" plus "."(period), "-" (hyphen), "_" (underscore), "/" (slash), "#" (hash), and ":" (colon). 
-* namespaces all follow the convention AWS/<service>, such as AWS/EC2 and AWS/ELB.
-* Namespace names must be fewer than 256 characters in length.
-* There is no default namespace. You must specify a namespace for each data element you put into CloudWatch.
-
-== Dimensions ==
-* A dimension is a name/value pair that helps you to uniquely identify a metric. 
-* Because dimensions are part of the unique identifier for a metric, whenever you add a unique name/value pair to one of your metrics, you are creating a new metric.
-* You specify dimensions when you create a metric with the PutMetricData action (or its command line equivalent mon-put-data). 
-* internal services that feed data to CloudWatch also attach dimensions to each metric. You can use dimensions to filter result sets that CloudWatch queries return.
-* For metrics produced by certain AWS products such as Amazon EC2, CloudWatch can aggregate data across dimensions. 
-* You can assign up to ten dimensions to a metric.
-* CloudWatch treats each unique combination of dimensions as a separate metric. 
-
-== Time stamps ==
-* each metric data point must be marked with a time stamp. 
-* The time stamp can be up to two weeks in the past and up to one day in the future. 
-* If you do not provide a time stamp, CloudWatch creates a time stamp for you based on the time the data element was received.
-* The time stamp you use in the request must be a dateTime object, with the complete date plus hours, minutes, and seconds (for more information, go to http://www.w3.org/TR/xmlschema-2/#dateTime). 
-  
-== Units ==
-* Units represent your statistic's unit of measure. 
-* You can also specify a unit when you create a custom metric. 
-* When you publish data without specifying a unit, CloudWatch associates it with the None unit. 
-* When you get statistics without specifying a unit, CloudWatch aggregates all data points of the same unit together. 
-* If you have two otherwise identical metrics with different units, two separate data streams will be returned, one for each unit.
-  
-== Statistics ==
-* Statistics are metric data aggregations over specified periods of time. 
-* CloudWatch provides statistics based on the metric data points you or AWS products have provided to CloudWatch. 
-* Aggregations are made using the namespace, metric name, dimensions, and the data point unit of measure, within the time period you specify. 
-* Available statistics:
-*- Minimum:  The lowest value observed during the specified period. You can use this value to determine low volumes of activity for your application.
-*- Maximum: The highest value observed during the specified period. You can use this value to determine high volumes of activity for your application.
-*- Sum:  All values submitted for the matching metric added together. This statistic can be useful for determining the total volume of a metric.
-*- Average: The value of Sum / SampleCount during the specified period. By comparing this statistic with the Minimum and Maximum, you can determine the full scope of a metric and how close the average use is to the Minimum and Maximum. This comparison helps you to know when to increase or decrease your resources as needed.
-*- SampleCount: The count (number) of data points used for the statistical calculation.
-* You use the GetMetricStatistics API (mon-get-stats) to retrieve statistics, specifying the same values used for the namespace, metric name, and dimension parameters used when the metric values were created. 
-* You also specify the encompassing period, or start and end times that CloudWatch will use for the aggregation. 
-* The starting and ending points can be as close together as 60 seconds, and as far apart as two weeks.
-* CloudWatch allows you to add pre-calculated statistics using the PutMetricData API (mon-put-data command) using the StatisticValues (statistic-values) parameter. 
-* Instead of data point values, you specify values for SampleCount, Minimum, Maximum, and Sum (CloudWatch calculates the average for you). 
-* The values you add in this way are aggregated with any other values associated with the matching metric.
-
-== Periods ==
-* A period is the length of time associated with a specific CloudWatch statistic. 
-* Each statistic represents an aggregation of the metrics data collected for a specified period of time. 
-* You can adjust how the data is aggregated by varying the length of the period. 
-* A period can be as short as one minute (60 seconds) or as long as two weeks (1,209,600 seconds).
-* Although periods are expressed in seconds, the minimum granularity for a period is one minute. Accordingly, you specify period values as multiples of 60. For example, to specify a period of six minutes, you would use the value 360.
+== Statistics/GetMetricStatistics ==
+* '''Statistics''' are metric data aggregations over specified periods of time. 
+** Aggregations are made using:
+*** Namespace
+*** Metric name
+*** Dimensions
+*** Unit
+*** Within a given time period. 
+* Defined statistics for a specified period of time is:
+** Minimum: The lowest value observed.
+** Maximum: The highest value observed.
+** Sum:  All values submitted for the matching metric added together.
+** SampleCount: The count (number) of data points used for the statistical calculation.
+** Average: The value of Sum / SampleCount during the specified period.
+* '''Time periods'''
+** Each statistic represents an aggregation of the metrics data collected for a specified period of time. 
+** A period can be as short as one minute (60 seconds) or as long as two weeks (1,209,600 seconds).
+** The minimum granularity for a period is one minute.
+** You also specify the encompassing period, or start and end times that CloudWatch will use for the aggregation. 
+** The starting and ending points can be as close together as 60 seconds, and as far apart as two weeks.
 * When you call GetMetricStatistics, you can specify the period length with the Period parameter. Two related parameters, StartTime and EndTime, determine the overall length of time associated with the statistics. 
 * The default value for the Period parameter is 60 seconds, whereas the default values for StartTime and EndTime give you the last hour's worth of statistics.
 * The values you select for the StartTime and EndTime parameters determine how many periods GetMetricStatistics will return. 
+
 Periods are also an important part of the CloudWatch Alarms feature. When you create an alarm to monitor a specific metric, you are asking CloudWatch to compare that metric to the threshold value that you supplied. You have extensive control over how CloudWatch makes that comparison. Not only can you specify the period over which the comparison is made, but you can also specify how many consecutive periods the threshold must be breached before you are notified. For more information on Alarms, see Alarms.
 
-== Aggregation ==
-* You can publish as many data points as you want with the same or similar time stamps. 
-* You can publish data points for a metric that share not only the same time stamp, but also the same namespace and dimensions. Subsequent calls to GetMetricStatistics will return aggregated statistics about those data points. You can even do this in one PutMetricData request. 
-* CloudWatch accepts multiple data points in the same PutMetricData call with the same time stamp. 
-* You can also publish multiple data points for the same or different metrics, with any time stamp. 
-* The size of a PutMetricData request, however, is limited to 8KB for HTTP GET requests and 40KB for HTTP POST requests. 
-* You can include a maximum of 20 data points in one PutMetricData request.
-* For large data sets that would make the use of PutMetricData impractical, CloudWatch allows for the insertion of a pre-aggregated data set called a StatisticSet. 
-* With StatisticSets you give CloudWatch the Min, Max, Sum, and SampleCount of a number of datapoints. 
-* A common use case for StatisticSets is when you are collecting data many times in a minute. For example, let’s say you have a metric for the request latency of a web page. 
-* It doesn’t make sense to do a PutMetricData request with every web page hit. 
-* We suggest you collect the latency of all hits to that web page, aggregate them together once a minute and send that StatisticSet to CloudWatch.
-* CloudWatch doesn't differentiate the source of a metric. 
-* If you publish a metric with the same namespace and dimensions from different sources, CloudWatch treats this as a single metric. 
+* '''Aggregation''' in PutMetricData allows for samples (sets of data points) to be submitted along w/ the corresponding metric.
+** Data points can have the same or similar time stamps. 
+*** Data points for a metric that share the same time stamp, namespace and dimensions will return aggregated statistics about those data points.
+** Multiple data points in the same PutMetricData call with the same time stamp. 
+** Multiple unrelated data points can also be published in one call.
+** The size of a PutMetricData request is limited: 
+*** default 8KB for HTTP GET
+*** default 40KB for HTTP POST 
+** PutMetricData request maximum data points per request: default of 20 data points.
+** '''StatisticSets''' are pre-aggregated data sets: given the Min, Max, Sum, and SampleCount of a number of datapoints. 
   
 == Alarms ==
 * CloudWatch is especially useful because it helps you make decisions and take immediate, automatic actions based on your metric data. 
@@ -97,54 +105,192 @@ Periods are also an important part of the CloudWatch Alarms feature. When you cr
 * Alarms invoke actions for sustained state changes only. 
 * CloudWatch alarms will not invoke actions simply because they are in a particular state, the state must have changed and been maintained for a specified number of periods.
 
-= API Details =
+= Internally Gathered Metrics =
+== Instance Related ==
+=== Metrics ===
+{|
+| Metric  
+| Description
+| Units
+| Notes
+|-
+| CPUUtilization
+| The percentage usage of allocated CPU
+| Percent
+|-
+| DiskReadOps
+| Completed read operations from all ephemeral disks available to the instance.
+| Count
+|-
+| DiskWriteOps
+| Completed write operations to all ephemeral disks available to the instance.
+| Count
+|-
+| DiskReadBytes
+| Bytes read from all ephemeral disks available to the instance.
+| Bytes
+|-
+| DiskWriteBytes
+| Bytes written to all ephemeral disks available to the instance.
+| Bytes
+|-
+| NetworkIn
+| The number of bytes received on all network interfaces by the instance. 
+| Bytes
+|-
+| NetworkOut
+| The number of bytes sent out on all network interfaces by the instance. 
+| Bytes
+|-
+| StatusCheckFailed
+| A combination of StatusCheckFailed_Instance and StatusCheckFailed_System that reports if either of the status checks has failed. Values for this metric are either 0 (zero) or 1 (one.) A zero indicates that the status check passed. A one indicates a status check failure.
+| Count
+| Status check metrics are available at 5 minute frequency and are not available in Detailed Monitoring. For a newly launched instance, status check metric data will only be available after the instance has completed the initialization state. Status check metrics will become available within a few minutes of being in the running state.|-
+|-
+| StatusCheckFailed_Instance
+| Reports whether the instance has passed the instance status check in the last 5 minutes. Values for this metric are either 0 (zero) or 1 (one.) A zero indicates that the status check passed. A one indicates a status check failure.
+| Count
+| Status check metrics are available at 5 minute frequency and are not available in Detailed Monitoring. For a newly launched instance, status check metric data will only be available after the instance has completed the initialization state. Status check metrics will become available within a few minutes of being in the running state.
+|-
+| StatusCheckFailed_System
+| Reports whether the instance has passed the system status check in the last 5 minutes. Values for this metric are either 0 (zero) or 1 (one.) A zero indicates that the status check passed. A one indicates a status check failure.
+| Count
+| Status check metrics are available at 5 minute frequency and are not available in Detailed Monitoring. For a newly launched instance, status check metric data will only be available after the instance has completed the initialization state. Status check metrics will become available within a few minutes of being in the running state.|-
+|-
+| '''Dimensions'''
+|-
+| Dimension
+| Description
+|-
+| AutoScalingGroupName    
+| This dimension filters the data you request for all instances in a specified capacity group. An AutoScalingGroup is a collection of instances you define if you're using the Auto Scaling service. This dimension is available only for metrics when the instances are in such an AutoScalingGroup. Available for instances with Detailed or Basic Monitoring enabled.
+|-
+| ImageId         
+| This dimension filters the data you request for all instances running this emi. Available for instances with Detailed Monitoring enabled.
+|-
+| InstanceId      
+| This dimension filters the data you request for the identified instance only. This helps you pinpoint an exact instance from which to monitor data. Available for instances with Detailed Monitoring enabled.
+|-
+| InstanceType    
+| This dimension filters the data you request for all instances running with this specified instance type. This helps you categorize your data by the type of instance running. For example, you might compare data from an m1.small instance and an m1.large instance to determine which has the better business value for your application. Available for instances with Detailed Monitoring enabled.
+|}
 
-== Operations ==
-* DeleteAlarms
-* DescribeAlarmHistory
-* DescribeAlarms
-* DescribeAlarmsForMetric
-* DisableAlarmActions
-* EnableAlarmActions
-* GetMetricStatistics
-* ListMetrics
-* PutMetricAlarm
-* PutMetricData
-* SetAlarmState 
+== Volumes (EBS) ==
+=== Metrics ===
+{|
+| Metric  
+| Description
+| Units
+| Notes
+|-
+| VolumeReadBytes/VolumeWriteBytes
+| The total number of bytes transferred in the period.
+| Bytes
+|-
+| VolumeReadOps/VolumeWriteOps
+| The total number of operations in the period.
+| Count
+|-
+| VolumeTotalReadTime/VolumeTotalWriteTime
+| The total number of seconds spent by all operations that completed in the period. If multiple requests are submitted at the same time, this total could be greater than the length of the period. For example, say the period is 5 minutes (300 seconds); if 700 operations completed during that period, and each operation took 1 second, the value would be 700 seconds.
+| Seconds
+|-
+| VolumeIdleTime
+| The total number of seconds in the period when no read or write operations were submitted.
+| Seconds
+|-
+| VolumeQueueLength
+| The number of read and write operation requests waiting to be completed in the period.
+| Count
+|-
+| VolumeThroughputPercentage
+| Used with Provisioned IOPS volumes only. The percentage of I/O operations per second (IOPS) delivered out of the IOPS provisioned for an EBS volume. Provisioned IOPS volumes deliver within 10 percent of the provisioned IOPS performance 99.9 percent of the time over a given year.
+| Percent
+| During a write, if there are no other pending I/O requests in a minute, the metric value will be 100 percent. Also, a volume's I/O performance may become degraded temporarily due to an action you have taken (e.g., creating a snapshot of a volume during peak usage, running the volume on a non-EBS-optimized instance, accessing data on the volume for the first time).
+|-
+| VolumeConsumedReadWriteOps
+| Used with Provisioned IOPS volumes only. The total amount of read and write operations consumed in the period.
+| Count
+|-
+| '''Dimensions'''
+|-
+| The only dimension that Amazon EBS sends to Amazon CloudWatch is the Volume ID. This means that all available statistics are filtered by Volume ID. 
+|}
+== Load Balancing (ELB) ==
+{|
+| Metric  
+| Description
+| Units
+| Statistics
+| Notes
+|-
+| Latency 
+| Time elapsed after the load balancer receives a request until it receives the corresponding response.
+| Seconds
+| Minimum, Maximum, Average, and Count
+|-
+| RequestCount  
+| The number of requests handled by the load balancer.
+| Count
+| Sum
+|-
+| HealthyHostCount  
+| The number of healthy instances registered with the load balancer in a specified Availability Zone. Hosts that have not failed more health checks than the value of the unhealthy threshold are considered healthy. When evaluating this metric, the dimensions must be provided for LoadBalancerName and AvailabilityZone. The metric represents the count of healthy instances in the specified Availability Zone. Instances may become unhealthy due to connectivity issues, health checks returning non-200 responses (in the case of HTTP or HTTPS health checks), or timeouts when performing the health check. To get the total count of all healthy hosts, this metric must be retrieved for each registered Availability Zone and then all the metrics need to be added together.
+| Count
+| Minimum, Maximum, and Average
+|-
+| UnHealthyHostCount  
+| The number of unhealthy instances registered with the load balancer in a specified Availability Zone. Hosts that have failed more health checks than the value of the unhealthy threshold are considered unhealthy. When evaluating this metric, the dimensions must be provided for LoadBalancerName and AvailabilityZone. The metric represents the count of unhealthy instances in the specified Availability Zone. Instances may become unhealthy due to connectivity issues, health checks returning non-200 responses (in the case of HTTP or HTTPS health checks), or timeouts when performing the health check. To get the total count of all unhealthy hosts, this metric must be retrieved for each registered Availability Zone and then all the metrics need to be added together.
+| Count
+| Minimum, Maximum, and Average
+|-
+| HTTPCode_ELB_4XX  
+| Count of HTTP response codes generated by Elastic Load Balancing that are in the 4xx (client error) series.
+| Count
+| Sum
+|-
+| HTTPCode_ELB_5XX  
+| Count of HTTP response codes generated by Elastic Load Balancing that are in the 5xx (server error) series. Elastic Load Balancing may generate 5xx errors if no back-end instances are registered, no healthy back-end instances, or the request rate exceeds Elastic Load Balancing's current available capacity. This response count does not include any responses that were generated by back-end instances.
+| Count
+| Sum
+|-
+| HTTPCode_Backend_2XX  
+| Count of HTTP response codes generated by back-end instances that are in the 2xx (success) series.
+| Count
+| Sum
+|-
+| HTTPCode_Backend_3XX  
+| Count of HTTP response codes generated by back-end instances that are in the 3xx (user action required) series.
+| Count
+| Sum
+|-
+| HTTPCode_Backend_4XX  
+| Count of HTTP response codes generated by back-end instances that are in the 4xx (client error) series. This response count does not include any responses that were generated by Elastic Load Balancing.
+| Count
+| Sum
+|-
+| HTTPCode_Backend_5XX  
+| Count of HTTP response codes generated by back-end instances that are in the 5xx (server error) series. This response count does not include any responses that were generated by Elastic Load Balancing.
+| Count
+| Sum
+|-
+| '''Dimensions'''
+|-
+| Dimension
+| Description
+|-
+| LoadBalancerName  
+| Limits the metric data to instances that are connected to the specified load balancer.
+|-
+| AvailabilityZone  
+| Limits the metric data to load balancers in the specified Availability Zone.
+|-
+|}
 
-== Data Types ==
-*  AlarmHistoryItem
-* Datapoint
-* DescribeAlarmHistoryResult
-* DescribeAlarmsForMetricResult
-* DescribeAlarmsResult
-* Dimension
-* DimensionFilter
-* GetMetricStatisticsResult
-* ListMetricsResult
-* Metric
-* MetricAlarm
-* MetricDatum
-* StatisticSet 
 
 = Metrics & Dimensions =
 http://docs.amazonwebservices.com/AmazonCloudWatch/latest/DeveloperGuide/CW_Support_For_AWS.html#aws-namespaces
 
-
-=== Key Use Cases ===
-* filtering metrics
-* metrics from spec: http://docs.amazonwebservices.com/AmazonCloudWatch/latest/DeveloperGuide/CW_Support_For_AWS.html- - EBS is missing: VolumeIdleTime, VolumeQueueLength- - EC2 is missing dimension: AutoScalingGroupName
-* performance impact should be bounded
-* storage of the metrics
-* sending alarms => SNS is a dependency, also AutoScale depends on this
-* statistics gathering
-
-=== From Spec ===
-* Monitor AWS resources automatically, without installing additional software:-   - Basic Monitoring for Amazon EC2 instances: seven pre-selected metrics at five-minute frequency, free of charge.-   - Detailed Monitoring for Amazon EC2 instances: seven pre-selected metrics at one-minute frequency, for an additional charge.-   - Amazon EBS volumes: eight pre-selected metrics at five-minute frequency, free of charge.-   - Elastic Load Balancers: ten pre-selected metrics at one-minute frequency, free of charge.-   - OUT: Amazon RDS DB instances: thirteen pre-selected metrics at one-minute frequency, free of charge.-   - OUT: Amazon SQS queues: eight pre-selected metrics at five-minute frequency, free of charge.-   - OUT: Amazon SNS topics: four pre-selected metrics at five-minute frequency, free of charge.-   - OUT: Amazon ElastiCache nodes: twenty-nine pre-selected metrics at one-minute frequency, free of charge.-   - OUT: Amazon DynamoDB tables: seven pre-selected metrics at five-minute frequency, free of charge.-   - OUT: AWS Storage Gateways: eleven pre-selected gateway metrics and five pre-selected storage volume metrics at five-minute frequency, free of charge.-   - OUT: Amazon Elastic MapReduce job flows: twenty-three pre-selected metrics at five-minute frequency, free of charge.-   - Auto Scaling groups: seven pre-selected metrics at one-minute frequency, optional and charged at standard pricing.-   - Estimated charges on your AWS bill: you can also choose to enable metrics to monitor your AWS charges. The number of metrics depends on the AWS products and services that you use, and these metrics are free of charge. Learn more about this option.
-* Submit Custom Metrics generated by your own applications (or by AWS resources not mentioned above) and have them monitored by CloudWatch. You can submit these metrics to CloudWatch via a simple Put API request.
-* Set alarms on any of your metrics to receive notifications or take other automated actions when your metric crosses your specified threshold.
-* OUT: View graphs and statistics for any of your metrics, and get a quick overview of all your alarms and monitored AWS resources in one location on the CloudWatch dashboard.
-* Use Auto Scaling to add or remove Amazon EC2 instances dynamically based on your CloudWatch metrics.
 
 ----
 [[tag:rls-3.3]]

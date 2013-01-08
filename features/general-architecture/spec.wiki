@@ -1,0 +1,20 @@
+= Overview =
+This document contains constraints, guidelines, architectural rules, design principles, and general guidance which applies through out the system's implementation.  Each service implementation (including internal) should adhere to these unless explicitly noted otherwise in related specification.
+
+== Service Operations ==
+* User facing operations should never introduce serialization -- they must be non-blocking.
+* User facing operations are often split into two parts:
+** Top-half: executes synchronously and returns a response that represents either the outcome or a commitment to achieve some goal asynchronously.
+** Bottom-half: work promised in the top-half is done and the commitment made then should be so that this work will succeed unless a hardware or network fault occurs.  
+* Systematic errors must be controlled for during the top-half.
+
+== State Management ==
+* All stateful operations are assumed to be asynchronous unless explicitly stated otherwise.
+** This means that an operation will return before the state change is actuated
+** The service managing the underlying stateful resource is responsible for reporting the ''ground-truth'' state of the resource by providing a describe operation.
+** The set of ground-truth states must make it possible for callers to unambigiously determine when:
+*** A transition is in progress from one state to another.
+*** Any transition has completed (i.e., state is reported explicitly and never implied by absence).
+*** Errors are unambigiously reflected by a terminal state.
+*** Terminal states are reported past the life span of the resource.
+** Additionally, ground-truth reporting must include information about the logical entity associated with the physical resource in order to support restoring system state after failures.
