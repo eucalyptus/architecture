@@ -7,6 +7,8 @@ This design covers both tagging and filtering of resources.
 ! Document Status || Draft || 
 |-
 ! Updated || 2013/01/07 || Update with details / changes from implementation, add tracking section
+|-
+! Updated || 2013/01/09 || Add details on filtering for a resource
 |}
 
 == Out of Scope ==
@@ -238,9 +240,11 @@ Support for DB filtering is optional, in this case aliases will be an empty Map 
 === Resource Filtering Details ===
 Each resource that supports filtering will include the following implementation classes:
 
-* '''*AddressFilterSupport''' - Defines how to filter for a resource
-* '''Filter*Functions''' enumerations - One per value type, functions to access values of each item that can be filtered
+* '''*FilterSupport''' - Defines how to filter for a resource
+* '''Filter*Functions''' - function enumerations to access values of each item that can be filtered
 * '''*FilterSupportTest''' - Unit test for the resource, should cover each filterable item
+
+For the second item there is no requirement to use an enumeration for the functions, but it is suggested that for clarity the function definition is outside of the '''*FilterSupport''' constructor.
 
 The support classes declare how to filter using the following approach:
 
@@ -252,7 +256,13 @@ The support classes declare how to filter using the following approach:
           .withStringProperty( "group-name", FilterFunctions.NAME )
           .withStringSetProperty( "ip-permission.cidr", FilterSetFunctions.PERMISSION_CIDR )
 
-The resource class is specifed (NetworkGroup in the above example) and then filterable items are declared with related details for collection and DB filtering.
+The resource class is specified (NetworkGroup in the above example) and then filterable items are declared with related details for collection and DB filtering.
+
+For Predicate filtering support, each filter is declared along with the function that is used to extract the value(s) for that filter. If the resource has multiple values for that filter item then one of the ''*Set*'' methods is used. The method used should reflect the (filter) type of the resources values for the filter (boolean, date, integer, long, string).
+
+For Criteria filtering support, it is necessary to declare any aliases used ('''withPersistenceAlias''') in addition to declaring each filter and its path ('''withPersistenceFilter'''). For non-string values the type must be declared (if Boolean, Date, Integer, Long), else a conversion function must be provided from a String value (a common case here is for Enum values, these can be converted using Guavas ''Enums.valueOfFunction'')
+
+To verify the predicates and criteria a unit test class should be implemented (Groovy recommended), this should extend ''FilterSupportTest.InstanceTest''.
 
 === Filter Details ===
 {|
