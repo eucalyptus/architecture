@@ -1,6 +1,16 @@
 = Overview =
 This design covers both tagging and filtering of resources.
 
+== Tracking ==
+
+{|
+! Document Status || Draft || 
+|-
+! Updated || 2013/01/07 || Update with details / changes from implementation, add tracking section
+|-
+! Updated || 2013/01/09 || Add details on filtering for a resource
+|}
+
 == Out of Scope ==
 Filters related to functional areas that we do not suport are out of scope. These areas are:
 
@@ -25,6 +35,19 @@ This feature relates to the following features in this release:
 * How will the eucalyptus account manage tags?, there is no place to add the usual '''verbose''' pseudoselector.
 * With filters, does '''.''' match newline?
 * Does a tag delete operation succeed if any tag was deleted? (or all tags, or just if there is no error)
+* If using multiple filters are they expected to match the same (sub) item? (persumably not, example below)
+* Should there be an error on an incorrectly escaped wildcard (e.g. "\a")
+* How do wildcards interact with typed filters? (numbers, dates and bools)
+
+  Filters:
+    ip-permission.protocol=tcp
+    ip-permission.to-port=1
+  Match both?:
+    Security Group A
+      Rule 1 = protocol tcp, port 1
+    Security Group B
+      Rule 1 = protocol udp, port 1
+      Rule 2 = protocol tcp, port 2
 
 = Design =
 
@@ -43,6 +66,8 @@ The entity model aims to use database features for:
 These aims are achieved with the following model:
 
 [[design-tag-er.png]]
+
+Note that tags are deleted when the tagged resource is deleted (e.g. an instance), but would not be restored when that instance is restored. This also means that you cannot filter a terminated instance by its tags.
 
 === Service Impact ===
 Tag CRUD is part of the EC2 API, internally a new '''TagManager''' component is created to handle tags.
@@ -87,14 +112,12 @@ Filtering is an EC2 concept but the implementation should be flexible enough for
 === Discovery ===
 Filters should be discovered, whether individually, per type or per API.
 
-=== Terminated Instances ===
-Filtering of terminated instances may require caching instances in their original form (not translated to API types)
-
 === Database Filtering ===
 Filtering will be peformed at query time where possible. It is not always possible to filter using the DB, the following cases have been identified:
 
 * Type mismatch - Where the DB type differs from the filter type wildard filtering is not possible (e.g. Volume '''size''' is an integer in the DB)
 * Translated values - Some values are translated from internal to EC2 (e.g. Volume '''status''')
+* ElementCollections - Hibernate does not support criteria queries for element collections
 
 Database filtering is an optimization, it will be used to restrict the results to the extent possible, but will not reliably filter out all non-matching resources.
 
@@ -162,6 +185,17 @@ In this case the resulting (Hibernate generated) query is:
          this_.metadata_display_name like ?) and 
        (networkrul1_.metadata_network_rule_protocol like ?))
 
+==== Testability ====
+As seen in the above example, use of criterion (as opposed to something like the JPA metamodel) result in textual reference to properties such as:
+
+  networkRules.protocol
+
+This is not verifiable at compilation time, so these reference will be verified with unit tests, e.g.:
+
+  class NetworkGroupFilterSupportTest
+    testFilteringSupport
+      new NetworkGroupFilterSupport().getPersistenceFilters().values().each { ...
+
 === Collection Filtering ===
 Filtering on collections of items must be possible for either internal for EC2 formats ('''TODO''' pick one format) 
 
@@ -192,9 +226,9 @@ These can be translated to regular expression wildcards:
 Other regular expression syntax from the filter value must be escaped (e.g. '''Pattern.quote''')
 
 === Filter Generation ===
-It should be possible to generate a filter from a request message (or filter set? though this rules out using the same API for non EC2 filtering).
+It will be possible to generate a filter from a  filter set, e.g.
 
-  Filter Filters.generate( R )
+  Filter Filters.generate( request.getFilterSet(), NetworkGroup.class )
   
   Filter
   - Map<String,String> getAliases()  // For DB filtering
@@ -203,11 +237,38 @@ It should be possible to generate a filter from a request message (or filter set
 
 Support for DB filtering is optional, in this case aliases will be an empty Map and the Criterion will be a no-op (e.g. '''Restrictions.conjunction()''')
 
+=== Resource Filtering Details ===
+Each resource that supports filtering will include the following implementation classes:
+
+* '''*FilterSupport''' - Defines how to filter for a resource
+* '''Filter*Functions''' - function enumerations to access values of each item that can be filtered
+* '''*FilterSupportTest''' - Unit test for the resource, should cover each filterable item
+
+For the second item there is no requirement to use an enumeration for the functions, but it is suggested that for clarity the function definition is outside of the '''*FilterSupport''' constructor.
+
+The support classes declare how to filter using the following approach:
+
+  public static class NetworkGroupFilterSupport extends FilterSupport<NetworkGroup> {
+    public NetworkGroupFilterSupport() {
+      super( builderFor( NetworkGroup.class )
+          .withStringProperty( "description", FilterFunctions.DESCRIPTION )
+          .withUnsupportedProperty( "group-id" )
+          .withStringProperty( "group-name", FilterFunctions.NAME )
+          .withStringSetProperty( "ip-permission.cidr", FilterSetFunctions.PERMISSION_CIDR )
+
+The resource class is specified (NetworkGroup in the above example) and then filterable items are declared with related details for collection and DB filtering.
+
+For Predicate filtering support, each filter is declared along with the function that is used to extract the value(s) for that filter. If the resource has multiple values for that filter item then one of the ''*Set*'' methods is used. The method used should reflect the (filter) type of the resources values for the filter (boolean, date, integer, long, string).
+
+For Criteria filtering support, it is necessary to declare any aliases used ('''withPersistenceAlias''') in addition to declaring each filter and its path ('''withPersistenceFilter'''). For non-string values the type must be declared (if Boolean, Date, Integer, Long), else a conversion function must be provided from a String value (a common case here is for Enum values, these can be converted using Guavas ''Enums.valueOfFunction'')
+
+To verify the predicates and criteria a unit test class should be implemented (Groovy recommended), this should extend ''FilterSupportTest.InstanceTest''.
+
 === Filter Details ===
 {|
 ! Type !! Name !! Supported !! DB Support !! Notes
 |-
-| Address (Elastic IP) || domain || Y || - || Hardcoded domain '''standard''' (no '''vpc''')<ref name="notvpc"/>
+| Address (Elastic IP) || domain || Y || - || Hardcoded domain '''standard''' (no '''vpc''')<ref name="notvpc">Eucalyptus does not support VPC</ref>
 |-
 | &nbsp; || instance-id || Y || - ||
 |-
@@ -479,17 +540,17 @@ Support for DB filtering is optional, in this case aliases will be an empty Map 
 |-
 | &nbsp; || group-name || Y || Y ||
 |-
-| &nbsp; || ip-permission.cidr || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+| &nbsp; || ip-permission.cidr || Y || - ||
 |-
-| &nbsp; || ip-permission.from-port || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+| &nbsp; || ip-permission.from-port || Y || Y ||
 |-
-| &nbsp; || ip-permission.group-name || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+| &nbsp; || ip-permission.group-name || Y || - ||
 |-
-| &nbsp; || ip-permission.protocol || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+| &nbsp; || ip-permission.protocol || Y || Y ||
 |-
-| &nbsp; || ip-permission.to-port || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+| &nbsp; || ip-permission.to-port || Y || Y ||
 |-
-| &nbsp; || ip-permission.user-id || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+| &nbsp; || ip-permission.user-id || Y || - ||
 |-
 | &nbsp; || owner-id || Y || Y || Account ID
 |-
@@ -563,6 +624,11 @@ Support for DB filtering is optional, in this case aliases will be an empty Map 
 |}
 
 <references />
+
+= Configuration =
+A new configuration property is added to control the permitted number of tags per resource (default 10):
+
+  tagging.max_tags_per_resource = 10
 
 = Upgrade =
 No upgrade impact noted.
