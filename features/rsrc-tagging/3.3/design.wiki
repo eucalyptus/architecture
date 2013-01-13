@@ -9,6 +9,8 @@ This design covers both tagging and filtering of resources.
 ! Updated || 2013/01/07 || Update with details / changes from implementation, add tracking section
 |-
 ! Updated || 2013/01/09 || Add details on filtering for a resource
+|-
+! Updated || 2013/01/12 || Update filtering support table for currently implemented items and with tag filtering details
 |}
 
 == Out of Scope ==
@@ -35,9 +37,10 @@ This feature relates to the following features in this release:
 * How will the eucalyptus account manage tags?, there is no place to add the usual '''verbose''' pseudoselector.
 * With filters, does '''.''' match newline?
 * Does a tag delete operation succeed if any tag was deleted? (or all tags, or just if there is no error)
-* If using multiple filters are they expected to match the same (sub) item? (persumably not, example below)
+* If using multiple filters are they expected to match the same (sub) item? (presumably not, example below)
 * Should there be an error on an incorrectly escaped wildcard (e.g. "\a")
 * How do wildcards interact with typed filters? (numbers, dates and bools)
+* Are wildcards permitted in the filter key for tags? (i.e. --filter tag:foo*=bar)
 
   Filters:
     ip-permission.protocol=tcp
@@ -225,8 +228,22 @@ These can be translated to regular expression wildcards:
 
 Other regular expression syntax from the filter value must be escaped (e.g. '''Pattern.quote''')
 
+=== Tag Filtering ===
+Filtering by tags is performed in the database to avoid loading tag information into memory.
+
+A sub-select is used to determine the identifiers of all resources meeting the user provided tag criteria.
+
+In this case the resulting (Hibernate generated) query is:
+
+  select this_.id as id9_0_, this_.creation_timestamp as creation3_9_0_, this_.last_update_timestamp as last4_9_0_, this_.metadata_perm_uuid as metadata5_9_0_, this_.version as version9_0_, this_.metadata_display_name as metadata7_9_0_, this_.metadata_last_state as metadata8_9_0_, this_.metadata_state as metadata9_9_0_, this_.metadata_state_change_stack as metadata10_9_0_, this_.metadata_account_name as metadata11_9_0_, this_.metadata_account_id as metadata12_9_0_, this_.metadata_unique_name as metadata13_9_0_, this_.metadata_user_id as metadata14_9_0_, this_.metadata_user_name as metadata15_9_0_, this_.metadata_image_arch as metadata16_9_0_, this_.metadata_image_description as metadata17_9_0_, this_.metadata_image_name as metadata18_9_0_, this_.metadata_image_is_public as metadata19_9_0_, this_.metadata_image_size_bytes as metadata20_9_0_, this_.metadata_image_type as metadata21_9_0_, this_.metadata_image_platform as metadata22_9_0_, this_.metadata_image_del_vol_on_terminate as metadata23_9_0_, this_.metadata_image_kernel_id as metadata24_9_0_, this_.metadata_image_ramdisk_id as metadata25_9_0_, this_.metadata_image_snapshot_id as metadata26_9_0_, this_.metadata_image_bundle_size as metadata27_9_0_, this_.metadata_image_unencrypted_checksum as metadata28_9_0_, this_.metadata_image_unencrypted_checksum_type as metadata29_9_0_, this_.metadata_image_manifest_path as metadata30_9_0_, this_.metadata_image_signature as metadata31_9_0_, this_.metadata_image_discriminator as metadata1_9_0_
+  from metadata_images this_ 
+  where (1=1) and (this_.id in (
+    select this_.metadata_tag_resource_id as y0_ from metadata_tags_images this_ inner join metadata_tags this_1_ on this_.id=this_1_.id where this_1_.metadata_account_id=$1    
+    and (((this_1_.metadata_display_name=$2 and this_1_.metadata_tag_value=$3)) and ((this_1_.metadata_tag_value=$4)) and ((this_1_.metadata_display_name=$5)))
+  ))
+
 === Filter Generation ===
-It will be possible to generate a filter from a  filter set, e.g.
+It will be possible to generate a filter from a filter set, e.g.
 
   Filter Filters.generate( request.getFilterSet(), NetworkGroup.class )
   
@@ -292,23 +309,23 @@ To verify the predicates and criteria a unit test class should be implemented (G
 |-
 | &nbsp; || zone-name || Y || - ||
 |-
-| Bundle Tasks || bundle-id || Y || - ||
+| Bundle Tasks || bundle-id || Y || - || Bundle ID is not persisted
 |-
-| &nbsp; || error-code || Y || - ||
+| &nbsp; || error-code || Y || Y ||
 |-
-| &nbsp; || error-message || Y || - ||
+| &nbsp; || error-message || Y || Y ||
 |-
-| &nbsp; || instance-id || Y || - ||
+| &nbsp; || instance-id || Y || Y ||
 |-
-| &nbsp; || progress || Y || - ||
+| &nbsp; || progress || Y || Y ||
 |-
-| &nbsp; || s3-bucket || Y || - ||
+| &nbsp; || s3-bucket || Y || Y ||
 |-
-| &nbsp; || s3-prefix || Y || - ||
+| &nbsp; || s3-prefix || Y || Y ||
 |-
-| &nbsp; || start-time || Y || - ||
+| &nbsp; || start-time || Y || - || 
 |-
-| &nbsp; || state || Y || - ||
+| &nbsp; || state || Y || Y ||
 |-
 | &nbsp; || update-time || Y || - ||
 |-
@@ -360,11 +377,11 @@ To verify the predicates and criteria a unit test class should be implemented (G
 |-
 | &nbsp; || state-reason-message || - || - || N/A <ref name="notsupported">Eucalyptus does not support this field</ref>
 |-
-| &nbsp; || tag-key || Y || - ||
+| &nbsp; || tag-key || Y || Y ||
 |-
-| &nbsp; || tag-value || Y || - ||
+| &nbsp; || tag-value || Y || Y ||
 |-
-| &nbsp; || tag:'''key''' || Y || - ||
+| &nbsp; || tag:'''key''' || Y || Y ||
 |-
 | &nbsp; || virtualization-type || - || - || Differ from AWS here <ref name="needmoreinfo">Investigation required</ref>
 |-
@@ -414,7 +431,7 @@ To verify the predicates and criteria a unit test class should be implemented (G
 |-
 | &nbsp; || key-name || Y || - || DB filtering could be possible (full key in DB) <ref name="perhapsdbfilter"/>
 |-
-| &nbsp; || launch-index || Y || Y || DB no wildcard <ref name="dbnowild"/>
+| &nbsp; || launch-index || Y || Y || DB no wildcard <ref name="dbnowild">Wildcards not supported for DB filtering with this type.</ref>
 |-
 | &nbsp; || launch-time || Y || Y || DB no wildcard <ref name="dbnowild"/>
 |-
@@ -456,11 +473,11 @@ To verify the predicates and criteria a unit test class should be implemented (G
 |-
 | &nbsp; || subnet-id || - || - || N/A <ref name="notvpc"/>
 |-
-| &nbsp; || tag-key || Y || - ||
+| &nbsp; || tag-key || Y || Y ||
 |-
-| &nbsp; || tag-value || Y || - ||
+| &nbsp; || tag-value || Y || Y ||
 |-
-| &nbsp; || tag:'''key''' || Y || - ||
+| &nbsp; || tag:'''key''' || Y || Y ||
 |-
 | &nbsp; || virtualization-type || - || - || TODO
 |-
@@ -554,11 +571,11 @@ To verify the predicates and criteria a unit test class should be implemented (G
 |-
 | &nbsp; || owner-id || Y || Y || Account ID
 |-
-| &nbsp; || tag-key || Y || - ||
+| &nbsp; || tag-key || Y || Y ||
 |-
-| &nbsp; || tag-value || Y || - ||
+| &nbsp; || tag-value || Y || Y ||
 |-
-| &nbsp; || tag:'''key''' || Y || - ||
+| &nbsp; || tag:'''key''' || Y || Y ||
 |-
 | Snapshot || description || Y || Y ||
 |-
@@ -566,19 +583,19 @@ To verify the predicates and criteria a unit test class should be implemented (G
 |-
 | &nbsp; || owner-id || Y || Y || Account ID
 |-
-| &nbsp; || progress || Y || Y ||
+| &nbsp; || progress || Y || - ||
 |-
 | &nbsp; || snapshot-id || Y || Y ||
 |-
-| &nbsp; || start-time || Y || Y || DB no wildcard <ref name="dbnowild">Non string DB type, wildcards not supported for DB filter</ref>
+| &nbsp; || start-time || Y || - || DB no wildcard <ref name="dbnowild">Non string DB type, wildcards not supported for DB filter</ref>
 |-
-| &nbsp; || status || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+| &nbsp; || status || Y || - || 
 |-
-| &nbsp; || tag-key || Y || - ||
+| &nbsp; || tag-key || Y || Y ||
 |-
-| &nbsp; || tag-value || Y || - ||
+| &nbsp; || tag-value || Y || Y ||
 |-
-| &nbsp; || tag:'''key''' || Y || - ||
+| &nbsp; || tag:'''key''' || Y || Y ||
 |-
 | &nbsp; || volume-id || Y || Y ||
 |-
@@ -586,9 +603,9 @@ To verify the predicates and criteria a unit test class should be implemented (G
 |-
 | Tag || key || Y || Y ||
 |-
-| &nbsp; || resource-id || Y || Y ||
+| &nbsp; || resource-id || Y || - ||
 |-
-| &nbsp; || resource-type || Y || Y ||
+| &nbsp; || resource-type || Y || - ||
 |-
 | &nbsp; || value || Y || Y ||
 |-
@@ -612,11 +629,11 @@ To verify the predicates and criteria a unit test class should be implemented (G
 |-
 | &nbsp; || status || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
 |-
-| &nbsp; || tag-key || Y || - ||
+| &nbsp; || tag-key || Y || Y ||
 |-
-| &nbsp; || tag-value || Y || - ||
+| &nbsp; || tag-value || Y || Y ||
 |-
-| &nbsp; || tag:'''key''' || Y || - ||
+| &nbsp; || tag:'''key''' || Y || Y ||
 |-
 | &nbsp; || volume-id || Y || Y ||
 |-
@@ -637,7 +654,9 @@ No upgrade impact noted.
 No specific packaging requirements.
 
 = Documentation =
-No specific documentation items noted.
+The following items are identified as documentation candidates:
+
+* The reservation of the prefix '''euca:''' for tag keys and values
 
 = Security =
 No specific security concerns are noted for this design.
