@@ -11,6 +11,8 @@ This design covers both tagging and filtering of resources.
 ! Updated || 2013/01/09 || Add details on filtering for a resource
 |-
 ! Updated || 2013/01/12 || Update filtering support table for currently implemented items and with tag filtering details
+|-
+! Updated || 2013/01/15 || Update filtering support table, add section on describe operation changes, update testing and security sections.
 |}
 
 == Out of Scope ==
@@ -34,13 +36,14 @@ This feature relates to the following features in this release:
 
 = Analysis =
 == Open Issues ==
-* How will the eucalyptus account manage tags?, there is no place to add the usual '''verbose''' pseudoselector.
+* How will the eucalyptus account manage tags?, there is no place to add the usual '''verbose''' pseudoselector, should other accounts tags be visible?.
 * With filters, does '''.''' match newline?
 * Does a tag delete operation succeed if any tag was deleted? (or all tags, or just if there is no error)
 * If using multiple filters are they expected to match the same (sub) item? (presumably not, example below)
 * Should there be an error on an incorrectly escaped wildcard (e.g. "\a")
 * How do wildcards interact with typed filters? (numbers, dates and bools)
 * Are wildcards permitted in the filter key for tags? (i.e. --filter tag:foo*=bar)
+* How should results be ordered? (and what about case)
 
   Filters:
     ip-permission.protocol=tcp
@@ -77,6 +80,17 @@ Tag CRUD is part of the EC2 API, internally a new '''TagManager''' component is 
 
 Tag functionality must be tested with both SOAP and Query APIs.
 
+==== Describe Operations ====
+Describe operations for existing resources are updated to include the requesting accounts tags for the returned resources. This applies to:
+
+* Images
+* Instances
+* Security Groups
+* Snapshots
+* Volumes
+
+Tags for each resource are ordered by key (case sensitively)
+
 === Tag Operations ===
 The tag manager implements the following operations.
 
@@ -102,6 +116,8 @@ The operation succeeds if any tag was deleted
 Describe tags for the account with possible filters as outlined below.
 
 You can tag public or shared resources, but the tags you assign are available only to your AWS account and not to the other accounts sharing the resource.
+
+Results are ordered by resource identifier and then key (case sensitively)
 
 === Integration Areas ===
 IAM: tag operations access controlled via IAM policies
@@ -553,7 +569,7 @@ To verify the predicates and criteria a unit test class should be implemented (G
 |-
 | Security Group || description || Y || Y ||
 |-
-| &nbsp; || group-id || - || - || N/A <ref name="notsupported"/>
+| &nbsp; || group-id || Y || Y ||
 |-
 | &nbsp; || group-name || Y || Y ||
 |-
@@ -621,13 +637,13 @@ To verify the predicates and criteria a unit test class should be implemented (G
 |-
 | &nbsp; || availability-zone || Y || Y ||
 |-
-| &nbsp; || create-time || Y || Y || DB no wildcard <ref name="dbnowild"/>
+| &nbsp; || create-time || Y || - || DB no wildcard <ref name="dbnowild"/>
 |-
 | &nbsp; || size || Y || Y || DB no wildcard <ref name="dbnowild"/>
 |-
 | &nbsp; || snapshot-id || Y || Y ||
 |-
-| &nbsp; || status || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+| &nbsp; || status || Y || - ||
 |-
 | &nbsp; || tag-key || Y || Y ||
 |-
@@ -637,7 +653,7 @@ To verify the predicates and criteria a unit test class should be implemented (G
 |-
 | &nbsp; || volume-id || Y || Y ||
 |-
-| &nbsp; || volume-type || Y || Y || Hardcoded type '''standard''' (no '''io1''')
+| &nbsp; || volume-type || Y || - || Hardcoded type '''standard''' (no '''io1''')
 |}
 
 <references />
@@ -659,10 +675,12 @@ The following items are identified as documentation candidates:
 * The reservation of the prefix '''euca:''' for tag keys and values
 
 = Security =
-No specific security concerns are noted for this design.
+Filtering can only restrict the output so there is low risk of introducing access control issues from an architectural perspective. Implementation of the feature means changing the enforcement of access permissions for each describe operation, so there is some risk of regression for each affected resource.
 
 = Testing =
-Testing should cover SOAP and Query APIs
+Testing should cover SOAP and Query APIs.
+
+Testing should verify that that permissions are enforced correctly for each modified resource (due to risk of regressions)
 
 = References =
 * [[features/rsrc-tagging/3.3/spec | Resource Tagging and Filtering specification]]
