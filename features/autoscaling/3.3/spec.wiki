@@ -1,23 +1,43 @@
 = Overview =
-Automatically Scale Server Farms 
-Scale Up/Down
-(Re)Balance Across AZs 
-Add/Remove from ELB
-Scaling Thermostat
+Feature consists of fundamental Autoscaling support implementing the AWS defined API.  There are two primary use cases:
+# Manual auto-scaling
+# Action triggered auto-scaling based on custom metrics
+Other important characteristics which are essential in serving these use cases are:
+# Register/Deregister instances with ELB
 == Types of Scaling ==
-Manual
-Send an API call or use CLI to launch/terminate instances 
-Only need to specify capacity change (+/-)
-By Schedule
-Scale up/down based on date and time
-By Policy
-Scale in response to changing conditions
-Based on user configured real-time monitoring and alerts 
-Health checks and CloudWatch
-Automatic Rebalance
-Instances are automatically launched/terminated to ensure the application is balanced across multiple AZs
-== Autoscaling Components ==
-=== Launch Configuration ===
+For 3.3 we only consider two kinds of scaling:
+# ''' Manual''' : user controlled change to sizing of autoscaling group.
+## [[SetDesiredCapacity]] allows the user to explicitly set the group size.
+## [[ExecutePolicy]] allows the user to trigger the application of a scaling policy by hand.
+# ''' Alarm/Policy'''  based: user configures metric-based actions which trigger application of a scaling policy.
+## [[MetricAlarms]] configured using [[PutMetricAlarm]] act as triggers.
+## [[AlarmActions]] reference the [[ScalingPolcicy]] relative to the fully qualified [[AutoScalingGroupARN]].
+# ''' Second for 3.3''' 
+## Metric collection
+## Scaling process control
+# ''' Excluded from 3.3''' 
+## Notifications
+## Operations requiring VPC support
+## Anything requiring support for spot instances
+## Schedule based scaling is not part of the 3.3 implementation plan.
+## Operations needed for schedule based scaling must still be present and Describe operations must successfully return an empty response.  This is needed to avoid breaking client tools.
+
+= API Operations =
+[[autoscaling-3.3-api-overview.png|width=1000px]]
+* Required operations in topological order
+** Operations for definiton a group
+*** <code>{Create,Describe,Update,Delete}AutoScalingGroup</code>
+** Running and health checking an instance in the group
+** 
+= Service Interactions =
+[[autoscaling-3.3-api-overview-all.png|width=1000px]]
+
+= Client Tools =
+
+= Components =
+[[autoscaling-3.3-spec-overview.png]]
+
+== Launch Configuration ==
 * Describes how to add instances  instances
 ** AMI 
 ** Instance Type
@@ -27,7 +47,7 @@ Instances are automatically launched/terminated to ensure the application is bal
 * Auto Scaling will terminate instances with old launch configurations first
 ** Rolling software updates
 
-=== Auto Scaling Group ===
+== Auto Scaling Group == 
 Auto Scaling managed grouping of EC2 instances
 Automatic health check to maintain pool size
 Automatically scale the number of instances by policy 
@@ -36,7 +56,7 @@ Automatic Integration with ELB
 Automatic Integration with AZs
 Automatic distribution & balancing across AZs
 
-=== Auto Scaling Policy ===
+== Auto Scaling Policy == 
 Parameters for performing an Auto Scaling action
 Scale Up/Down
 By how much
@@ -46,7 +66,7 @@ ChangeInPercent (+/- %)
 Cool Down (seconds)
 Policy can be triggered by CloudWatch Events
 
-=== Cloud Watch Alarms ===
+== Cloud Watch Alarms ==
 Monitors a CloudWatch metric 
 Threshold (> 50% CPU)
 Period (for 3 minutes)
@@ -58,7 +78,7 @@ Available Actions
 Trigger Auto Scaling Policy (scale up/down event) 
 Send SNS notification
 
-=== Scaling Activity ===
+== Scaling Activity == 
 Instance Launch
 Instances are launched (not started) from a “gold” image
  Bootstrapping is important! 
@@ -74,36 +94,13 @@ Gives the system time to perform and adjust to before executing a new scaling ac
 Suspend/Resume Processes
 Allows you to manually suspend and resume Auto Scaling activities
 
-= IAM IMPLICATION =
-* IAM needs updating to reflect the added keys, actions, resource types from this service
-* autoscaling allocates resources on behalf of the user
-= EC2 IMPLICATION =
-* tagging
-= ELB IMPLICATION =
-* add to scaling group to load balancer (ELBility)
-= Scope Limitations
-* vpc out
-* spot instances out
-= Scaling Processes =
-== Health Check ==  
-== Policy ==
-* load generation tools would be needed for test & dev.
-== Scheduled ==
-Auto Scaling guarantees execution order for scheduled actions within the same group, but not for scheduled actions across groups.
+= Operation Parameters =
+See [[autoscaling-3.3-api-parameters]]
 
-    A scheduled action generally executes within seconds. However, the action may be delayed up to two minutes from the scheduled start time. Because Auto Scaling executes actions within an Auto Scaling group in the order they are specified, scheduled actions with scheduled start times close to each other may take longer to execute.
+= Testing Plan =
 
-    You can schedule a scheduled action for up to a month in the future.
+= Footnotes =
+<references/>
 
-    You can create a maximum of 125 scheduled actions per Auto Scaling group. This allows scaling four times a day for a 31-day month for each Auto Scaling group.
-
-    A scheduled action must have a unique time value. If you attempt to schedule an activity at a time when another existing activity is already scheduled, the call will be rejected with an error message noting the conflict.
-    
-= Questions =
-* workload examples; esp. for testing, user story creation
-* survival group use case (no dependency)
-* scheduled scale-out use case (
-* triggered scale-{out,in} use case (cloud watch, sns maybe?)
-  
 ----
 [[tag:rls-3.3]]

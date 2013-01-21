@@ -16,37 +16,22 @@ CreateLaunchConfiguration
 DeleteLaunchConfiguration
 DescribeLaunchConfigurations
 
-== Scaling Metric Collection == 
-DescribeMetricCollectionTypes
-DisableMetricsCollection
-EnableMetricsCollection
+== Scaling Policies ==
+DeletePolicy
+DescribePolicies
+ExecutePolicy
+PutScalingPolicy
+
+= 2nd Step =
+DescribeTerminationPolicyTypes
+DescribeAdjustmentTypes
 
 == Tags ==
 CreateOrUpdateTags
 DeleteTags
 DescribeTags
 
-== Scaling Policies ==
-DeletePolicy
-DescribePolicies
-ExecutePolicy
-PutScalingPolicy
-DescribeTerminationPolicyTypes
-DescribeAdjustmentTypes
-
-
-== Scaling Event Notifications ==
-DeleteNotificationConfiguration
-DescribeAutoScalingNotificationTypes
-DescribeNotificationConfigurations
-PutNotificationConfiguration
-
-== Scheduled Policy Control ==
-DeleteScheduledAction
-DescribeScheduledActions
-PutScheduledUpdateGroupAction
-
-
+= 3rd Step =
 == Scaling Processes ==
 DescribeScalingActivities
 ResumeProcesses

@@ -3,10 +3,10 @@ Each EC2 tag consists of a key and a value, both of which the user can define.
 
 == Tag Restrictions ==
 The following basic restrictions apply to tags:
-    Maximum Number of Tags Per Resource—10
-    Maximum Key Length—128 Unicode characters
-    Maximum Value Length—256 Unicode characters
-    Unavailable Prefix—aws: (we have reserved it for tag names and values)
+* Maximum Number of Tags Per Resource—10
+* Maximum Key Length—128 Unicode characters
+* Maximum Value Length—256 Unicode characters
+* Unavailable Prefix—aws: (we have reserved it for tag names and values)
 Tag keys and values are case sensitive.
 You can't terminate, stop, or delete a resource based solely on its tags.
 An instance can't retrieve its own tags from its metadata. 
@@ -14,15 +14,15 @@ Tag information is available only through the EC2 API.
 
 == Taggable Resources ==
 You can tag the following:
-    images (AMIs, kernels, RAM disks)
-    instances
-    security groups
-    volumes
-    snapshots
+* images (AMIs, kernels, RAM disks)
+* instances
+* security groups
+* volumes
+* snapshots
 The following cannot be tagged:
-    Elastic IP addresses
-    Key pairs
-    Placement groups
+* Elastic IP addresses
+* Key pairs
+* Placement groups
 You can tag public or shared resources, but the tags you assign are available only to your AWS account and not to the other accounts sharing the resource.
 
 == Operations ==
@@ -34,22 +34,22 @@ You can tag public or shared resources, but the tags you assign are available on
 ** resource-id (e.g., i-XXXXXXXX which is associated w/ the tag)
 ** key
 ** value
-    
+
 = Filtering =
 You can search and filter resources based on the above described tags (e.g., --filter tag:Owner=TeamA)
 * tag-key
 ** The key of a tag assigned to the resource. This filter is independent of the tag-value filter. For example, if you use both the filter tag-key=Purpose and the filter tag-value=X, you get any resources assigned both the tag key Purpose (regardless of what the tag's value is), and the tag value X (regardless of what the tag's key is). If you want to list only resources where Purpose=X, see the tag:key filter later in this table. Type: String
 * tag-value
 ** The value of a tag assigned to the resource. This filter is independent of the tag-key filter. Type: String
-        tag:key
-        Filters the results based on a specific tag/value combination.
-        Example: To list just the resources assigned tag Purpose=X, then specify:
-        Filter.1.Name=tag:Purpose
-        Filter.1.Value.1=X
-        Example: To list just resources assigned tag Purpose=X OR Purpose=Y, then specify:
-        Filter.1.Name=tag:Purpose
-        Filter.1.Value.1=X
-        Filter.1.Value.2=Y
+*     tag:key
+*     Filters the results based on a specific tag/value combination.
+*     Example: To list just the resources assigned tag Purpose=X, then specify:
+*     Filter.1.Name=tag:Purpose
+*     Filter.1.Value.1=X
+*     Example: To list just resources assigned tag Purpose=X OR Purpose=Y, then specify:
+*     Filter.1.Name=tag:Purpose
+*     Filter.1.Value.1=X
+*     Filter.1.Value.2=Y
 
 == Available Filters by Operation ==
 === Supported Operations ===
@@ -69,7 +69,7 @@ You can search and filter resources based on the above described tags (e.g., --f
 * region-name: The Region the Availablity Zone is in (for example, us-east-1). Type: String
 * state: The state of the Availability Zone. Type: String; Valid values: available
 * zone-name: The name of the zone. Type: String
-  
+
 === DescribeAddresses ===
 * domain: Indicates whether the address is a EC2 address, or a VPC address. Type: String; Valid values: standard | vpc
 * instance-id:  The instance the address is associated with (if any). Type: String
@@ -79,7 +79,7 @@ You can search and filter resources based on the above described tags (e.g., --f
 * network-interface-id: The network interface (if any) that the address is associated with. (for VPC addresses only). Type: String
 * network-interface-owner-id: The owner IID.
 * private-ip-address: The private IP address associated with the Elastic IP address (for VPC addresses only). Type: String
-  
+
 === DescribeBundleTasks ===
 * bundle-id: The ID of the bundle task. Type: String
 * error-code: If the task failed, the error code returned. Type: String
@@ -184,7 +184,7 @@ You can search and filter resources based on the above described tags (e.g., --f
 === DescribeRegions ===
 * endpoint: The endpoint of the Region (for example, ec2.us-east-1.amazonaws.com). Type: String
 * region-name: The name of the Region. Type: String
-  
+
 === DescribeSecurityGroups ===
 * description: The description of the security group. Type: String
 * group-id: The ID of the security group. Type: String

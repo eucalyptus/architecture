@@ -1,0 +1,89 @@
+= Overview =
+
+Implement an AWS compatible Cloud Watch solution.
+
+== Out of Scope ==
+
+VPC, SNS, DynamoDB, Billing, ElastiCache, ElasticMapReduce, RDS, SQS, StorageGateway
+
+== Feature Dependencies ==
+
+Ground true data collection per each system-defined metric.
+
+== Related Features ==
+
+AutoScaling, ELB
+
+= Design =
+
+Entity Model
+
+Table: eucalyptus_cwatch 
+
+CRUD design
+
+Create : An aggregation of raw data rows will be persisted with the following column definitions :
+
+Per row entry (hash code of each row for lookup == Dimensions (key:value)) - user, account, uuid, MetricName, MetricType(Predefined or User Custom), MetricActions?, (string), NameSpace, timestamp, SUM, sample points, max, min
+
+(Note, timestamp format :  http://en.wikipedia.org/wiki/ISO_8601 : Timestamps to be truncated to the previous minute)
+
+Read : The key for search will be based on the a hash code that represents a possible combination of dimension (key:value), metric name, and namespace
+
+Update : Not required
+
+Delete - removes rows in which have a time stamp that is equals (current system time - (current time + two weeks))
+
+=== Service Impact ===
+
+CLC -> Consume general jvm resource the cloud controller
+
+DB -> additional jdbc connections 
+
+Alarms -> additional duty cycle in which will spawn more threads
+
+Must be HA compliant 
+
+=== Put Metric Workflow ===
+
+[[put-metric-data-workflow.png]] 
+
+=== Diagram Definitions === 
+
+* PutMetricData -> user created request 
+
+* Cloud Watch Service -> Eucalyptus implementation of the Cloud Watch Service
+
+* Raw Data Queue -> FIFO queue
+
+* Aggregation -> Function to process an aggregation of one minute window of raw data to be inserted into the database
+
+* Cleaner -> House keeping process to delete metric data from the database with a 2 week window  
+
+* Data Points Rows -> Processed information
+
+=== Database Purge ===
+
+Global period data deletion after 2 weeks.
+
+=== Discovery ===
+Filters should be discovered, whether individually, per type or per API.
+
+= Upgrade =
+No upgrade impact noted.
+
+= Packaging =
+No specific packaging requirements.
+
+= Documentation =
+*Need feedback from the docs team
+
+= Security =
+No specific security concerns are noted for this design.
+
+= Testing =
+Testing should cover SOAP and Query APIs 
+
+= References =
+AWS Cloud Watch : http://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/Welcome.html
+JIRA https://eucalyptus.atlassian.net/browse/EUCA-4307

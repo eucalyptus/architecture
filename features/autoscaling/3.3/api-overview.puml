@@ -1,0 +1,45 @@
+@startuml
+ !include ../../../lib/component.skin
+  skinparam ranksep 10
+'  skinparam nodesep 30
+'  scale 1000 height 
+  left to right direction
+ node AutoScaling as as {
+    interface "- Create\n- Update\n- Describe\n- Delete"  as groupops
+    interface "- Put\n- Update\n- Describe\n- Delete"  as policyops
+    interface "- Create\n- Describe\n- Delete"  as configops
+    interface "- Describe" as activityops
+    interface "- Describe\n- Terminate" as vmops
+    interface "- SetDesiredCapacity" as setcapacity
+    interface "- SetInstanceHealth" as sethealth
+    interface "- ExecutePolicy" as policyexec
+    interface "- Resume\n- Suspend" <<Development>> as processops
+    interface "Describe\n- TerminationPolicies\n- ScalingProcesses\n- AdjustmentTypes" as typeops
+    interface "- CreateOrUpdate\n- Describe\n- Delete" <<Development>> as tagops
+'    frame Model {
+      component "AutoScaling Instance" as asvm
+      component AutoScalingGroup as group
+      component LaunchConfiguration as config
+      component ScalingPolicy as policy
+      component ScalingProcesses as processes
+      component Activity as activity
+      component Tags <<Development>> as tags
+      group -- config
+      asvm -- group
+      group -- activity
+      group -- processes
+      policy -- group
+      tags -- group
+'    }
+    activityops -- activity
+    processops -- processes
+    policyops -- policy
+    tagops -- tags
+    groupops -- group
+    configops -- config
+    vmops -- asvm
+    sethealth -- asvm
+    policyexec -- setcapacity
+    setcapacity -- group
+  }
+@enduml

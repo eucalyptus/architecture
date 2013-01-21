@@ -1,0 +1,84 @@
+= Overview =
+This design covers changes in 3.3 in support of AWS SDK compatibility.
+
+== Tracking ==
+
+{|
+! Status || Draft || 
+|-
+! Updated || 2012/12/20 || Initial document, made a start on signature v4.
+|-
+! Updated || 2013/01/12 || Update post initial implementation.
+|}
+
+== Out of Scope ==
+Nothing noted.
+
+== Feature Dependencies ==
+None noted.
+
+== Related Features ==
+None noted.
+
+= Analysis =
+== Open Issues ==
+* Should we support '''only''' signature V4 for IAM / STS? (has tool impact)
+* Should we support signature V4 for all services that use signature V2 currently?
+* Should we validate the service / region for signature V4?
+
+= Design =
+
+== Signature V4 ==
+
+=== Signature V4 Verification ===
+We are only verifying the date from the credential scope in the request, we do not verify the region or the service name.
+
+=== Signature Variants and Versions ===
+In order to support an additional signature mechanism that is significantly different from previous versions we introduce the concept of signature variants:
+
+* '''Signature Version''' - A signature specification i.e. 1,2,4.
+* '''Signature Variant''' - A variant of a version, i.e. Signature V4 with query parameters
+
+Signature variants define how to access properties of the signature, which parameters are required, etc.
+
+Existing handlers and utility classes are updated to use the above abstractions rather than having special cases for each supported signature version.
+
+=== Required Service Parameters ===
+The '''SignatureVersion''' parameter will no longer be required for services supporting signature V4.
+
+=== Timestamp Verification ===
+The QueryTimestampHandler is updated to use HmacUtils as a facade hiding the details of the signature variant in use.
+
+Timestamps is updated to support more timestamp formats. Short variants of ISO 8601 dates are now accepted and RFC 2616 / HTTP 1.1 can now also be parsed (e.g. from the HTTP 'Date' header)
+
+=== Parameter Source ===
+MappingHttpRequest is updated to support identification of parameters that were from form fields (as opposed to the query string), this is necessary as form field parameters should not be included in the canonical form of the query parameters (they are included as the request body)
+
+=== AWS Java SDK Compatibility ===
+The AWS Java SDK does not currently canonicalize requests correctly when an endpoint has a path component. To support use of this toolkit we allow use of the path "/" in addition to the correct path for the request.
+
+= Configuration =
+No configuration properties noted.
+
+= Upgrade =
+No upgrade impact noted.
+
+= Packaging =
+No specific packaging requirements.
+
+= Documentation =
+No specific documentation items noted.
+
+= Security =
+No specific security concerns are noted for this design.
+
+= Testing =
+Due to changes to signature v1 and signature v2 support we should verify that toolkits using these signature versions function correctly.
+
+If possible a client support the signature v4 with query parameters should be tested.
+
+= References =
+* [http://docs.amazonwebservices.com/general/latest/gr/signature-version-4.html Signature V4 (amazonwebservices.com)]
+
+[[tag:rls-3.3]]
+

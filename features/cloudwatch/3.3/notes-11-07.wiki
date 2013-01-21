@@ -1,10 +1,13 @@
 = CloudWatch =
 
+= Step #1 = 
 == Metric Basics ==
 GetMetricStatistics
 ListMetrics
 PutMetricData
 
+= Nice to have =
+= Step #2 =
 == Alarms ==
 DeleteAlarms
 DescribeAlarms
@@ -12,6 +15,7 @@ DescribeAlarmsForMetric
 PutMetricAlarm
 SetAlarmState 
 
+= Step #3 =
 === History ===
 DescribeAlarmHistory
 

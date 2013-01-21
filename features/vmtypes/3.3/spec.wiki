@@ -7,6 +7,7 @@ VM Type support in Eucalyptus has two disjoint aspects:
 # Private cloud administrator control over vm type definitions.
 
 
+
 == AWS compatibility ==
 Currently (09/18/12) the [[http://aws.amazon.com/ec2/instance-types/|vm type definitions used by AWS]] are:
 {|
@@ -67,39 +68,28 @@ Currently (09/18/12) the [[http://aws.amazon.com/ec2/instance-types/|vm type def
 === High I/O Instances ===
 * High I/O Quadruple Extra Large 60.5 GB memory, 35 EC2 Compute Units, 2* 1024 GB of SSD-based local instance storage, 64-bit platform, 10 Gigabit Ethernet
 
-== Cloud Administration ==
-hi
-
-=== Types ===
-hi
-
-==== Try ====
-hi
-
-https://eucalyptus.atlassian.net/secure/IssueNavigator.jspa?requestId=12210&mode=hide
-
-https://eucalyptus.atlassian.net/secure/Dashboard.jspa?selectPageId=11900#Filter-Results/12117
-
- Story 	EUCA-3500 	VM Type Configuration Enhancements 	
-Actions
-EUCA-2845 	Provide more instance types 	
-Actions
-New Feature 	EUCA-442 	Allow unordered vmType specification 	
-Actions
-New Feature 	EUCA-2300 	Request for adding m1.medium instance type 	
-Actions
-New Feature 	EUCA-424 	Ability to specify VM types (more than 5) via a specification/config file 	
-https://eucalyptus.atlassian.net/browse/Euca-1287
-Actions
-New Feature 	EUCA-646 	VMType CRUD from API 	
-Actions
-New Feature 	EUCA-223 	Allow more flexibility for VM types 	
-Actions
-New Feature 	EUCA-595 	Revise default VM Types 	
-Actions
-New Feature 	EUCA-348 	Allow regular user read access to instance type defs 	
-Actions
-New Feature 	EUCA-1719 	Define more than 5 VM types
+== Notes ==
+* MVP is a larger number of vm types
+** Having an arbitrary number is not in MVP
+** Create and Delete become optional if the number of VMTypes are fixed
+* MVP precludes requiring admin to login via to adjust the VMTypes
+* MVP includes an admin API for controlling vm type definitions
+** Create and Delete are optional
+** Don't allow for removal of default AWS types
+* Deleting would involve invalidating existing references
+* t1.micro doesn't have instance store option
+* MVP includes a euca-describe-vmtypes
+* Ephemeral disk configurations
+* UserConsole changes related to removing config file for vmtypes
+** Use the new UI instead
+** Change the presentation to accommodate the larger number of vmtypes
+** Changing ephemeral configuration changes the 
+* Admin UI 
+** Presentation of existing types
+** Create and delete mutable types
+* Authorization and authentication are required in 
+* Constraints on legitimate values
+* Restrict naming to [:alnum:] period
 
 ----
 [[tag:rls-3.3]]

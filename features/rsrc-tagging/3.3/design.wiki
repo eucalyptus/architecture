@@ -1,0 +1,691 @@
+= Overview =
+This design covers both tagging and filtering of resources.
+
+== Tracking ==
+
+{|
+! Document Status || Draft || 
+|-
+! Updated || 2013/01/07 || Update with details / changes from implementation, add tracking section
+|-
+! Updated || 2013/01/09 || Add details on filtering for a resource
+|-
+! Updated || 2013/01/12 || Update filtering support table for currently implemented items and with tag filtering details
+|-
+! Updated || 2013/01/15 || Update filtering support table, add section on describe operation changes, update testing and security sections.
+|}
+
+== Out of Scope ==
+Filters related to functional areas that we do not suport are out of scope. These areas are:
+
+* VPC
+* Spot instances
+
+== Feature Dependencies ==
+Support for filters related to the following items depend on these features being included in the release:
+
+* Add ID to security groups [https://eucalyptus.atlassian.net/browse/EUCA-3182 EUCA-3182 (atlassian.net) ]
+* Idempotency (client-token) [https://eucalyptus.atlassian.net/browse/EUCA-4353 EUCA-4353 (atlassian.net)]
+* monitoring-state ('''CloudWatch''' / '''EC2''')
+
+== Related Features ==
+This feature relates to the following features in this release:
+
+* CloudWatch
+* Resource Attributes
+
+= Analysis =
+== Open Issues ==
+* How will the eucalyptus account manage tags?, there is no place to add the usual '''verbose''' pseudoselector, should other accounts tags be visible?.
+* With filters, does '''.''' match newline?
+* Does a tag delete operation succeed if any tag was deleted? (or all tags, or just if there is no error)
+* If using multiple filters are they expected to match the same (sub) item? (presumably not, example below)
+* Should there be an error on an incorrectly escaped wildcard (e.g. "\a")
+* How do wildcards interact with typed filters? (numbers, dates and bools)
+* Are wildcards permitted in the filter key for tags? (i.e. --filter tag:foo*=bar)
+* How should results be ordered? (and what about case)
+
+  Filters:
+    ip-permission.protocol=tcp
+    ip-permission.to-port=1
+  Match both?:
+    Security Group A
+      Rule 1 = protocol tcp, port 1
+    Security Group B
+      Rule 1 = protocol udp, port 1
+      Rule 2 = protocol tcp, port 2
+
+= Design =
+
+== Tagging ==
+=== Eucalyptus Extensions ===
+We will reserve the additional prefix '''euca''' for tag names and values. We will support the standard '''aws''' prefixes, the '''euca''' prefix is for use where there is no '''aws''' equivalent (Eucalyptus extensions)
+
+=== Entity Model ===
+Tags are supplementary information, so must not impact the resource that they tag. Tags can be created by accounts that do not own the tagged resource so must be separately managed.
+
+The entity model aims to use database features for:
+
+# Tag lifecycle - delete when tagged resource deleted
+# Tag constraint - relation to tagged data must be valid
+
+These aims are achieved with the following model:
+
+[[design-tag-er.png]]
+
+Note that tags are deleted when the tagged resource is deleted (e.g. an instance), but would not be restored when that instance is restored. This also means that you cannot filter a terminated instance by its tags.
+
+=== Service Impact ===
+Tag CRUD is part of the EC2 API, internally a new '''TagManager''' component is created to handle tags.
+
+Tag functionality must be tested with both SOAP and Query APIs.
+
+==== Describe Operations ====
+Describe operations for existing resources are updated to include the requesting accounts tags for the returned resources. This applies to:
+
+* Images
+* Instances
+* Security Groups
+* Snapshots
+* Volumes
+
+Tags for each resource are ordered by key (case sensitively)
+
+=== Tag Operations ===
+The tag manager implements the following operations.
+
+==== CreateTags ====
+Tag creation enforces the following:
+
+* Maximum tags - each account has a limited number of tags per resource
+* Tag key and value format syntactic validation of tag data
+* Tag key and value semantic validation (forbid reserved values / duplicate keys for an account)
+
+Multiple resources and tags can be specified in a request. Every specified tag is added to every specified resource.
+
+Specifying a key that already exists for a resource overwrites the existing value for that tag.
+
+==== DeleteTags ==== 
+Tag deletion deletes all matching tags from all specified resources.
+
+Tag values are optional, if specified the value must match. 
+
+The operation succeeds if any tag was deleted
+
+==== DescribeTags ====
+Describe tags for the account with possible filters as outlined below.
+
+You can tag public or shared resources, but the tags you assign are available only to your AWS account and not to the other accounts sharing the resource.
+
+Results are ordered by resource identifier and then key (case sensitively)
+
+=== Integration Areas ===
+IAM: tag operations access controlled via IAM policies
+
+== Filtering ==
+Filtering should be done by the DB where possible for efficiency. Since filters can have multiple values query by example is not a good fit and criteria will be used.
+
+=== Modularity ===
+Filtering is an EC2 concept but the implementation should be flexible enough for use with other APIs. Other APIs will often allow a subset of information to be returned from an operation based on some selection parameters.
+
+=== Discovery ===
+Filters should be discovered, whether individually, per type or per API.
+
+=== Database Filtering ===
+Filtering will be peformed at query time where possible. It is not always possible to filter using the DB, the following cases have been identified:
+
+* Type mismatch - Where the DB type differs from the filter type wildard filtering is not possible (e.g. Volume '''size''' is an integer in the DB)
+* Translated values - Some values are translated from internal to EC2 (e.g. Volume '''status''')
+* ElementCollections - Hibernate does not support criteria queries for element collections
+
+Database filtering is an optimization, it will be used to restrict the results to the extent possible, but will not reliably filter out all non-matching resources.
+
+==== Filtering via Hibernate Criterion ====
+Hibernate criterion can be used to filter database listings. A new '''Entities''' method is required to support this:
+
+  List<T> query( T example, 
+                 Bool readOnly, 
+                 Criterion criterion,
+                 Map aliases )
+
+The aliases are required in the case of filters on related entities.
+
+Filters can be translated to criterion as follows:
+
+  conjunction // And
+  - disjunction // Or
+    - filter restriction 1
+    - filter restriction 2
+  - disjunction // Or
+    - filter restriction 3
+
+The top level criterion is a conjunction ('''Restrictions.conjunction()'''), containing a disjuction for each filter with all the permitted values. 
+
+==== Wildcard Translation ====
+Filters support the following wildcards:
+
+* '''*''': Matches zero or more characters
+* '''?''': Matches exactly one character
+
+Hibernate supports the following wildcards when using ''like'':
+
+* '''%''' : Matches zero or more characters
+* '''_''': Matches exactly one character
+
+In both cases wildcards can be escaped (to allow literal values) with a backslash ('''\''').
+
+Translation of wildcards for direct DB filtering must support literal values from each grammar.
+
+==== Example for Security Groups ====
+An example of using criterion for restriction of query results is:
+
+  final Junction filters = Restrictions.conjunction();
+  final Junction nameFilter = Restrictions.disjunction();
+  final Junction ruleTypeFilter = Restrictions.disjunction();
+  filters.add( nameFilter );
+  filters.add( ruleTypeFilter );
+  nameFilter.add( Restrictions.like( "displayName", "A%" ) );
+  nameFilter.add( Restrictions.like( "displayName", "B%" ) );
+  ruleTypeFilter.add( Restrictions.like( "networkRules.protocol", NetworkRule.Protocol.tcp ) ); // Enum type
+
+In this case the resulting (Hibernate generated) query is:
+
+  select 
+       this_.id as id10_5_, this_.creation_timestamp as creation2_10_5_, this_.last_update_timestamp as last3_10_5_, this_.metadata_perm_uuid as metadata4_10_5_, this_.version as version10_5_, this_.metadata_display_name as metadata6_10_5_, this_.metadata_last_state as metadata7_10_5_, this_.metadata_state as metadata8_10_5_, this_.metadata_state_change_stack as metadata9_10_5_, this_.metadata_account_name as metadata10_10_5_, this_.metadata_account_id as metadata11_10_5_, this_.metadata_unique_name as metadata12_10_5_, this_.metadata_user_id as metadata13_10_5_, this_.metadata_user_name as metadata14_10_5_, this_.metadata_network_group_description as metadata15_10_5_, this_.vm_network_index as vm16_10_5_, extantnetw3_.id as id9_0_, extantnetw3_.creation_timestamp as creation2_9_0_, extantnetw3_.last_update_timestamp as last3_9_0_, extantnetw3_.metadata_perm_uuid as metadata4_9_0_, extantnetw3_.version as version9_0_, extantnetw3_.metadata_display_name as metadata6_9_0_, extantnetw3_.metadata_last_state as metadata7_9_0_, extantnetw3_.metadata_state as metadata8_9_0_, extantnetw3_.metadata_state_change_stack as metadata9_9_0_, extantnetw3_.metadata_account_name as metadata10_9_0_, extantnetw3_.metadata_account_id as metadata11_9_0_, extantnetw3_.metadata_unique_name as metadata12_9_0_, extantnetw3_.metadata_user_id as metadata13_9_0_, extantnetw3_.metadata_user_name as metadata14_9_0_, extantnetw3_.networkGroup_id as network16_9_0_, extantnetw3_.metadata_extant_network_tag as metadata15_9_0_, indexes4_.metadata_extant_network_index_fk as metadata18_9_7_, indexes4_.id as id7_, indexes4_.id as id12_1_, indexes4_.creation_timestamp as creation2_12_1_, indexes4_.last_update_timestamp as last3_12_1_, indexes4_.metadata_perm_uuid as metadata4_12_1_, indexes4_.version as version12_1_, indexes4_.metadata_display_name as metadata6_12_1_, indexes4_.metadata_last_state as metadata7_12_1_, indexes4_.metadata_state as metadata8_12_1_, indexes4_.metadata_state_change_stack as metadata9_12_1_, indexes4_.metadata_account_name as metadata10_12_1_, indexes4_.metadata_account_id as metadata11_12_1_, indexes4_.metadata_unique_name as metadata12_12_1_, indexes4_.metadata_user_id as metadata13_12_1_, indexes4_.metadata_user_name as metadata14_12_1_, indexes4_.metadata_network_index_bogus_id as metadata15_12_1_, indexes4_.metadata_network_index_extant_network_fk as metadata17_12_1_, indexes4_.metadata_network_index as metadata16_12_1_, extantnetw5_.id as id9_2_, extantnetw5_.creation_timestamp as creation2_9_2_, extantnetw5_.last_update_timestamp as last3_9_2_, extantnetw5_.metadata_perm_uuid as metadata4_9_2_, extantnetw5_.version as version9_2_, extantnetw5_.metadata_display_name as metadata6_9_2_, extantnetw5_.metadata_last_state as metadata7_9_2_, extantnetw5_.metadata_state as metadata8_9_2_, extantnetw5_.metadata_state_change_stack as metadata9_9_2_, extantnetw5_.metadata_account_name as metadata10_9_2_, extantnetw5_.metadata_account_id as metadata11_9_2_, extantnetw5_.metadata_unique_name as metadata12_9_2_, extantnetw5_.metadata_user_id as metadata13_9_2_, extantnetw5_.metadata_user_name as metadata14_9_2_, extantnetw5_.networkGroup_id as network16_9_2_, extantnetw5_.metadata_extant_network_tag as metadata15_9_2_, networkgro6_.id as id10_3_, networkgro6_.creation_timestamp as creation2_10_3_, networkgro6_.last_update_timestamp as last3_10_3_, networkgro6_.metadata_perm_uuid as metadata4_10_3_, networkgro6_.version as version10_3_, networkgro6_.metadata_display_name as metadata6_10_3_, networkgro6_.metadata_last_state as metadata7_10_3_, networkgro6_.metadata_state as metadata8_10_3_, networkgro6_.metadata_state_change_stack as metadata9_10_3_, networkgro6_.metadata_account_name as metadata10_10_3_, networkgro6_.metadata_account_id as metadata11_10_3_, networkgro6_.metadata_unique_name as metadata12_10_3_, networkgro6_.metadata_user_id as metadata13_10_3_, networkgro6_.metadata_user_name as metadata14_10_3_, networkgro6_.metadata_network_group_description as metadata15_10_3_, networkgro6_.vm_network_index as vm16_10_3_, networkrul1_.id as id11_4_, networkrul1_.creation_timestamp as creation2_11_4_, networkrul1_.last_update_timestamp as last3_11_4_, networkrul1_.metadata_perm_uuid as metadata4_11_4_, networkrul1_.version as version11_4_, networkrul1_.metadata_network_rule_high_port as metadata6_11_4_, networkrul1_.metadata_network_rule_low_port as metadata7_11_4_, networkrul1_.metadata_network_rule_protocol as metadata8_11_4_ 
+  from 
+       metadata_network_group this_ left outer join metadata_extant_network extantnetw3_ on this_.vm_network_index=extantnetw3_.id 
+           left outer join metadata_network_indices indexes4_ on extantnetw3_.id=indexes4_.metadata_extant_network_index_fk 
+           left outer join metadata_extant_network extantnetw5_ on indexes4_.metadata_network_index_extant_network_fk=extantnetw5_.id 
+           left outer join metadata_network_group networkgro6_ on extantnetw5_.networkGroup_id=networkgro6_.id 
+           inner join metadata_network_rule networkrul1_ on this_.id=networkrul1_.metadata_network_group_rule_fk 
+  where 
+       (this_.metadata_account_id like ?) and 
+       ((this_.metadata_display_name like ? or 
+         this_.metadata_display_name like ?) and 
+       (networkrul1_.metadata_network_rule_protocol like ?))
+
+==== Testability ====
+As seen in the above example, use of criterion (as opposed to something like the JPA metamodel) result in textual reference to properties such as:
+
+  networkRules.protocol
+
+This is not verifiable at compilation time, so these reference will be verified with unit tests, e.g.:
+
+  class NetworkGroupFilterSupportTest
+    testFilteringSupport
+      new NetworkGroupFilterSupport().getPersistenceFilters().values().each { ...
+
+=== Collection Filtering ===
+Filtering on collections of items must be possible for either internal for EC2 formats ('''TODO''' pick one format) 
+
+Filtering should be implemented using Predicates (Guava)
+
+Similarly to database filter construction we can contruct a Predicate for a given set of filters:
+
+  Predicates.and
+  - Predicates.or
+    - filter restriction 1
+    - filter restriction 2
+  - Predicates.or
+    - filter restriction 3
+
+Each predicate will extract the list of values for that filter and check against a distinct given value (or wildcard).
+
+==== Wildcard Translation ====
+Filters support the following wildcards:
+
+* '''*''': Matches zero or more characters
+* '''?''': Matches exactly one character
+
+These can be translated to regular expression wildcards:
+
+* '''.*''': Matches zero or more characters
+* '''.''': Matches exactly one character
+
+Other regular expression syntax from the filter value must be escaped (e.g. '''Pattern.quote''')
+
+=== Tag Filtering ===
+Filtering by tags is performed in the database to avoid loading tag information into memory.
+
+A sub-select is used to determine the identifiers of all resources meeting the user provided tag criteria.
+
+In this case the resulting (Hibernate generated) query is:
+
+  select this_.id as id9_0_, this_.creation_timestamp as creation3_9_0_, this_.last_update_timestamp as last4_9_0_, this_.metadata_perm_uuid as metadata5_9_0_, this_.version as version9_0_, this_.metadata_display_name as metadata7_9_0_, this_.metadata_last_state as metadata8_9_0_, this_.metadata_state as metadata9_9_0_, this_.metadata_state_change_stack as metadata10_9_0_, this_.metadata_account_name as metadata11_9_0_, this_.metadata_account_id as metadata12_9_0_, this_.metadata_unique_name as metadata13_9_0_, this_.metadata_user_id as metadata14_9_0_, this_.metadata_user_name as metadata15_9_0_, this_.metadata_image_arch as metadata16_9_0_, this_.metadata_image_description as metadata17_9_0_, this_.metadata_image_name as metadata18_9_0_, this_.metadata_image_is_public as metadata19_9_0_, this_.metadata_image_size_bytes as metadata20_9_0_, this_.metadata_image_type as metadata21_9_0_, this_.metadata_image_platform as metadata22_9_0_, this_.metadata_image_del_vol_on_terminate as metadata23_9_0_, this_.metadata_image_kernel_id as metadata24_9_0_, this_.metadata_image_ramdisk_id as metadata25_9_0_, this_.metadata_image_snapshot_id as metadata26_9_0_, this_.metadata_image_bundle_size as metadata27_9_0_, this_.metadata_image_unencrypted_checksum as metadata28_9_0_, this_.metadata_image_unencrypted_checksum_type as metadata29_9_0_, this_.metadata_image_manifest_path as metadata30_9_0_, this_.metadata_image_signature as metadata31_9_0_, this_.metadata_image_discriminator as metadata1_9_0_
+  from metadata_images this_ 
+  where (1=1) and (this_.id in (
+    select this_.metadata_tag_resource_id as y0_ from metadata_tags_images this_ inner join metadata_tags this_1_ on this_.id=this_1_.id where this_1_.metadata_account_id=$1    
+    and (((this_1_.metadata_display_name=$2 and this_1_.metadata_tag_value=$3)) and ((this_1_.metadata_tag_value=$4)) and ((this_1_.metadata_display_name=$5)))
+  ))
+
+=== Filter Generation ===
+It will be possible to generate a filter from a filter set, e.g.
+
+  Filter Filters.generate( request.getFilterSet(), NetworkGroup.class )
+  
+  Filter
+  - Map<String,String> getAliases()  // For DB filtering
+  - Criterion asCriterion()          // For DB filtering
+  - Predicate asPredicate()          // For collection filtering
+
+Support for DB filtering is optional, in this case aliases will be an empty Map and the Criterion will be a no-op (e.g. '''Restrictions.conjunction()''')
+
+=== Resource Filtering Details ===
+Each resource that supports filtering will include the following implementation classes:
+
+* '''*FilterSupport''' - Defines how to filter for a resource
+* '''Filter*Functions''' - function enumerations to access values of each item that can be filtered
+* '''*FilterSupportTest''' - Unit test for the resource, should cover each filterable item
+
+For the second item there is no requirement to use an enumeration for the functions, but it is suggested that for clarity the function definition is outside of the '''*FilterSupport''' constructor.
+
+The support classes declare how to filter using the following approach:
+
+  public static class NetworkGroupFilterSupport extends FilterSupport<NetworkGroup> {
+    public NetworkGroupFilterSupport() {
+      super( builderFor( NetworkGroup.class )
+          .withStringProperty( "description", FilterFunctions.DESCRIPTION )
+          .withUnsupportedProperty( "group-id" )
+          .withStringProperty( "group-name", FilterFunctions.NAME )
+          .withStringSetProperty( "ip-permission.cidr", FilterSetFunctions.PERMISSION_CIDR )
+
+The resource class is specified (NetworkGroup in the above example) and then filterable items are declared with related details for collection and DB filtering.
+
+For Predicate filtering support, each filter is declared along with the function that is used to extract the value(s) for that filter. If the resource has multiple values for that filter item then one of the ''*Set*'' methods is used. The method used should reflect the (filter) type of the resources values for the filter (boolean, date, integer, long, string).
+
+For Criteria filtering support, it is necessary to declare any aliases used ('''withPersistenceAlias''') in addition to declaring each filter and its path ('''withPersistenceFilter'''). For non-string values the type must be declared (if Boolean, Date, Integer, Long), else a conversion function must be provided from a String value (a common case here is for Enum values, these can be converted using Guavas ''Enums.valueOfFunction'')
+
+To verify the predicates and criteria a unit test class should be implemented (Groovy recommended), this should extend ''FilterSupportTest.InstanceTest''.
+
+=== Filter Details ===
+{|
+! Type !! Name !! Supported !! DB Support !! Notes
+|-
+| Address (Elastic IP) || domain || Y || - || Hardcoded domain '''standard''' (no '''vpc''')<ref name="notvpc">Eucalyptus does not support VPC</ref>
+|-
+| &nbsp; || instance-id || Y || - ||
+|-
+| &nbsp; || public-ip || Y || - ||
+|-
+| &nbsp; || allocation-id || - || - || N/A <ref name="notvpc">Eucalyptus does not support VPC</ref>
+|-
+| &nbsp; || association-id || - || - || N/A <ref name="notvpc"/>
+|-
+| &nbsp; || network-interface-id || - || - || N/A <ref name="notvpc"/>
+|-
+| &nbsp; || network-interface-owner-id || - || - || N/A <ref name="notvpc"/>
+|-
+| &nbsp; || private-ip-address || - || - || N/A <ref name="notvpc"/>
+|-
+| Availability Zone || message || - || - || N/A <ref name="notsupported">Eucalyptus does not support this field</ref>
+|-
+| &nbsp; || region-name || - || - || N/A <ref name="notsupported"/>
+|-
+| &nbsp; || state || - || - || Not compatible <ref name="notaws">Eucalyptus uses this field for other purposes</ref>
+|-
+| &nbsp; || zone-name || Y || - ||
+|-
+| Bundle Tasks || bundle-id || Y || - || Bundle ID is not persisted
+|-
+| &nbsp; || error-code || Y || Y ||
+|-
+| &nbsp; || error-message || Y || Y ||
+|-
+| &nbsp; || instance-id || Y || Y ||
+|-
+| &nbsp; || progress || Y || Y ||
+|-
+| &nbsp; || s3-bucket || Y || Y ||
+|-
+| &nbsp; || s3-prefix || Y || Y ||
+|-
+| &nbsp; || start-time || Y || - || 
+|-
+| &nbsp; || state || Y || Y ||
+|-
+| &nbsp; || update-time || Y || - ||
+|-
+| Image || architecture || Y || Y ||
+|-
+| &nbsp; || block-device-mapping.delete-on-termination || Y || Y ||
+|-
+| &nbsp; || block-device-mapping.device-name || Y || Y ||
+|-
+| &nbsp; || block-device-mapping.snapshot-id || Y || Y ||
+|-
+| &nbsp; || block-device-mapping.volume-size || Y || Y ||
+|-
+| &nbsp; || block-device-mapping.volume-type || Y || Y || Hardcoded type '''standard''' (no '''io1''')
+|-
+| &nbsp; || description || Y || Y ||
+|-
+| &nbsp; || image-id || Y || Y ||
+|-
+| &nbsp; || image-type || Y || Y ||
+|-
+| &nbsp; || is-public || Y || Y ||
+|-
+| &nbsp; || kernel-id || Y || Y ||
+|-
+| &nbsp; || manifest-location || Y || Y ||
+|-
+| &nbsp; || name || Y || Y ||
+|-
+| &nbsp; || owner-alias || Y || - || DB filtering could be possible <ref name="perhapsdbfilter">DB filtering could be possible</ref>
+|-
+| &nbsp; || owner-id || Y || Y || Account ID
+|-
+| &nbsp; || platform || Y || Y || As per AWS ''windows'' or empty
+|-
+| &nbsp; || product-code || Y || Y ||
+|-
+| &nbsp; || product-code.type || - || - || '''devpay''' / '''marketplace''', probably not relevant for us <ref name="needmoreinfo">Investigation required</ref>
+|-
+| &nbsp; || ramdisk-id || Y || Y ||
+|-
+| &nbsp; || root-device-name || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+|-
+| &nbsp; || root-device-type || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+|-
+| &nbsp; || state || Y || Y || 
+|-
+| &nbsp; || state-reason-code || - || - || N/A <ref name="notsupported">Eucalyptus does not support this field</ref>
+|-
+| &nbsp; || state-reason-message || - || - || N/A <ref name="notsupported">Eucalyptus does not support this field</ref>
+|-
+| &nbsp; || tag-key || Y || Y ||
+|-
+| &nbsp; || tag-value || Y || Y ||
+|-
+| &nbsp; || tag:'''key''' || Y || Y ||
+|-
+| &nbsp; || virtualization-type || - || - || Differ from AWS here <ref name="needmoreinfo">Investigation required</ref>
+|-
+| &nbsp; || hypervisor || - || - || Differ from AWS here <ref name="needmoreinfo">Investigation required</ref>
+|-
+| Instance || architecture || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+|-
+| &nbsp; || availability-zone || Y || Y ||
+|-
+| &nbsp; || block-device-mapping.attach-time || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+|-
+| &nbsp; || block-device-mapping.delete-on-termination || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+|-
+| &nbsp; || block-device-mapping.device-name || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+|-
+| &nbsp; || block-device-mapping.status || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+|-
+| &nbsp; || block-device-mapping.volume-id || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+|-
+| &nbsp; || client-token || - || - || N/A <ref name="notsupported">Eucalyptus does not support this field</ref>
+|-
+| &nbsp; || dns-name || Y || Y || Public name
+|-
+| &nbsp; || group-id || - || - || N/A <ref name="notsupported">Eucalyptus does not support this field</ref>
+|-
+| &nbsp; || group-name || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+|-
+| &nbsp; || image-id || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+|-
+| &nbsp; || instance-id || Y || Y ||
+|-
+| &nbsp; || instance-lifecycle || Y || Y || Hardcoded with no value (no '''spot''') <ref name="nospot">Eucalyptus does not support spot instances</ref>
+|-
+| &nbsp; || instance-state-code || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+|-
+| &nbsp; || instance-state-name || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+|-
+| &nbsp; || instance-type || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+|-
+| &nbsp; || instance.group-id || - || - || N/A <ref name="notvpc"/>
+|-
+| &nbsp; || instance.group-name || - || - || N/A <ref name="notvpc"/>
+|-
+| &nbsp; || ip-address || Y || Y || Public IP
+|-
+| &nbsp; || kernel-id || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+|-
+| &nbsp; || key-name || Y || - || DB filtering could be possible (full key in DB) <ref name="perhapsdbfilter"/>
+|-
+| &nbsp; || launch-index || Y || Y || DB no wildcard <ref name="dbnowild">Wildcards not supported for DB filtering with this type.</ref>
+|-
+| &nbsp; || launch-time || Y || Y || DB no wildcard <ref name="dbnowild"/>
+|-
+| &nbsp; || monitoring-state || - || - || N/A <ref name="notsupported">Eucalyptus does not support this field</ref>
+|-
+| &nbsp; || owner-id || Y || Y || Account ID
+|-
+| &nbsp; || placement-group-name || - || - || N/A <ref name="notsupported">Eucalyptus does not support this field</ref>
+|-
+| &nbsp; || platform || Y || Y ||
+|-
+| &nbsp; || private-dns-name || Y || Y ||
+|-
+| &nbsp; || private-ip-address || Y || Y ||
+|-
+| &nbsp; || product-code || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+|-
+| &nbsp; || product-code.type || - || - || N/A <ref name="notsupported">Eucalyptus does not support this field</ref>
+|-
+| &nbsp; || ramdisk-id || Y || - || DB filtering could be possible (full key in DB) <ref name="perhapsdbfilter"/>
+|-
+| &nbsp; || reason || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+|-
+| &nbsp; || requester-id || - || - || N/A <ref name="notsupported">Eucalyptus does not support this field</ref>
+|-
+| &nbsp; || reservation-id || Y || Y ||
+|-
+| &nbsp; || root-device-name || - || - || TODO
+|-
+| &nbsp; || root-device-type || - || - || TODO
+|-
+| &nbsp; || source-dest-check || - || - || TODO
+|-
+| &nbsp; || spot-instance-request-id || - || - || N/A <ref name="nospot">
+|-
+| &nbsp; || state-reason-code || - || - || TODO
+|-
+| &nbsp; || state-reason-message || - || - || TODO
+|-
+| &nbsp; || subnet-id || - || - || N/A <ref name="notvpc"/>
+|-
+| &nbsp; || tag-key || Y || Y ||
+|-
+| &nbsp; || tag-value || Y || Y ||
+|-
+| &nbsp; || tag:'''key''' || Y || Y ||
+|-
+| &nbsp; || virtualization-type || - || - || TODO
+|-
+| &nbsp; || vpc-id || - || - || N/A <ref name="notvpc"/>
+|-
+| &nbsp; || hypervisor || - || - || TODO
+|-
+| &nbsp; || network-interface.description || - || - || N/A <ref name="notvpc"/>
+|-
+| &nbsp; || network-interface.subnet-id || - || - || N/A <ref name="notvpc"/>
+|-
+| &nbsp; || network-interface.vpc-id || - || - || N/A <ref name="notvpc"/>
+|-
+| &nbsp; || network-interface.network-interface.id || - || - || N/A <ref name="notvpc"/>
+|-
+| &nbsp; || network-interface.owner-id || - || - || N/A <ref name="notvpc"/>
+|-
+| &nbsp; || network-interface.availability-zone || - || - || N/A <ref name="notvpc"/>
+|-
+| &nbsp; || network-interface.requester-id || - || - || N/A <ref name="notvpc"/>
+|-
+| &nbsp; || network-interface.requester-managed || - || - || N/A <ref name="notvpc"/>
+|-
+| &nbsp; || network-interface.status || - || - || N/A <ref name="notvpc"/>
+|-
+| &nbsp; || network-interface.mac-address || - || - || N/A <ref name="notvpc"/>
+|-
+| &nbsp; || network-interface-private-dns-name || - || - || N/A <ref name="notvpc"/>
+|-
+| &nbsp; || network-interface.source-destination-check || - || - || N/A <ref name="notvpc"/>
+|-
+| &nbsp; || network-interface.group-id || - || - || N/A <ref name="notvpc"/>
+|-
+| &nbsp; || network-interface.group-name || - || - || N/A <ref name="notvpc"/>
+|-
+| &nbsp; || network-interface.attachment.attachment-id || - || - || N/A <ref name="notvpc"/>
+|-
+| &nbsp; || network-interface.attachment.instance-id || - || - || N/A <ref name="notvpc"/>
+|-
+| &nbsp; || network-interface.attachment.instance-owner-id || - || - || N/A <ref name="notvpc"/>
+|-
+| &nbsp; || network-interface.addresses.private-ip-address || - || - || N/A <ref name="notvpc"/>
+|-
+| &nbsp; || network-interface.attachment.device-index || - || - || N/A <ref name="notvpc"/>
+|-
+| &nbsp; || network-interface.attachment.status || - || - || N/A <ref name="notvpc"/>
+|-
+| &nbsp; || network-interface.attachment.attach-time || - || - || N/A <ref name="notvpc"/>
+|-
+| &nbsp; || network-interface.attachment.delete-on-termination || - || - || N/A <ref name="notvpc"/>
+|-
+| &nbsp; || network-interface.addresses.primary || - || - || N/A <ref name="notvpc"/>
+|-
+| &nbsp; || network-interface.addresses.association.public-ip || - || - || N/A <ref name="notvpc"/>
+|-
+| &nbsp; || network-interface.addresses.association.ip-owner-id || - || - || N/A <ref name="notvpc"/>
+|-
+| &nbsp; || association.public-ip || - || - || N/A <ref name="notvpc"/>
+|-
+| &nbsp; || association.ip-owner-id || - || - || N/A <ref name="notvpc"/>
+|-
+| &nbsp; || association.allocation-id || - || - || N/A <ref name="notvpc"/>
+|-
+| &nbsp; || association.association-id || - || - || N/A <ref name="notvpc"/>
+|-
+| Key Pair || fingerprint || Y || Y ||
+|-
+| &nbsp; || key-name || Y || Y ||
+|-
+| Region || endpoint || Y || - ||
+|-
+| &nbsp; || region-name || Y || - || 
+|-
+| Security Group || description || Y || Y ||
+|-
+| &nbsp; || group-id || Y || Y ||
+|-
+| &nbsp; || group-name || Y || Y ||
+|-
+| &nbsp; || ip-permission.cidr || Y || - ||
+|-
+| &nbsp; || ip-permission.from-port || Y || Y ||
+|-
+| &nbsp; || ip-permission.group-name || Y || - ||
+|-
+| &nbsp; || ip-permission.protocol || Y || Y ||
+|-
+| &nbsp; || ip-permission.to-port || Y || Y ||
+|-
+| &nbsp; || ip-permission.user-id || Y || - ||
+|-
+| &nbsp; || owner-id || Y || Y || Account ID
+|-
+| &nbsp; || tag-key || Y || Y ||
+|-
+| &nbsp; || tag-value || Y || Y ||
+|-
+| &nbsp; || tag:'''key''' || Y || Y ||
+|-
+| Snapshot || description || Y || Y ||
+|-
+| &nbsp; || owner-alias || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+|-
+| &nbsp; || owner-id || Y || Y || Account ID
+|-
+| &nbsp; || progress || Y || - ||
+|-
+| &nbsp; || snapshot-id || Y || Y ||
+|-
+| &nbsp; || start-time || Y || - || DB no wildcard <ref name="dbnowild">Non string DB type, wildcards not supported for DB filter</ref>
+|-
+| &nbsp; || status || Y || - || 
+|-
+| &nbsp; || tag-key || Y || Y ||
+|-
+| &nbsp; || tag-value || Y || Y ||
+|-
+| &nbsp; || tag:'''key''' || Y || Y ||
+|-
+| &nbsp; || volume-id || Y || Y ||
+|-
+| &nbsp; || volume-size || Y || Y || DB no wildcard <ref name="dbnowild"/>
+|-
+| Tag || key || Y || Y ||
+|-
+| &nbsp; || resource-id || Y || - ||
+|-
+| &nbsp; || resource-type || Y || - ||
+|-
+| &nbsp; || value || Y || Y ||
+|-
+| Volume || attachment.attach-time || Y || - ||
+|-
+| &nbsp; || attachment.delete-on-termination || Y || - || 
+|-
+| &nbsp; || attachment.device || Y || - ||
+|-
+| &nbsp; || attachment.instance-id || Y || - ||
+|-
+| &nbsp; || attachment.status || Y || - ||
+|-
+| &nbsp; || availability-zone || Y || Y ||
+|-
+| &nbsp; || create-time || Y || - || DB no wildcard <ref name="dbnowild"/>
+|-
+| &nbsp; || size || Y || Y || DB no wildcard <ref name="dbnowild"/>
+|-
+| &nbsp; || snapshot-id || Y || Y ||
+|-
+| &nbsp; || status || Y || - ||
+|-
+| &nbsp; || tag-key || Y || Y ||
+|-
+| &nbsp; || tag-value || Y || Y ||
+|-
+| &nbsp; || tag:'''key''' || Y || Y ||
+|-
+| &nbsp; || volume-id || Y || Y ||
+|-
+| &nbsp; || volume-type || Y || - || Hardcoded type '''standard''' (no '''io1''')
+|}
+
+<references />
+
+= Configuration =
+A new configuration property is added to control the permitted number of tags per resource (default 10):
+
+  tagging.max_tags_per_resource = 10
+
+= Upgrade =
+No upgrade impact noted.
+
+= Packaging =
+No specific packaging requirements.
+
+= Documentation =
+The following items are identified as documentation candidates:
+
+* The reservation of the prefix '''euca:''' for tag keys and values
+
+= Security =
+Filtering can only restrict the output so there is low risk of introducing access control issues from an architectural perspective. Implementation of the feature means changing the enforcement of access permissions for each describe operation, so there is some risk of regression for each affected resource.
+
+= Testing =
+Testing should cover SOAP and Query APIs.
+
+Testing should verify that that permissions are enforced correctly for each modified resource (due to risk of regressions)
+
+= References =
+* [[features/rsrc-tagging/3.3/spec | Resource Tagging and Filtering specification]]
+* [http://docs.amazonwebservices.com/AWSEC2/latest/UserGuide/Using_Tags.html Using Tags (amazonwebservices.com)]
+* [http://docs.guava-libraries.googlecode.com/git-history/v9.0/javadoc/index.html Guava v9 (googlecode.com)]
+* [https://eucalyptus.atlassian.net/browse/EUCA-2117 JIRA Task EUCA-2117 - Resource tagging  (atlassian.net)]
+
+[[tag:rls-3.3]]

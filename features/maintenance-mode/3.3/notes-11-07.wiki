@@ -15,7 +15,6 @@
 * euca-node-evacuate NODEID
 ** Determines whether evacuation can be performed given resource availability
 ** Returns commitment to user which is viable in the absence of failures
-** 
 * Cancellation is NOT possible in VMware 5.0 GUI
 * TODO
 ** Testing plans for maintenance mode

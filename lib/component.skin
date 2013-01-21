@@ -1,0 +1,39 @@
+skinparam noteBackgroundColor White
+skinparam component {
+  FontColor Black
+    FontSize 12
+    FontName monospaced
+
+    StereotypeFontStyle Bold
+    StereotypeFontSize 10
+    StereotypeFontColor Red
+    StereotypeFontName monospaced
+
+    ArrowColor Black
+    ArrowFontColor Black
+    ArrowFontSize 10
+    ArrowFontName monospaced
+
+    BackgroundColor #ddffdd
+    BorderColor Green
+    InterfaceBackgroundColor Green
+    InterfaceBorderColor Green
+
+    BorderColor<<Service>> Blue
+    InterfaceBorderColor<<Service>> Blue
+    BackgroundColor<<Service>> #ddddff
+
+    BorderColor<<User>> LightGray
+    InterfaceBorderColor<<User>> LightGray
+    BackgroundColor<<User>> White
+
+    BorderColor<<Development>> Yellow
+    InterfaceBorderColor<<Development>> Yellow
+    BackgroundColor<<Development>> #ffffee
+
+    BorderColor<<Future>> Red
+    InterfaceBorderColor<<Future>> Red
+    BackgroundColor<<Future>> #ffeeee    
+
+}
+

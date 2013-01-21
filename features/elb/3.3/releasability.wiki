@@ -1,0 +1,73 @@
+= Distro Support =
+
+== nginx ==
+
+Latest Stable: 1.2.4
+Latest Development: 1.3.8
+
+CentOS 6.3 (EPEL): 1.0.15
+CentOS 5.8 (EPEL): 0.8.55
+
+Probably need to package this since we would need the [tcp proxy module](https://github.com/yaoweibin/nginx_tcp_proxy_module.git),
+which requires that we patch nginx.
+
+=== Dependencies ===
+
+* GeoIP
+* gd (graphics library)
+* libxslt
+* openssl
+* pcre
+* perl
+* zlib
+
+== haproxy ==
+
+Latest Stable: 1.4.22
+Latest Development: 1.5-dev12
+
+CentOS 6.3 (EPEL): 1.4.22
+CentOS 5.8 (EPEL): 1.3.26
+
+=== Dependencies ===
+
+* pcre
+
+== pound ==
+
+Latest Stable: 2.6
+Latest Experimental: 2.7a
+
+CentOS 6.3 (EPEL): 2.6
+CentOS 5.8 (EPEL): 2.4.4
+
+=== Dependencies ===
+
+* openssl
+* pcre
+
+= Distributing a VM  =
+
+== Methods of Distribution ==
+
+* Provide tools for creating the LB image
+** Includes kickstart file and tool (e.g. ami-creator)
+** We should provide these if we supply a VM or not
+* Provide a pre-built VM with LB
+** How are these obtained?
+
+== When to build the VM ==
+
+* When packages are built
+** Builds take longer
+*** Using remote mirror (20mins)
+*** Using local mirror (5mins)
+** Requires us to provide new VMs when security patches are needed
+** Requires us to have a method of distribution for images
+* When packages are installed
+** Can allow users to get updated dependencies themselves
+** Creates a longer installation process
+** Requires documentation of the image build process
+
+----
+[[tag:rls-3.3]]

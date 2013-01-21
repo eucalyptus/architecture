@@ -9,7 +9,7 @@
 ** Future direction involves SDN integrations
 ** Future direction for supporting AWS semantics vis a vis VPC 
 ** VMware support
-** Encapuslation of traffic from the hosting network
+** Encapsulation of traffic from the hosting network
 * OVS/OpenFlow approach as marketing play
 * Pending Questions
 ** Look at both VMware and openvswitch for these questions:

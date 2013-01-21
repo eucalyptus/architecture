@@ -196,7 +196,7 @@
             <xs:element name="MaxSize" type="xs:integer"/>
             <xs:element name="DesiredCapacity" type="xs:integer" minOccurs="0"/>
             <xs:element name="DefaultCooldown" type="xs:integer" minOccurs="0"/>
-            <xs:element name="AvailabilityZones" type="tns:AvailabilityZones"/>
+            <xs:element name="AvailabilityZones" type="tns:AvailabilityZones" minOccurs="0"/>
             <xs:element name="LoadBalancerNames" type="tns:LoadBalancerNames" minOccurs="0"/>
             <xs:element name="HealthCheckType" type="tns:XmlStringMaxLen32" minOccurs="0"/>
             <xs:element name="HealthCheckGracePeriod" type="xs:integer" minOccurs="0"/>
@@ -576,6 +576,7 @@
             <xs:element name="InstanceMonitoring" type="tns:InstanceMonitoring" minOccurs="0"/>
             <xs:element name="SpotPrice" type="tns:SpotPrice" minOccurs="0"/>
             <xs:element name="IamInstanceProfile" type="tns:XmlStringMaxLen1600" minOccurs="0"/>
+            <xs:element name="EbsOptimized" type="xs:boolean" minOccurs="0"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
@@ -1327,6 +1328,7 @@
             <xs:element name="SpotPrice" type="tns:SpotPrice" minOccurs="0"/>
             <xs:element name="IamInstanceProfile" type="tns:XmlStringMaxLen1600" minOccurs="0"/>
             <xs:element name="CreatedTime" type="xs:dateTime"/>
+            <xs:element name="EbsOptimized" type="xs:boolean" minOccurs="0"/>
         </xs:sequence>
       </xs:complexType>
 

@@ -1,0 +1,354 @@
+= API parameters = 
+
+== CreateLoadBalancer ==
+=== WILL SUPPORT ===
+  * AvailabilityZones.member.N        
+    - A list of Availability Zones. 
+    - Type: String list
+    - Required: no
+  * Listeners.member.N
+    - A list of the following tuples: LoadBalancerPort, InstancePort, and Protocol.
+    - Type: Listener list
+    - Required: no
+  * LoadBalancerName
+    - The name associated with the LoadBalancer. The name must be unique within your set of LoadBalancers.
+    - Type: String
+    - Required: Yes
+
+=== WILL NOT SUPPORT ===
+  * Scheme
+    - The type of a LoadBalancer. This option is only available for LoadBalancers attached to an Amazon VPC.
+    - Type: String
+    - Required: No
+  * SecurityGroups.member.N
+    - The security groups assigned to your LoadBalancer within your VPC.
+    - Type: String list
+    - Required: No
+  * Subnets.member.N
+    - A list of subnet IDs in your VPC to attach to your LoadBalancer.
+    - Type: String list
+    - Required: No
+
+== DeleteLoadBalancer == 
+=== WILL SUPPORT === 
+  * LoadBalancerName
+    - The name associated with the LoadBalancer. 
+    - Type: String
+    - Required: Yes
+
+== DescribeLoadBalancers ==
+=== WILL SUPPORT === 
+  * LoadBalancerNames.member.N
+    - A list of names associated with the LoadBalancers at creation time.
+    - Type: String list
+    - Required: No
+
+=== WILL NOT SUPPORT ===
+  * Marker
+    - An optional parameter reserved for future use.
+    - Type: String
+    - Required: No
+
+== DeregisterInstancesFromLoadBalancer ==
+=== WILL SUPPORT ===
+  * Instances.member.N
+    - A list of EC2 instance IDs consisting of all instances to be deregistered.
+    - Type: Instance list
+    - Required: Yes
+
+  * LoadBalancerName
+    - The name associated with the LoadBalancer. The name must be unique within the client AWS account.
+    - Type: String
+    - Required: Yes
+
+
+== RegisterInstancesWithLoadBalancer ==
+=== WILL SUPPORT ===
+  * Instances.member.N
+    - A list of instance IDs that should be registered with the LoadBalancer.
+    - Type: Instance list
+    - Required: Yes
+
+  * LoadBalancerName
+    - The name associated with the LoadBalancer. The name must be unique within the client AWS account.
+    - Type: String
+    - Required: Yes
+
+
+== CreateLoadBalancerListeners ==
+=== WILL SUPPORT ===
+  * Listeners.member.N
+    - A list of LoadBalancerPort, InstancePort, Protocol, and SSLCertificateId items.
+    - Type: Listener list
+    - Required: Yes
+
+  * LoadBalancerName
+    - The name of the LoadBalancer.
+    - Type: String
+    - Required: Yes
+
+== DeleteLoadBalancerListeners ==
+=== WILL SUPPORT ===
+  * LoadBalancerName
+    - The mnemonic name associated with the LoadBalancer.
+    - Type: String
+    - Required: Yes
+
+  * LoadBalancerPorts.member.N
+    - The client port number(s) of the LoadBalancerListener(s) to be removed.
+    - Type: Integer list
+    - Required: Yes
+
+== ConfigureHealthCheck ==
+=== WILL SUPPORT ===
+  * HealthCheck
+    - A structure containing the configuration information for the new healthcheck.
+    - Type: HealthCheck
+    - Required: Yes
+
+  * LoadBalancerName
+    - The mnemonic name associated with the LoadBalancer. This name must be unique within the client AWS account.
+    - Type: String
+    - Required: Yes
+
+== DescribeInstanceHealth ==
+=== WILL SUPPORT ===
+  * Instances.member.N
+    - A list of instance IDs whose states are being queried.
+    - Type: Instance list
+    - Required: No 
+
+  * LoadBalancerName
+    - The name associated with the LoadBalancer. The name must be unique within the client AWS account.
+    - Type: String
+    - Required: Yes 
+
+
+== DescribeInstanceHealth ==
+Description:
+  - Returns the current state of the instances of the specified LoadBalancer. 
+  - If no instances are specified, the state of all the instances for the LoadBalancer is returned.
+  - Note: The client must have created the specified input LoadBalancer in order to retrieve this information; the client must provide the same account credentials as those that were used to create the LoadBalancer.
+
+Request Parameters :
+Will Support :
+
+*Instances.member.N
+  - A list of instance IDs whose states are being queried.
+  - Type: Instance list
+  - Required: No 
+
+*LoadBalancerName
+  - The name associated with the LoadBalancer. The name must be unique within the client AWS account.
+  - Type: String
+  - Required: Yes 
+
+Response : 
+*DescribeInstanceHealthResult
+  - Type: DescribeInstanceHealthResult
+
+Errors : 
+*AccessPointNotFound  
+  - The specified LoadBalancer could not be found.
+  - HttpResponseCode: 400
+*InvalidEndPoint  
+  - The specified EndPoint is not valid.
+  - HttpResponseCode: 400
+
+== CreateLoadBalancerPolicy ==
+Description :
+  - Creates a new policy that contains the necessary attributes depending on the policy type. 
+  - Policies are settings that are saved for your Elastic LoadBalancer and that can be applied to the front-end listener, or the back-end application server, depending on your policy type.
+
+Request Parameters :
+Will Support :
+
+*LoadBalancerName
+  - The name associated with the LoadBalancer for which the policy is being created. This name must be unique within the client AWS account.
+  - Type: String
+  - Required: Yes 
+
+*PolicyAttributes.member.N
+  - A list of attributes associated with the policy being created.
+  - Type: PolicyAttribute list
+  - Required: No 
+
+*PolicyName
+  - The name of the LoadBalancer policy being created. The name must be unique within the set of policies for this LoadBalancer.
+  - Type: String
+  - Required: Yes 
+
+*PolicyTypeName
+  - The name of the base policy type being used to create this policy. To get the list of policy types, use the DescribeLoadBalancerPolicyTypes action.
+  - Type: String
+  - Required: Yes 
+
+Errors :
+*AccessPointNotFound
+  - The specified LoadBalancer could not be found.
+  - HttpResponseCode: 400
+*DuplicatePolicyName
+  - Policy with the same name exists for this LoadBalancer. Please choose another name.
+  - HttpResponseCode: 400
+*InvalidConfigurationRequest
+  - Requested configuration change is invalid.
+  - HttpResponseCode: 409
+*PolicyTypeNotFound
+  - One or more of the specified policy types do not exist.
+  - HttpResponseCode: 400
+*TooManyPolicies
+  - Quota for number of policies for this LoadBalancer has already been reached.
+  - HttpResponseCode: 400
+
+
+== DeleteLoadBalancerPolicy ==
+
+Description :
+  - Deletes a policy from the LoadBalancer. The specified policy must not be enabled for any listeners.
+
+Request Parameters :
+Will Support :
+* LoadBalancerName
+  - The mnemonic name associated with the LoadBalancer. The name must be unique within your AWS account.
+  - Type: String
+  - Required: Yes
+* PolicyName
+  - The mnemonic name for the policy being deleted.
+  - Type: String
+  - Required: Yes
+
+Errors :
+* AccessPointNotFound
+  - The specified LoadBalancer could not be found.
+  - HttpResponseCode: 400
+* InvalidConfigurationRequest
+  - Requested configuration change is invalid.
+  - HttpResponseCode: 409
+
+
+== DescribeLoadBalancerPolicies ==
+
+Description :
+  - Returns detailed descriptions of the policies.
+  - If you specify a LoadBalancer name, the operation returns either the descriptions of the specified policies, or descriptions of all the policies created for the LoadBalancer.
+  - If you don't specify a LoadBalancer name, the operation returns descriptions of the specified sample policies, or descriptions of all the sample policies.
+  - The names of the sample policies have the ELBSample- prefix.
+
+Request Parameters :
+Will Support :
+*LoadBalancerName
+  - The mnemonic name associated with the LoadBalancer. 
+  - If no name is specified, the operation returns the attributes of either all the sample policies pre-defined by Elastic Load Balancing or the specified sample polices.
+  - Type: String
+  - Required: No
+
+*PolicyNames.member.N
+  - The names of LoadBalancer policies you've created or Elastic Load Balancing sample policy names.
+  - Type: String list
+  - Required: No
+
+Response : 
+*DescribeLoadBalancerPoliciesResult
+  - Type: DescribeLoadBalancerPoliciesResult
+
+Errors :
+*AccessPointNotFound
+  - The specified LoadBalancer could not be found.
+  - HttpResponseCode: 400
+*PolicyNotFound
+  - One or more specified policies were not found.
+  - HttpResponseCode: 400
+
+Data Types :
+"DescribeInstanceHealthResult"
+* InstanceStates
+  - A list containing health information for the specified instances.
+  - Type: InstanceState list
+
+"DescribeLoadBalancerPoliciesResult"
+*PolicyAttributeDescriptions
+  - A list of policy attribute description structures.
+  - Type: PolicyAttributeDescription list
+*PolicyName
+  - The name mof the policy associated with the LoadBalancer.
+  - Type: String
+*PolicyTypeName
+  - The name of the policy type associated with the LoadBalancer.
+  - Type: String
+
+
+"Instance" 
+*InstanceId
+  - Provides an EC2 instance ID.
+  - Type: String
+
+"InstanceState"
+*Description
+  - Provides a description of the instance state.
+  - Type: String
+*InstanceId
+  - Provides an EC2 instance ID.
+  - Type: String
+*ReasonCode
+  - Provides information about the cause of OutOfService instances. Specifically, it indicates whether the cause is Elastic Load Balancing or the instance behind the LoadBalancer.
+  - Type: String
+*State
+  - Specifies the current state of the instance. Valid value: InService|OutOfService
+  - Type: String
+
+"PolicyAttribute"
+*AttributeName
+  - The name of the attribute associated with the policy.
+  - Type: String
+*AttributeValue
+  - The value of the attribute associated with the policy.
+  - Type: String
+
+"PolicyDescription"
+*PolicyAttributeDescriptions
+  - A list of policy attribute description structures.
+  - Type: PolicyAttributeDescription list
+*PolicyName
+  - The name mof the policy associated with the LoadBalancer.
+  - Type: String
+*PolicyTypeName
+  - The name of the policy type associated with the LoadBalancer.
+  - Type: String
+
+"PolicyAttributeDescription"
+*AttributeName
+  - The name of the attribute associated with the policy.
+  - Type: String
+*AttributeValue
+  - The value of the attribute associated with the policy.
+  - Type: String
+
+
+== DescribeLoadBalancerPolicyTypes ==
+=== WILL SUPPORT ===
+  * PolicyTypeNames.member.N
+  - Specifies the name of the policy types.
+  - Type: String
+  - Required: No
+  - Error: PolicyTypeNotFound
+   
+= 2nd Step =
+== DisableAvailabilityZonesForLoadBalancer ==
+== EnableAvailabilityZonesForLoadBalancer ==
+
+== CreateAppCookieStickinessPolicy ==
+== CreateLBCookieStickinessPolicy ==
+
+== SetLoadBalancerListenerSSLCertificate ==
+
+== CreateLoadBalancerPolicy ==
+== DeleteLoadBalancerPolicy ==
+== DescribeLoadBalancerPolicies ==
+== DescribeLoadBalancerPolicyTypes ==
+== SetLoadBalancerPoliciesOfListener ==
+== SetLoadBalancerPoliciesForBackendServer ==
+
+= Unsupport =
+== AttachLoadBalancerToSubnets - VPC ==
+== DetachLoadBalancerFromSubnets - VPC ==
+== ApplySecurityGroupsToLoadBalancer - VPC ==
