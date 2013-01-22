@@ -13,11 +13,11 @@ rectangle {
 database "eucalyptus_cloudwatch" {
 folder "List Metric Rows" {
     [list_metrics_dimensions]
-    [list_metrics_metrics]
+    [list_metrics]
   }
 }
-[list_metrics_metrics] --> [list_metrics_dimensions] : CASCADE(ONE-TO-MANY)
-[list_metrics_metrics] o-- (Aggregation) : INSERT/UPDATE
-(Cleaner) --left-> [list_metrics_metrics] : DELETE
+[list_metrics] --> [list_metrics_dimensions] : CASCADE(ONE-TO-MANY)
+[list_metrics] o-- (Aggregation) : INSERT/UPDATE
+(Cleaner) --left-> [list_metrics] : DELETE
 @enduml
 
