@@ -5,16 +5,16 @@ title Put Metric Data Workflow
 rectangle {
     ()"Cloud Watch Service"
 }
-() "Cloud Watch Service" --> (PutMetricData): response 
+() "Cloud Watch Service" --> (PutMetricData): response
 (PutMetricData) -down-> ()"Cloud Watch Service" : request
-() "Cloud Watch Service" -down-> [Raw Data Queue] 
-[Raw Data Queue] --> (Aggregation) 
-[Raw Data Queue] <-right- (Aggregation) 
-database "eucalyptus_cwatch" {
+() "Cloud Watch Service" -down-> [Raw Data Queue]
+[Raw Data Queue] --> (Aggregation)
+[Raw Data Queue] <-right- (Aggregation)
+database "eucalyptus_cloudwatch" {
 folder "Data Points Rows" {
-    [Calculated Data Query Type] 
+    [Calculated Data Query Type]
   }
-} 
-[Calculated Data Query Type] o-- (Aggregation) : INSERT 
+}
+[Calculated Data Query Type] o-- (Aggregation) : INSERT
 (Cleaner) --left-> [Calculated Data Query Type] : DELETE
 @enduml
