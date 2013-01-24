@@ -1,0 +1,49 @@
+@startuml
+  title (Source,Dest) Migration State Tuples\nThe state machine from the CC PoV.
+  state "Pending,None" as pendingNone
+  state "Extant,None" as extantNone
+  state "Teardown,None" as teardownNone
+  state "Teardown,Extant" as teardownExtant
+  state "None,Extant" as noneExtant
+  state "None,Teardown" as noneTeardown
+  state "Extant (Preparing),None" as preparingNone
+  state "Extant,Extant" as extantExtant {
+    state "(Preparing,Preparing)" as preparingPreparing
+    state "(Ready,Ready)" as readyReady
+    state "(Preparing,Ready)" as preparingReady
+    state "(Ready,Preparing)" as readyPreparing
+    state "(Migrating,Ready)" as migratingReady
+    state "(Migrating,Migrating)" as migratingMigrating
+    state "(Cleaning,Migrating)" as cleaningMigrating
+    state "(Cleaning,None)" as cleaningNone
+    state "(None,None)" as noneNone
+    [*] -down-> preparingPreparing
+    [*] -down-> readyReady
+    [*] -right-> preparingReady
+    [*] -left-> readyPreparing
+    preparingPreparing -up-> preparingReady
+    preparingPreparing -up-> readyPreparing
+    preparingReady -down-> readyReady
+    readyPreparing -down-> readyReady
+    readyReady -down-> migratingReady
+    readyReady -down-> migratingMigrating
+    migratingReady -right-> migratingMigrating
+    migratingMigrating -down-> cleaningMigrating
+    migratingMigrating -down-> noneNone
+    migratingMigrating -down-> cleaningNone
+    cleaningNone -right-> noneNone
+    cleaningMigrating -right-> cleaningNone
+    noneNone -down-> [*]
+  }
+  [*] -down-> pendingNone
+  pendingNone -down-> extantNone
+  pendingNone -> teardownNone
+  extantNone -> teardownNone
+  extantNone -> preparingNone
+  preparingNone -> extantExtant
+  extantExtant -> teardownExtant
+  teardownExtant -> noneExtant
+  noneExtant -> noneTeardown
+  noneTeardown -> [*]
+  teardownNone -> [*]
+@enduml

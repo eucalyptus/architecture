@@ -1,0 +1,35 @@
+@startuml
+  title "Source & Destination NC"
+  left to right direction 
+  [*] -> Pending
+  Pending -> Extant
+  Pending -> Teardown
+  Extant -> Teardown
+  Extant -> Extant
+  state Extant {
+    state "Preparing" as PreparingSource 
+    PreparingSource : Source NC
+    state "Migrating" as MigratingSource 
+    MigratingSource : Source NC
+    state "Ready" as ReadySource 
+    ReadySource : Source NC
+    state "Clean up" as Cleanup
+    Cleanup : Source NC
+    [*] -down-> PreparingSource
+    PreparingSource -down-> ReadySource
+    ReadySource -down-> MigratingSource
+    MigratingSource -down-> Cleanup
+    Cleanup -down-> [*] : Instance\ngoes to\nTeardown
+    --
+    state "Preparing" as PreparingDest
+    PreparingDest : Destination NC
+    state "Migrating" as MigratingDest
+    MigratingDest : Destination NC
+    state "Ready" as ReadyDest
+    ReadyDest : Destination NC
+    [*] -down-> PreparingDest
+    PreparingDest -down-> ReadyDest
+    ReadyDest -down-> MigratingDest
+    MigratingDest -down-> [*] : Instance\ngoes to\nExtant
+  }
+@enduml
