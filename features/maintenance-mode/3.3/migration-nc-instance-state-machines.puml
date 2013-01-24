@@ -1,5 +1,5 @@
 @startuml
-  title "Source & Destination NC"
+  title Source & Destination NC
   left to right direction 
   [*] -> Pending
   Pending -> Extant

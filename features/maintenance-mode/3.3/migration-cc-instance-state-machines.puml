@@ -25,8 +25,8 @@
     preparingPreparing -up-> readyPreparing
     preparingReady -down-> readyReady
     readyPreparing -down-> readyReady
-    readyReady -down-> migratingReady
-    readyReady -down-> migratingMigrating
+    readyReady -down-> migratingReady : ncMigrateInstances:COMMIT
+    readyReady -down-> migratingMigrating : ncMigrateInstances:COMMIT
     migratingReady -right-> migratingMigrating
     migratingMigrating -down-> cleaningMigrating
     migratingMigrating -down-> noneNone
@@ -37,13 +37,13 @@
   }
   [*] -down-> pendingNone
   pendingNone -down-> extantNone
-  pendingNone -> teardownNone
-  extantNone -> teardownNone
-  extantNone -> preparingNone
-  preparingNone -> extantExtant
-  extantExtant -> teardownExtant
-  teardownExtant -> noneExtant
-  noneExtant -> noneTeardown
-  noneTeardown -> [*]
-  teardownNone -> [*]
+  pendingNone -left-> teardownNone
+  extantNone -left-> teardownNone
+  extantNone -down-> preparingNone : ncMigrateInstances:PREPARE
+  preparingNone -down-> extantExtant
+  extantExtant -down-> teardownExtant
+  teardownExtant -down-> noneExtant
+  noneExtant -down-> noneTeardown
+  noneTeardown -down-> [*]
+  teardownNone -down-> [*]
 @enduml
