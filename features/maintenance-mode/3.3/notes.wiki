@@ -1,3 +1,5 @@
+= Raw notes from early discussions =
+
 * Support for vmware 5.0 and 5.1
 * There is a clear overhead to setting up the environment for vmware setup
 * Are there conditions under which evacuation can fail?

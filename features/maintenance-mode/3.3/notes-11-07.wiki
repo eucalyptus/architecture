@@ -1,3 +1,5 @@
+= Notes from discussion on 2012-11-07 =
+
 * Vasya:  VMware 5.0 vMotion worked
 ** Orchestrating virtual resources during migration
 *** VM (memory, cpu state, rootfs)
