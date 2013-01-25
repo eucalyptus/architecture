@@ -11,7 +11,9 @@
     state "(Preparing,Preparing)" as preparingPreparing
     state "(Ready,Ready)" as readyReady
     state "(Preparing,Ready)" as preparingReady
+'    state "(Preparing,Failed)" as preparingFailed
     state "(Ready,Preparing)" as readyPreparing
+'    state "(Ready,Failed)" as readyFailed
     state "(Migrating,Ready)" as migratingReady
     state "(Migrating,Migrating)" as migratingMigrating
     state "(Cleaning,Migrating)" as cleaningMigrating
@@ -25,8 +27,8 @@
     preparingPreparing -up-> readyPreparing
     preparingReady -down-> readyReady
     readyPreparing -down-> readyReady
-    readyReady -down-> migratingReady : ncMigrateInstances:COMMIT
-    readyReady -down-> migratingMigrating : ncMigrateInstances:COMMIT
+    readyReady -down-> migratingReady : ncMigrateInstances:COMMIT\non Source NC
+    readyReady -down-> migratingMigrating : ncMigrateInstances:COMMIT\non Source NC
     migratingReady -right-> migratingMigrating
     migratingMigrating -down-> cleaningMigrating
     migratingMigrating -down-> noneNone
@@ -39,11 +41,12 @@
   pendingNone -down-> extantNone
   pendingNone -left-> teardownNone
   extantNone -left-> teardownNone
-  extantNone -down-> preparingNone : ncMigrateInstances:PREPARE
-  preparingNone -down-> extantExtant
+  extantNone -down-> preparingNone : ncMigrateInstances:PREPARE\non Source NC
+  preparingNone -down-> extantExtant : ncMigrateInstances:PREPARE\non Dest. NC
   extantExtant -down-> teardownExtant
   teardownExtant -down-> noneExtant
   noneExtant -down-> noneTeardown
+  noneExtant -up-> extantNone : Another\ninstance\nmigration
   noneTeardown -down-> [*]
   teardownNone -down-> [*]
 @enduml
