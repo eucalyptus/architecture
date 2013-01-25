@@ -1,15 +1,332 @@
-multiple host maintenance
-- terminate/run mode for instance store is out; no loss of in memory state
-- admin command for quarantine through CLC
-- RHEV & VMware seem to be the low hanging fruit functionally
-- KVM, Xen reliability are a major question
-- is there a way to pause the vm
-- vm maintenance mode
-- compromised 
-- what are the benefits?
-- controlling workload schedule
-- slow down the system
-- live migration with attached volumes
+= Maintenance mode =
+
+== Overview ==
+
+Maitenance mode operations should allow a cloud administrator to perform maitenance of node controllers with minimal intereference of cloud workload. 
+
+== Component APIs ==
+
+Each level of the system (cloud level, cluster level, and node level) implements operations related to maitenance.
+
+{|
+| '''NOTATION''': For Eucalyptus 3.3 minimal viable product, only parameters marked with &clubs; must be implemented.
+|}
+
+=== CLC an CC operations ===
+
+Both CLC and CC implement the same operations with the same parameters:
+
+==== MigrateInstances ====
+
+Requests migration of either a specific instance or ''all'' instances on a specific NC. Optionally, the request may restrict the set of hosts that can be considered as potential migration destinations either by specifying a white list or a black list.
+
+{|
+|+ '''Request Parameters'''
+! scope="col"| Name
+! scope="col"| Description
+! scope="col"| Required
+|-
+| <tt>sourceHost</tt>&clubs;
+| Name of the NC from which ''all'' instances are to be migrated (mutually exclusive with <tt>instanceId</tt>).
+* Type: ''String''
+* Default: ''None''
+| Yes (XOR <tt>instanceId</tt>)
+|-
+| <tt>instanceId</tt>
+| ID of the instance to migrate (mutually exclusive with <tt>sourceHost</tt>).
+* Type: ''String''
+* Default: ''None''
+|Yes (XOR <tt>sourceHost</tt>)
+|-
+| <tt>destinationHost.n</tt>
+|Set of hosts that are either allowed or disallowed as targets of migration(s), depending on <tt>allowHosts</tt>. If the set is empty, then all hosts are potential targets for migration, with CC making the choice based on its standard scheduling algorithm.
+* Type: ''String''
+* Default: ''Empty''
+| No
+|-
+| <tt>allowHosts</tt>
+| If ''true'', the hosts in <tt>destinationHost</tt> set are the ''only'' allowed destinations for migration. (In the trivial case of a single host, there is no scheduling to perform.) If ''false'', that set contains hosts explicitly disallowed as destinations. The parameter has no meaning if the set above is empty.
+* Type: ''Boolean''
+* Default: ''None''
+| No
+|}
+
+Successful response from CLC indicates that:
+* the migration request is valid and the participants are present (instance is still running or host is still functioning) 
+* a migration plan has been computed and recorded on the source NC
+* there were sufficient resources to perform the migration and they have been reserved (resource availability will reflect the additional resources necessary during migration)
+
+{|
+|+ '''Response Elements (from CLC)'''
+! scope="col"| Name
+! scope="col"| Description
+! scope="col"| Required
+|-
+|<tt>return</tt>&clubs;
+|Request accepted if ''false'' and error if ''true''
+* Type: ''Boolean''
+* Default: ''None''
+| Yes
+|}
+
+Successful response from the CC will also include resource availability that resulted from the migrate request.
+
+{|
+|+ '''Response Elements (from CC)'''
+! scope="col"| Name
+! scope="col"| Description
+! scope="col"| Required
+|-
+|<tt>return</tt>&clubs;
+|Request accepted if ''false'' and error if ''true''
+* Type: ''Boolean''
+* Default: ''None''
+| Yes
+|-
+|<tt>resources</tt>&clubs;
+|Resource matrix (max and available for each VM type) after resources needed for migration are taken into account.
+* Type: ''ccResourceType'' (see <tt>eucalyptus_cc.wsdl</tt>)
+* Default: ''None''
+| Yes
+|}
+
+==== EnableService ====
+
+==== DisableService ====
+
+Requests to disable or enable a node controller are used for placing it into and out of maitenance mode. When in maitenance mode, the node controller:
+* is running, but is only responding to a subset of requests (most importantly, RunInstance requests are not accepted)
+* is monitoring virtual machines currently running on it
+* is not going to be the target of a migration ''unless'' it is specifically listed in the white list of a <tt>MigrateInstances</tt>
+Maitenance mode may be used separately or in combination with a <tt>MigrateInstances</tt> request(s). For instance, evacuation of a node for the purposes of migration can be implemented as a combination of placing the node into maintenance mode, followed by the request to migrate all instances away from it.
+
+{|
+|+ '''Request Parameters'''
+! scope="col"| Name
+! scope="col"| Description
+! scope="col"| Required
+|-
+| <tt>ServiceId</tt>&clubs;
+| ???
+* Type: ''String''
+* Default: ''None''
+| Y
+|-
+! <tt>Type</tt>&clubs;
+| Must be "NODE" when used with NC.
+* Type: ''String''
+* Default: ''None''
+| Y
+|-
+! <tt>Host</tt>&clubs;
+| Name of the NC that is to be enabled or disabled.
+* Type: ''String''
+* Default: ''None''
+| Y
+|-
+! <tt>Partition</tt>&clubs;
+| Partition associated with the cluster in which NC is located.
+* Type: ''String''
+* Default: ''None''
+| Y
+|}
+
+Successful response to DisableService indicates that the node controller has been placed into maitenance mode. It will remain there until the administrator issues EnableService request for the host.
+
+{|
+|+ '''Response Elements (from CLC)'''
+! scope="col"| Name
+! scope="col"| Description
+! scope="col"| Required
+|-
+|<tt>return</tt>&clubs;
+|Request accepted if ''false'' and error if ''true''
+* Type: ''Boolean''
+* Default: ''None''
+| Yes
+|}
+
+Successful response from the CC will also include resource availability that resulted from the request to enable or disable.
+
+{|
+|+ '''Response Elements (from CC)'''
+! scope="col"| Name
+! scope="col"| Description
+! scope="col"| Required
+|-
+|<tt>return</tt>&clubs;
+|Request accepted if ''false'' and error if ''true''
+* Type: ''Boolean''
+* Default: ''None''
+| Yes
+|-
+|<tt>resources</tt>&clubs;
+|Resource matrix (max and available for each VM type) after enabling or disabling of the node has been accounted for.
+* Type: ''ccResourceType'' (see <tt>eucalyptus_cc.wsdl</tt>)
+* Default: ''None''
+| Yes
+|}
+
+=== NC operations ===
+
+NC impelements two operations related to maitenance mode:
+
+==== ncMigrateInstances ====
+
+Migration of an instance from one NC to another is accomplished through a sequence of <tt>ncMigrateInstances</tt> requests issued to the source and destination NCs with different <tt>action</tt> parameters. The sequence is as follows:
+
+# Migrate request to the '''source''' with action set to ''Prepare'' and a set of all instances to be migrated as part of the user's request. The intention of this request is, at the very least, to permanently record the migration plan so that it can be implemented even if higher-level components restart or failover and lose state. Additionally, source NC may perform checks or any other activities that necessarily precede preparations on the destination. Once ready to send an instance, the source NC sets its migration state to ''Ready''.
+# Migrate request to each '''destination''' with action set to ''Prepare'' and a set of instances destined for that NC. Using instance metadata and source node credetials included in the request, the NC performs everything necessary to receive an incoming migration: sets up the necessary directory structure, network devices, block devices, authorizes the anticipated incoming migration. Once cready to receive an instance, the destination NC sets its migration state to ''Ready''.
+# Migrate request to the source with action set to ''Commit'' and the instance to migrate. This triggers the actual migration.
+
+In addition to driving the successful sequence, CC will detect error conditions and will request cleanup from source or destination NCs by using <tt>action</tt> set to ''Cancel''. Roughly, if destination fails to prepare, cancellation is sent to the source, while failure to migrate by the source leads to a cancellation sent to the destination.
+
+{|
+|+ '''Request Parameters'''
+! scope="col"| Name
+! scope="col"| Description
+! scope="col"| Required
+|-
+| <tt>instance.n</tt>&clubs;
+| Set of one or more instances to migrate. This data structure contains all instance metadata, as reported in <tt>ncDescribeInstances</tt>, augmented with the three parameters specific to migration (source, destination, and state), listed below.
+* Type: ''instanceType'' (see <tt>eucalyptus_nc.wsdl</tt>)
+* Default: ''None''
+| Yes
+|-
+| <tt>action</tt>&clubs;
+| Specific migration-related action to perform.
+* Type: ''String''
+* Default: ''None''
+* Valid values: ''Prepare'', ''Commit'', ''Rollback''
+| Yes
+|-
+| <tt>credentials</tt>&clubs;
+|String encoding the credentials necessary for the source to initiate a migration to the destination. This can be, for example, the public key of the source host.
+* Type: ''String''
+* Default: ''Empty''
+| Yes
+|}
+
+Successful response indicates that the request is valid. Additionally, a response to ''Prepare'' request to source indicates that the migration plan has been persisted to disk. Success of the actual operation can be determined asynchronously, based on the migration state reported in <tt>ncDescribeInstances</tt>:
+* ''Preparing'' -> ''Ready''
+* ''Migrating'' -> ''Cleaning'' or ''None''
+
+{|
+|+ '''Response Elements'''
+! scope="col"| Name
+! scope="col"| Description
+! scope="col"| Required
+|-
+|<tt>return</tt>&clubs;
+|Request accepted if ''false'' and error if ''true''
+* Type: ''Boolean''
+* Default: ''None''
+| Yes
+|}
+
+==== ncModifyNode ====
+
+Requests to disable or enable a node controller are both implemented on the NC as a change of state requested with <tt>ncModifyNode</tt> operation.
+
+{|
+|+ '''Request Parameters'''
+! scope="col"| Name
+! scope="col"| Description
+! scope="col"| Required
+|-
+| <tt>stateName</tt>&clubs;
+| The name of the state to set the Node Controller into.
+* Type: ''String''
+* Default: ''None''
+* Valid values: ''Enabled'', ''Disabled''
+| Y
+|}
+
+Successful response to <tt>ncModifyNode</tt> indicates that the node controller has changed state and the latest state has been persisted to disk. NC maintains its state across NC service restarts and host reboots.
+
+{|
+|+ '''Response Elements'''
+! scope="col"| Name
+! scope="col"| Description
+! scope="col"| Required
+|-
+|<tt>return</tt>&clubs;
+|Request accepted if ''false'' and error if ''true''
+* Type: ''Boolean''
+* Default: ''None''
+| Yes
+|}
+
+
+
+
+
+
+== Migration states  ==
+
+Migration status is reflected in <tt>ncDescribeInstance</tt> and <tt>ccDescribeInstances</tt> responses. Within instance metadata the fields related to migration are:
+
+{|
+! scope="col"| Name
+! scope="col"| Type
+! scope="col"| Description
+|-
+| <tt>migrationSource</tt>&clubs;
+| ''String''
+| Host name of the migration source NC.
+|-
+| <tt>migrationDestination</tt>&clubs;
+| ''String''
+| Host name of the migration destination NC.
+|-
+| <tt>migrationState</tt>&clubs;
+| ''String''
+| State of the migration on the NC that is responding or state as reported by the CC. The set of allowed state names is enumerated below.
+|}
+
+The set of migration states reported by the CC to the CLC is smaller than the set of states reported by the NC to the CC.
+
+{|
+|+ Migration States
+! scope="col"| Name
+! scope="col"| Component
+! scope="col"| Description
+|-
+| ''None''
+| NC & CC
+| No current migration-related activities on the host
+|-
+| ''Preparing''
+| NC & CC
+| Source or destination is preparing for migration
+|-
+| ''Ready''
+| NC
+| Source or destination is ready (to send or receive) a VM
+|-
+| ''Migrating''
+| NC & CC
+| Source or destination is in the process of migration
+|-
+| ''Cleaning''
+| NC
+|Source of the migration is cleaning up after the migration
+|}
+
+
+== Misc ==
+
+* terminate/run mode for instance store is out; no loss of in memory state
+* admin command for quarantine through CLC
+* RHEV & VMware seem to be the low hanging fruit functionally
+* KVM, Xen reliability are a major question
+* is there a way to pause the vm
+* vm maintenance mode
+* compromised 
+* what are the benefits?
+* controlling workload schedule
+* slow down the system
+* live migration with attached volumes
 
 ----
 [[tag:rls-3.3]]
