@@ -1,0 +1,4 @@
+# generate PNGs here with
+
+rm spec-migrate-request-flow.png ; java -jar /tmp/ditaa/trunk/web/lib/ditaa0_9.jar --scale 2 spec-migrate-request-flow.ditaa
+rm spec-enable-request-flow.png ; java -jar /tmp/ditaa/trunk/web/lib/ditaa0_9.jar --scale 2 spec-enable-request-flow.ditaa

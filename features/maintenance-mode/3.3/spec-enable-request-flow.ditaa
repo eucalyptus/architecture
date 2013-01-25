@@ -1,0 +1,25 @@
+Cloud
+Admin                  CLC                      CC                         NC1
+
+     Disable Node NC1
+  --------------------->
+
+                 gate the cluster
+
+                           DisableService(NC1)
+                         ---------------------->
+                                                     ncModifyNode(DISABLED)
+                                                  ------------------------->
+
+                                                                   record state to disk
+                                                                      change state
+
+                                                  <------------------------
+
+                                        reduce resources
+
+                        <----------------------
+
+               ungate the cluster
+
+  <--------------------
