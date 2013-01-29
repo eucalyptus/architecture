@@ -12,7 +12,7 @@ This design covers our implementation of AWS Auto Scaling.
 |}
 
 == Out of Scope ==
-Properties related to functional areas that we do not suport are out of scope. These areas are:
+Implementation of items related to features that we do not support are out of scope. These features are:
 
 * IAM Roles
 * Placement groups
