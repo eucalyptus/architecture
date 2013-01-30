@@ -76,6 +76,10 @@ Here is the ''beginning'' of the migrate request flow:
 
 [[spec-migrate-request-flow.png]]
 
+Here is the end of the migrate flow:
+
+[[spec-migrate2-request-flow.png]]
+
 == Command-line tools == 
 
 ''to be filled in by Garrett''
