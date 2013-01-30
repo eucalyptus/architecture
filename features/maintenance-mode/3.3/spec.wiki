@@ -11,9 +11,7 @@ Maitenance mode operations should allow a cloud administrator to perform maitena
 We refer to the combination of these approaches as '''evacuation''': the node is first placed into maintenance mode and then is cleared of ''all'' instances if sufficient resources for migrations are available at the time of the request. While evacuation is the only approach that is scheduled to be included in Eucalyptus 3.3, more fine-grained approaches to maitenance may be available in 3.3 or a later release:
 
 * Cloud admin may have the option of migrating only specific VMs
-
 * Cloud admin may have the option of migration to only specific destinations
-
 * Cloud admin may have the option of not only specifying, but ''reserving'' destination hosts
 
 If resources necessary for migration are ''not'' available at the time of the migration or evacuation request, the request will fail. Currently, no mechanism is being developed for re-trying the migration until adequate resources are available. Such mechanism could be built with tools external to Eucalyptus by relying on the interface describe here.
@@ -70,15 +68,20 @@ Components at all three levels (cloud, cluster, node) have methods corresponding
 * credentials
 |}
 
-Both types of requests are "synchronous" for the CLC. Here is the enable request flow:
+Both types of requests are "synchronous" in that an upstream component waits for the corresponding downstream component to respond to the request before it replies. In case of the disable/enable request, the CLC waits for the CC to reply, which waits for the NC to persist the change of state to disk before replying. While CLC is waiting for the downstream components, it is "gating" requests to the cluster: most requests to the cluster, such as running a new instance or attaching a volume to an instance, are queued up.
 
 [[spec-enable-request-flow.png]]
 
-Here is the ''beginning'' of the migrate request flow:
+Similarly, CLC "gates" requests while the Migrate Instance request is pending. Handler for MigrateInstance() on the CC creates the migration plan (i.e., computes the optimal schedule for migration based on the restrictions from the user, if any) and sends it to the source NC for storage. (The primary purpose of the MigrateInstances() request to the source NC is to save the migration plan on disk.) Once NC has acknowledged the migration plan, CC takes into account the reduced resource usage, as does the CLC, prior to unblocking any pending requests.
 
 [[spec-migrate-request-flow.png]]
 
-Here is the end of the migrate flow:
+Instance migration proper is driven by CC in response to state changes on its NCs:
+
+* When a source NC reports itself as READY for outgoing migration, the CC issues the PREPARE request to the destination.
+* When a destination NC reports itself as READY for incoming migration, the CC issues the COMMIT request to the source, which effectively initiates the migration.
+
+Failures during this process are handled locally when possible and are also advertised upstream when necessary. For instance, failure of the destination to prepare prompts CC to send the ROLLBACK request to the source (so no migration-related state will be reported henceforth).
 
 [[spec-migrate2-request-flow.png]]
 
