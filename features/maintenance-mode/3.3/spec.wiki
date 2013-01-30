@@ -11,7 +11,9 @@ Maitenance mode operations should allow a cloud administrator to perform maitena
 We refer to the combination of these approaches as '''evacuation''': the node is first placed into maintenance mode and then is cleared of ''all'' instances if sufficient resources for migrations are available at the time of the request. While evacuation is the only approach that is scheduled to be included in Eucalyptus 3.3, more fine-grained approaches to maitenance may be available in 3.3 or a later release:
 
 * Cloud admin may have the option of migrating only specific VMs
+
 * Cloud admin may have the option of migration to only specific destinations
+
 * Cloud admin may have the option of not only specifying, but ''reserving'' destination hosts
 
 If resources necessary for migration are ''not'' available at the time of the migration or evacuation request, the request will fail. Currently, no mechanism is being developed for re-trying the migration until adequate resources are available. Such mechanism could be built with tools external to Eucalyptus by relying on the interface describe here.
