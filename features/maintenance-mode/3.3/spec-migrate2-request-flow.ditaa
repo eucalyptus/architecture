@@ -14,7 +14,7 @@ NC_s is READY for i
       ncDescribeInstances
       <--------------------------------------------->
 
-NC_d is READY for i
+NC_d1 is READY for i
 
       ncMigrateInstances(i, COMMIT)
       -------------------->
