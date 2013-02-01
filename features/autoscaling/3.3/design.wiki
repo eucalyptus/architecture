@@ -9,6 +9,8 @@ This design covers our implementation of AWS Auto Scaling.
 ! Updated || 2012/12/19 || Initial document, focus is preparation for Sprint 1
 |-
 ! Updated || 2013/01/28 || Updated for Sprint 2 functionality (which was previously for Sprint 1)
+|-
+! Updated || 2013/02/01 || Updated with Sprint 2 final details
 |}
 
 == Out of Scope ==
@@ -21,13 +23,14 @@ Implementation of items related to features that we do not support are out of sc
 * VPC
 
 == Feature Dependencies ==
+* EC2 - Verifying metadata, managing instances, tagging
 * ELB - health check type
-* Tagging - propagation of tags to instances
 
 == Related Features ==
 This feature relates to the following features in this release:
 
-* Tagging / Filtering
+* EC2 - Tagging / Filtering
+* EC2 - Instance health checking
 * CloudWatch
 * ElasticLoadBalancing
 
@@ -42,9 +45,9 @@ This feature relates to the following features in this release:
 |-
 | Source modules || scaling || Contents under '''com.eucalyptus.scaling''' package
 |-
-| &nbsp; || scaling-common || Contents under '''com.eucalyptus.scaling''' package
+| &nbsp; || scaling-common || Contents under '''com.eucalyptus.scaling.common''' package
 |-
-| Service class || AutoScalingManager ||
+| Service class || AutoScalingService ||
 |-
 | Component ID class || AutoScaling ||
 |-
@@ -65,7 +68,7 @@ This feature relates to the following features in this release:
 * Are we implementing metrics operations? ( DescribeMetricCollectionTypes, DisableMetricsCollection, EnableMetricsCollection )
 * Are we supporting CW of auto scaling?
 * Are we supporting "pagination" for describe operations?
-* Where are ARNs supported instead of names?
+* Where are ARNs supported instead of names? (are ARNs supported for the policy name in PutScalingPolicy?)
 
 = Design =
 
@@ -75,10 +78,47 @@ The following entities will be added:
 
 * Launch configuration
 * Auto scaling group
-* Auto scaling instance
+* Auto scaling policy
 
 == Service Impact ==
 New SOAP / Query API user facing services are added.
+
+=== Supported Operations ===
+
+For more information on administrative support by operation, see Administrative Functionality below.
+
+{|
+! Operation !! Policy Enforced !! Admin Enabled !! Notes 
+|-
+| CreateAutoScalingGroup || Y ||  || Placement group, VPC Zone Identifier not supported.
+|-
+| CreateLaunchConfiguration || Y ||  || Spot Price, IAM Instance Profile, EBS Optimized not supported.
+|-
+| DeleteAutoScalingGroup || Y || Y ||
+|-
+| DeleteLaunchConfiguration || Y || Y ||
+|-
+| DeletePolicy || Y || Y ||
+|-
+| DescribeAdjustmentTypes || Y ||  ||
+|-
+| DescribeAutoScalingGroups || Y || Y ||
+|-
+| DescribeLaunchConfigurations || Y || Y ||
+|-
+| DescribePolicies || Y || Y ||
+|-
+| DescribeTerminationPolicyTypes || Y ||  ||
+|-
+| ExecutePolicy || Y || Y ||
+|-
+| PutScalingPolicy || Y ||  ||
+|-
+| SetDesiredCapacity || Y || Y ||
+|-
+| UpdateAutoScalingGroup || Y || Y || Placement group, VPC Zone Identifier not supported.
+|}
+
 
 === Integration Areas ===
 ==== IAM ====
@@ -92,20 +132,20 @@ New SOAP / Query API user facing services are added.
 |-
 | &nbsp; || autoscalinggroup ||
 |-
-| &nbsp; || tag ||
+| &nbsp; || scalingpolicy ||
 |-
-| Actions || autoscaling:* || We will permit use of any actions from the supported API version
+| Actions || autoscaling:* || We will permit use in policy of any actions from the supported API version
 |-
 | Quotas || autoscaling:quota-launchconfigurationnumber ||
 |-
 | &nbsp; || autoscaling:quota-autoscalinggroupnumber ||
 |-
-| &nbsp; || autoscaling:quota-tagnumber ||
+| &nbsp; || autoscaling:quota-scalingpolicynumber ||
 |}
 
 The ARN of an Auto Scaling resource has the form:
 
-  arn:aws:autoscaling::<account id>:<resource type>/<resource id>
+  arn:aws:autoscaling::<account id>:<resource type>/<resource id>:[<name>/<value>]+
 
 An example policy for service access:
 
@@ -139,12 +179,34 @@ An example policy for limiting auto scaling groups:
 === Administrative Functionality ===
 We will extend the standard functionality for administrative purposes.
 
+==== Listing Resources ====
 The following operations will support listing of all accounts/users item:
 
 * DescribeLaunchConfigurations
 * DescribeAutoScalingGroups
+* DescribePolicies
 
 To enable this the parameter '''verbose''' is passed as a ''name'' selector.
+
+==== Deleting Resources ====
+The following operations will support administrative deletion of resources:
+
+* DeleteLaunchConfiguration
+* DeleteAutoScalingGroup
+* DeletePolicy
+
+For administrative deletion the ARN of the resource must be used (not the simple name), e.g.:
+
+  arn:aws:autoscaling::013765657871:launchConfiguration:6789b01a-a9c9-489f-9d24-ed39533fca61:launchConfigurationName/Test
+
+==== Updating Resources ====
+The following operations will support administrative update of resources:
+
+* ExecutePolicy
+* SetDesiredCapacity
+* UpdateAutoScalingGroup
+
+For administrative deletion the ARN of the resource must be used (not the simple name)
 
 = Configuration =
 No configuration properties noted.
@@ -156,10 +218,10 @@ No upgrade impact noted.
 No specific packaging requirements.
 
 = Documentation =
-No specific documentation items noted.
+Administrative functionality should be documented.
 
 = Security =
-No specific security concerns are noted for this design.
+Use of ARN in place of simple name adds risk of permitting deletion of other accounts resources.
 
 = Testing =
 No specific test cases noted.
