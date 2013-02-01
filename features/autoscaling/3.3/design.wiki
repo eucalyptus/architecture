@@ -1,0 +1,170 @@
+= Overview =
+This design covers our implementation of AWS Auto Scaling.
+
+== Tracking ==
+
+{|
+! Status || Draft || 
+|-
+! Updated || 2012/12/19 || Initial document, focus is preparation for Sprint 1
+|-
+! Updated || 2013/01/28 || Updated for Sprint 2 functionality (which was previously for Sprint 1)
+|}
+
+== Out of Scope ==
+Implementation of items related to features that we do not support are out of scope. These features are:
+
+* IAM Roles
+* Placement groups
+* Spot Instances
+* SNS
+* VPC
+
+== Feature Dependencies ==
+* ELB - health check type
+* Tagging - propagation of tags to instances
+
+== Related Features ==
+This feature relates to the following features in this release:
+
+* Tagging / Filtering
+* CloudWatch
+* ElasticLoadBalancing
+
+== Implementation Summary ==
+
+{|
+! Item !! Value !! Notes
+|-
+| Version || 2011-01-01 || Version of AutoScaling API supported
+|-
+| DB || eucalyptus_autoscaling ||
+|-
+| Source modules || scaling || Contents under '''com.eucalyptus.scaling''' package
+|-
+| &nbsp; || scaling-common || Contents under '''com.eucalyptus.scaling''' package
+|-
+| Service class || AutoScalingManager ||
+|-
+| Component ID class || AutoScaling ||
+|-
+| Service type name || autoscaling ||
+|-
+| Service URIs || /services/AutoScaling || SOAP / Query API
+|- 
+| &nbsp; || /internal/AutoScaling || SOAP / Query API
+|- 
+| Eucarc variable name || AWS_AUTO_SCALING_URL || 
+|- 
+| Properties prefix || autoscaling || 
+|- 
+|}
+
+= Analysis =
+== Open Issues ==
+* Are we implementing metrics operations? ( DescribeMetricCollectionTypes, DisableMetricsCollection, EnableMetricsCollection )
+* Are we supporting CW of auto scaling?
+* Are we supporting "pagination" for describe operations?
+* Where are ARNs supported instead of names?
+
+= Design =
+
+== Entities ==
+
+The following entities will be added:
+
+* Launch configuration
+* Auto scaling group
+* Auto scaling instance
+
+== Service Impact ==
+New SOAP / Query API user facing services are added.
+
+=== Integration Areas ===
+==== IAM ====
+
+{|
+! Item !! Value !! Notes 
+|-
+| Vendor || autoscaling || Prefix for actions, e.g. autoscaling:DescribeLaunchConfigurations
+|-
+| Resources || launchconfiguration ||
+|-
+| &nbsp; || autoscalinggroup ||
+|-
+| &nbsp; || tag ||
+|-
+| Actions || autoscaling:* || We will permit use of any actions from the supported API version
+|-
+| Quotas || autoscaling:quota-launchconfigurationnumber ||
+|-
+| &nbsp; || autoscaling:quota-autoscalinggroupnumber ||
+|-
+| &nbsp; || autoscaling:quota-tagnumber ||
+|}
+
+The ARN of an Auto Scaling resource has the form:
+
+  arn:aws:autoscaling::<account id>:<resource type>/<resource id>
+
+An example policy for service access:
+
+    {
+       "Statement":[{
+          "Effect":"Allow",
+          "Action":"autoscaling:*",
+          "Resource":"*"
+       }]
+    }
+
+== Eucalyptus Extensions ==
+=== IAM ===
+Support for quotas and resource (see above)
+
+An example policy for limiting auto scaling groups:
+
+    {
+      "Statement":[{
+        "Effect":"Limit",
+        "Action":"autoscaling:createautoscalinggroup",
+        "Resource":"*",
+        "Condition":{
+          "NumericLessThanEquals":{
+            "autoscaling:quota-autoscalinggroupnumber":"2",
+          }
+        }
+      }]
+    }
+
+=== Administrative Functionality ===
+We will extend the standard functionality for administrative purposes.
+
+The following operations will support listing of all accounts/users item:
+
+* DescribeLaunchConfigurations
+* DescribeAutoScalingGroups
+
+To enable this the parameter '''verbose''' is passed as a ''name'' selector.
+
+= Configuration =
+No configuration properties noted.
+
+= Upgrade =
+No upgrade impact noted.
+
+= Packaging =
+No specific packaging requirements.
+
+= Documentation =
+No specific documentation items noted.
+
+= Security =
+No specific security concerns are noted for this design.
+
+= Testing =
+No specific test cases noted.
+
+= References =
+* [http://docs.amazonwebservices.com/AutoScaling/latest/DeveloperGuide/IAM.html AutoScaling and IAM (amazonwebservices.com)]
+
+[[tag:rls-3.3]]
