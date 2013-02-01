@@ -70,11 +70,11 @@ Components at all three levels (cloud, cluster, node) have methods corresponding
 
 Both types of requests are "synchronous" in that an upstream component waits for the corresponding downstream component to respond to the request before it replies. In case of the disable/enable request, the CLC waits for the CC to reply, which waits for the NC to persist the change of state to disk before replying. While CLC is waiting for the downstream components, it is "gating" requests to the cluster: most requests to the cluster, such as running a new instance or attaching a volume to an instance, are queued up.
 
-[[spec-enable-request-flow.png]]
+[[maintenance-mode-3.3-spec-enable-request-flow.png]]
 
 Similarly, CLC "gates" requests while the Migrate Instance request is pending. Handler for MigrateInstance() on the CC creates the migration plan (i.e., computes the optimal schedule for migration based on the restrictions from the user, if any) and sends it to the source NC for storage. (The primary purpose of the MigrateInstances() request to the source NC is to save the migration plan on disk.) Once NC has acknowledged the migration plan, CC takes into account the reduced resource usage, as does the CLC, prior to unblocking any pending requests.
 
-[[spec-migrate-request-flow.png]]
+[[maintenance-mode-3.3-spec-migrate-request-flow.png]]
 
 Instance migration proper is driven by CC in response to state changes on its NCs:
 
@@ -83,7 +83,7 @@ Instance migration proper is driven by CC in response to state changes on its NC
 
 Failures during this process are handled locally when possible and are also advertised upstream when necessary. For instance, failure of the destination to prepare prompts CC to send the ROLLBACK request to the source (so no migration-related state will be reported henceforth).
 
-[[spec-migrate2-request-flow.png]]
+[[maintenance-mode-3.3-spec-migrate2-request-flow.png]]
 
 == Command-line tools == 
 
