@@ -1,0 +1,21 @@
+     CC                  NC_s                      NC_d1
+
+       ncDescribeInstances
+      <--------------------
+
+NC_s is READY for i
+
+      ncMigrateInstances(i, PREPARE)
+      ---------------------------------------------->
+      <----------------------------------------------
+
+    . . .
+
+      ncDescribeInstances
+      <--------------------------------------------->
+
+NC_d1 is READY for i
+
+      ncMigrateInstances(i, COMMIT)
+      -------------------->
+      <--------------------

@@ -2,7 +2,92 @@
 
 == Overview ==
 
-Maitenance mode operations should allow a cloud administrator to perform maitenance of node controllers with minimal intereference of cloud workload. 
+Maitenance mode operations should allow a cloud administrator to perform maitenance of node controllers with minimal intereference with the cloud workload. The general goal is to steer virtual machines away from the node to be maintained and then to re-integrate the node after maitenance has been performed. Two complementary approaches are supported:
+
+* ''Passive'' approach involves setting the node into maintenance mode, which means no new VMs will be scheduled on it, and waiting for the natural churn of instances to free up the node.
+
+* ''Active'' approach involves migrating VMs away from the node to be maintained using live migration features of the hypervisor.
+
+We refer to the combination of these approaches as '''evacuation''': the node is first placed into maintenance mode and then is cleared of ''all'' instances if sufficient resources for migrations are available at the time of the request. While evacuation is the only approach that is scheduled to be included in Eucalyptus 3.3, more fine-grained approaches to maitenance may be available in 3.3 or a later release:
+
+* Cloud admin may have the option of migrating only specific VMs
+* Cloud admin may have the option of migration to only specific destinations
+* Cloud admin may have the option of not only specifying, but ''reserving'' destination hosts
+
+If resources necessary for migration are ''not'' available at the time of the migration or evacuation request, the request will fail. Currently, no mechanism is being developed for re-trying the migration until adequate resources are available. Such mechanism could be built with tools external to Eucalyptus by relying on the interface describe here.
+
+== Implementation overview ==
+
+Two types operations are exposed through the CLC interface for the purposes of node maitenance:
+
+* '''Enable / Disable Node''' pair of operations request a specific node to enter or leave maintenance mode (i.e., enter or leave state in which no new instances will be scheduled on the node).
+
+* '''Migrate Instances''' operation requests migration of one or all instances from a source node to one or more destinations.
+
+Components at all three levels (cloud, cluster, node) have methods corresponding to these operations, however their names, and the set of input or output parameters vary:
+
+{|
+|+ '''Maintenance-mode operations at different levels'''
+! scope="col"| Conceptual
+! scope="col"| CLC API
+! scope="col"| CC API
+! scope="col"| NC/VB API
+|-
+| '''Enable / Disable Node'''
+* host name / IP
+| <tt>EnableService</tt><br /><tt>DisableService</tt>
+* ServiceId
+* Type
+* Host
+* Partition
+| <tt>EnableService</tt><br /><tt>DisableService</tt>
+* ServiceId
+* Type
+* Host
+* Partition
+| <tt>ModifyNode</tt>
+* stateName
+|-
+| '''Migrate Instances'''
+* SourceHost
+* (InstanceId)
+* (Destinations)
+| <tt>MigrateInstances</tt>
+* sourceHost
+* instanceId
+* destinationHost.n
+* allowHosts
+| <tt>ccMigrateInstances</tt>
+* sourceHost
+* instanceId
+* destinationHost.n
+* allowHosts
+| <tt>ccMigrateInstances</tt>
+* instance.n
+* action
+* credentials
+|}
+
+Both types of requests are "synchronous" in that an upstream component waits for the corresponding downstream component to respond to the request before it replies. In case of the disable/enable request, the CLC waits for the CC to reply, which waits for the NC to persist the change of state to disk before replying. While CLC is waiting for the downstream components, it is "gating" requests to the cluster: most requests to the cluster, such as running a new instance or attaching a volume to an instance, are queued up.
+
+[[spec-enable-request-flow.png]]
+
+Similarly, CLC "gates" requests while the Migrate Instance request is pending. Handler for MigrateInstance() on the CC creates the migration plan (i.e., computes the optimal schedule for migration based on the restrictions from the user, if any) and sends it to the source NC for storage. (The primary purpose of the MigrateInstances() request to the source NC is to save the migration plan on disk.) Once NC has acknowledged the migration plan, CC takes into account the reduced resource usage, as does the CLC, prior to unblocking any pending requests.
+
+[[spec-migrate-request-flow.png]]
+
+Instance migration proper is driven by CC in response to state changes on its NCs:
+
+* When a source NC reports itself as READY for outgoing migration, the CC issues the PREPARE request to the destination.
+* When a destination NC reports itself as READY for incoming migration, the CC issues the COMMIT request to the source, which effectively initiates the migration.
+
+Failures during this process are handled locally when possible and are also advertised upstream when necessary. For instance, failure of the destination to prepare prompts CC to send the ROLLBACK request to the source (so no migration-related state will be reported henceforth).
+
+[[spec-migrate2-request-flow.png]]
+
+== Command-line tools == 
+
+''to be filled in by Garrett''
 
 == Component APIs ==
 
@@ -18,7 +103,7 @@ Both CLC and CC implement the same operations with the same parameters:
 
 ==== MigrateInstances ====
 
-Requests migration of either a specific instance or ''all'' instances on a specific NC. Optionally, the request may restrict the set of hosts that can be considered as potential migration destinations either by specifying a white list or a black list.
+Requests migration of either a specific instance or ''all'' instances on a specific NC or ESX(i) host. Optionally, the request may restrict the set of hosts that can be considered as potential migration destinations either by specifying a white list or a black list.
 
 {|
 |+ '''Request Parameters'''
@@ -27,7 +112,7 @@ Requests migration of either a specific instance or ''all'' instances on a speci
 ! scope="col"| Required
 |-
 | <tt>sourceHost</tt>&clubs;
-| Name of the NC from which ''all'' instances are to be migrated (mutually exclusive with <tt>instanceId</tt>).
+| Name of the NC/ESX host from which ''all'' instances are to be migrated (mutually exclusive with <tt>instanceId</tt>).
 * Type: ''String''
 * Default: ''None''
 | Yes (XOR <tt>instanceId</tt>)
@@ -53,7 +138,7 @@ Requests migration of either a specific instance or ''all'' instances on a speci
 
 Successful response from CLC indicates that:
 * the migration request is valid and the participants are present (instance is still running or host is still functioning) 
-* a migration plan has been computed and recorded on the source NC
+* a migration plan has been computed and recorded on the source NC or in the VB database
 * there were sufficient resources to perform the migration and they have been reserved (resource availability will reflect the additional resources necessary during migration)
 
 {|
@@ -83,7 +168,7 @@ Successful response from the CC will also include resource availability that res
 * Default: ''None''
 | Yes
 |-
-|<tt>resources</tt>&clubs;
+|<tt>resources</tt>
 |Resource matrix (max and available for each VM type) after resources needed for migration are taken into account.
 * Type: ''ccResourceType'' (see <tt>eucalyptus_cc.wsdl</tt>)
 * Default: ''None''
@@ -107,25 +192,25 @@ Maitenance mode may be used separately or in combination with a <tt>MigrateInsta
 ! scope="col"| Required
 |-
 | <tt>ServiceId</tt>&clubs;
-| ???
+| ''what's this?''
 * Type: ''String''
 * Default: ''None''
 | Y
 |-
-! <tt>Type</tt>&clubs;
-| Must be "NODE" when used with NC.
+| <tt>Type</tt>&clubs;
+| Must be "NODE" when used with NC or VB.
 * Type: ''String''
 * Default: ''None''
 | Y
 |-
-! <tt>Host</tt>&clubs;
-| Name of the NC that is to be enabled or disabled.
+| <tt>Host</tt>&clubs;
+| Name of the NC/ESX host that is to be enabled or disabled.
 * Type: ''String''
 * Default: ''None''
 | Y
 |-
-! <tt>Partition</tt>&clubs;
-| Partition associated with the cluster in which NC is located.
+| <tt>Partition</tt>&clubs;
+| Partition associated with the cluster in which NC/ESX host is located.
 * Type: ''String''
 * Default: ''None''
 | Y
@@ -160,20 +245,20 @@ Successful response from the CC will also include resource availability that res
 * Default: ''None''
 | Yes
 |-
-|<tt>resources</tt>&clubs;
+|<tt>resources</tt>
 |Resource matrix (max and available for each VM type) after enabling or disabling of the node has been accounted for.
 * Type: ''ccResourceType'' (see <tt>eucalyptus_cc.wsdl</tt>)
 * Default: ''None''
 | Yes
 |}
 
-=== NC operations ===
+=== NC/VB operations ===
 
-NC impelements two operations related to maitenance mode:
+NC/VB impelements two operations related to maitenance mode:
 
 ==== ncMigrateInstances ====
 
-Migration of an instance from one NC to another is accomplished through a sequence of <tt>ncMigrateInstances</tt> requests issued to the source and destination NCs with different <tt>action</tt> parameters. The sequence is as follows:
+Migration of an instance from one hypervisor host to another is accomplished through a sequence of <tt>ncMigrateInstances</tt> requests issued to the source and destination NCs with different <tt>action</tt> parameters. The sequence is as follows:
 
 # Migrate request to the '''source''' with action set to ''Prepare'' and a set of all instances to be migrated as part of the user's request. The intention of this request is, at the very least, to permanently record the migration plan so that it can be implemented even if higher-level components restart or failover and lose state. Additionally, source NC may perform checks or any other activities that necessarily precede preparations on the destination. Once ready to send an instance, the source NC sets its migration state to ''Ready''.
 # Migrate request to each '''destination''' with action set to ''Prepare'' and a set of instances destined for that NC. Using instance metadata and source node credetials included in the request, the NC performs everything necessary to receive an incoming migration: sets up the necessary directory structure, network devices, block devices, authorizes the anticipated incoming migration. Once cready to receive an instance, the destination NC sets its migration state to ''Ready''.
@@ -226,7 +311,7 @@ Successful response indicates that the request is valid. Additionally, a respons
 
 ==== ncModifyNode ====
 
-Requests to disable or enable a node controller are both implemented on the NC as a change of state requested with <tt>ncModifyNode</tt> operation.
+Requests to disable or enable a node controller are both implemented on the NC/VB as a change of state requested with <tt>ncModifyNode</tt> operation.
 
 {|
 |+ '''Request Parameters'''
@@ -242,7 +327,7 @@ Requests to disable or enable a node controller are both implemented on the NC a
 | Y
 |}
 
-Successful response to <tt>ncModifyNode</tt> indicates that the node controller has changed state and the latest state has been persisted to disk. NC maintains its state across NC service restarts and host reboots.
+Successful response to <tt>ncModifyNode</tt> indicates that the node controller has changed state and the latest state has been persisted to disk. NC/VB maintains its state across NC/VB service restarts and host reboots.
 
 {|
 |+ '''Response Elements'''
@@ -273,18 +358,18 @@ Migration status is reflected in <tt>ncDescribeInstance</tt> and <tt>ccDescribeI
 |-
 | <tt>migrationSource</tt>&clubs;
 | ''String''
-| Host name of the migration source NC.
+| Host name of the migration source NC/ESX host.
 |-
 | <tt>migrationDestination</tt>&clubs;
 | ''String''
-| Host name of the migration destination NC.
+| Host name of the migration destination NC/ESX host.
 |-
 | <tt>migrationState</tt>&clubs;
 | ''String''
 | State of the migration on the NC that is responding or state as reported by the CC. The set of allowed state names is enumerated below.
 |}
 
-The set of migration states reported by the CC to the CLC is smaller than the set of states reported by the NC to the CC.
+The set of migration states reported by the CC to the CLC is smaller than the set of states reported by the NC/VB to the CC.
 
 {|
 |+ Migration States
@@ -293,23 +378,23 @@ The set of migration states reported by the CC to the CLC is smaller than the se
 ! scope="col"| Description
 |-
 | ''None''
-| NC & CC
+| NC/VB & CC
 | No current migration-related activities on the host
 |-
 | ''Preparing''
-| NC & CC
+| NC/VB & CC
 | Source or destination is preparing for migration
 |-
 | ''Ready''
-| NC
+| NC/VB
 | Source or destination is ready (to send or receive) a VM
 |-
 | ''Migrating''
-| NC & CC
+| NC/VB & CC
 | Source or destination is in the process of migration
 |-
 | ''Cleaning''
-| NC
+| NC/VB
 |Source of the migration is cleaning up after the migration
 |}
 

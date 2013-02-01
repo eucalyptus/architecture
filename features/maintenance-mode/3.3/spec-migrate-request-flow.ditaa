@@ -1,0 +1,30 @@
+Cloud
+Admin                  CLC                      CC                        NC_s
+
+  Migrate Instances NC_s
+  --------------------->
+
+                 gate the cluster
+         authorize volumes for all cluster NCs
+                 
+                         MigrateInstances(NC_s)
+                         ---------------------->
+
+                                      create migration plan
+
+                                                  ncMigrateInstances(PREPARE)
+                                                  ------------------------->
+
+                                                             record migration plan to disk
+
+                                                  <------------------------
+
+                                        reduce resources
+
+                        <----------------------
+
+          update resource availability
+              ungate the cluster
+        authorize volumes to specific NCs
+
+  <--------------------
