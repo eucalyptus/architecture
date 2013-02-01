@@ -13,6 +13,8 @@ This design covers both tagging and filtering of resources.
 ! Updated || 2013/01/12 || Update filtering support table for currently implemented items and with tag filtering details
 |-
 ! Updated || 2013/01/15 || Update filtering support table, add section on describe operation changes, update testing and security sections.
+|-
+! Updated || 2013/01/28 || Update filtering support table (images, instances)
 |}
 
 == Out of Scope ==
@@ -347,23 +349,23 @@ To verify the predicates and criteria a unit test class should be implemented (G
 |-
 | Image || architecture || Y || Y ||
 |-
-| &nbsp; || block-device-mapping.delete-on-termination || Y || Y ||
+| &nbsp; || block-device-mapping.delete-on-termination || Y || Y || DB no wildcard <ref name="dbnowild">Wildcards not supported for DB filtering with this type.</ref>
 |-
 | &nbsp; || block-device-mapping.device-name || Y || Y ||
 |-
 | &nbsp; || block-device-mapping.snapshot-id || Y || Y ||
 |-
-| &nbsp; || block-device-mapping.volume-size || Y || Y ||
+| &nbsp; || block-device-mapping.volume-size || Y || Y || DB no wildcard <ref name="dbnowild">Wildcards not supported for DB filtering with this type.</ref>
 |-
-| &nbsp; || block-device-mapping.volume-type || Y || Y || Hardcoded type '''standard''' (no '''io1''')
+| &nbsp; || block-device-mapping.volume-type || Y || - || Hardcoded type '''standard''' (no '''io1''')
 |-
 | &nbsp; || description || Y || Y ||
 |-
 | &nbsp; || image-id || Y || Y ||
 |-
-| &nbsp; || image-type || Y || Y ||
+| &nbsp; || image-type || Y || Y || DB no wildcard <ref name="dbnowild">Wildcards not supported for DB filtering with this type.</ref>
 |-
-| &nbsp; || is-public || Y || Y ||
+| &nbsp; || is-public || Y || Y || DB no wildcard <ref name="dbnowild">Wildcards not supported for DB filtering with this type.</ref>
 |-
 | &nbsp; || kernel-id || Y || Y ||
 |-
@@ -375,19 +377,19 @@ To verify the predicates and criteria a unit test class should be implemented (G
 |-
 | &nbsp; || owner-id || Y || Y || Account ID
 |-
-| &nbsp; || platform || Y || Y || As per AWS ''windows'' or empty
+| &nbsp; || platform || Y || Y || As per AWS ''windows'' or empty. DB no wildcard <ref name="dbnowild">Wildcards not supported for DB filtering with this type.</ref>
 |-
-| &nbsp; || product-code || Y || Y ||
+| &nbsp; || product-code || Y || - ||
 |-
 | &nbsp; || product-code.type || - || - || '''devpay''' / '''marketplace''', probably not relevant for us <ref name="needmoreinfo">Investigation required</ref>
 |-
 | &nbsp; || ramdisk-id || Y || Y ||
 |-
-| &nbsp; || root-device-name || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+| &nbsp; || root-device-name || Y || - ||
 |-
-| &nbsp; || root-device-type || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+| &nbsp; || root-device-type || Y || - ||
 |-
-| &nbsp; || state || Y || Y || 
+| &nbsp; || state || Y || Y || DB no wildcard <ref name="dbnowild">Wildcards not supported for DB filtering with this type.</ref>
 |-
 | &nbsp; || state-reason-code || - || - || N/A <ref name="notsupported">Eucalyptus does not support this field</ref>
 |-
@@ -399,57 +401,57 @@ To verify the predicates and criteria a unit test class should be implemented (G
 |-
 | &nbsp; || tag:'''key''' || Y || Y ||
 |-
-| &nbsp; || virtualization-type || - || - || Differ from AWS here <ref name="needmoreinfo">Investigation required</ref>
+| &nbsp; || virtualization-type || - || - ||
 |-
-| &nbsp; || hypervisor || - || - || Differ from AWS here <ref name="needmoreinfo">Investigation required</ref>
+| &nbsp; || hypervisor || - || - ||
 |-
-| Instance || architecture || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+| Instance || architecture || Y || Y || DB no wildcard <ref name="dbnowild">Wildcards not supported for DB filtering with this type.</ref>
 |-
 | &nbsp; || availability-zone || Y || Y ||
 |-
-| &nbsp; || block-device-mapping.attach-time || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+| &nbsp; || block-device-mapping.attach-time || Y || - ||
 |-
-| &nbsp; || block-device-mapping.delete-on-termination || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+| &nbsp; || block-device-mapping.delete-on-termination || Y || - ||
 |-
-| &nbsp; || block-device-mapping.device-name || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+| &nbsp; || block-device-mapping.device-name || Y || - ||
 |-
-| &nbsp; || block-device-mapping.status || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+| &nbsp; || block-device-mapping.status || Y || - ||
 |-
-| &nbsp; || block-device-mapping.volume-id || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+| &nbsp; || block-device-mapping.volume-id || Y || - ||
 |-
 | &nbsp; || client-token || - || - || N/A <ref name="notsupported">Eucalyptus does not support this field</ref>
 |-
-| &nbsp; || dns-name || Y || Y || Public name
+| &nbsp; || dns-name || Y || - || Public name
 |-
-| &nbsp; || group-id || - || - || N/A <ref name="notsupported">Eucalyptus does not support this field</ref>
+| &nbsp; || group-id || Y || Y ||
 |-
-| &nbsp; || group-name || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+| &nbsp; || group-name || Y || Y ||
 |-
-| &nbsp; || image-id || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+| &nbsp; || image-id || Y || Y ||
 |-
 | &nbsp; || instance-id || Y || Y ||
 |-
-| &nbsp; || instance-lifecycle || Y || Y || Hardcoded with no value (no '''spot''') <ref name="nospot">Eucalyptus does not support spot instances</ref>
+| &nbsp; || instance-lifecycle || Y || - || Hardcoded with no value (no '''spot''') <ref name="nospot">Eucalyptus does not support spot instances</ref>
 |-
-| &nbsp; || instance-state-code || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+| &nbsp; || instance-state-code || Y || - ||
 |-
-| &nbsp; || instance-state-name || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+| &nbsp; || instance-state-name || Y || - ||
 |-
-| &nbsp; || instance-type || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+| &nbsp; || instance-type || Y || Y ||
 |-
 | &nbsp; || instance.group-id || - || - || N/A <ref name="notvpc"/>
 |-
 | &nbsp; || instance.group-name || - || - || N/A <ref name="notvpc"/>
 |-
-| &nbsp; || ip-address || Y || Y || Public IP
+| &nbsp; || ip-address || Y || - || Public IP
 |-
-| &nbsp; || kernel-id || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+| &nbsp; || kernel-id || Y || Y ||
 |-
-| &nbsp; || key-name || Y || - || DB filtering could be possible (full key in DB) <ref name="perhapsdbfilter"/>
+| &nbsp; || key-name || Y || - ||
 |-
-| &nbsp; || launch-index || Y || Y || DB no wildcard <ref name="dbnowild">Wildcards not supported for DB filtering with this type.</ref>
+| &nbsp; || launch-index || Y || Y ||
 |-
-| &nbsp; || launch-time || Y || Y || DB no wildcard <ref name="dbnowild"/>
+| &nbsp; || launch-time || Y || - ||
 |-
 | &nbsp; || monitoring-state || - || - || N/A <ref name="notsupported">Eucalyptus does not support this field</ref>
 |-
@@ -457,35 +459,35 @@ To verify the predicates and criteria a unit test class should be implemented (G
 |-
 | &nbsp; || placement-group-name || - || - || N/A <ref name="notsupported">Eucalyptus does not support this field</ref>
 |-
-| &nbsp; || platform || Y || Y ||
+| &nbsp; || platform || Y || - ||
 |-
-| &nbsp; || private-dns-name || Y || Y ||
+| &nbsp; || private-dns-name || Y || - ||
 |-
-| &nbsp; || private-ip-address || Y || Y ||
+| &nbsp; || private-ip-address || Y || - ||
 |-
-| &nbsp; || product-code || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+| &nbsp; || product-code || - || - ||
 |-
 | &nbsp; || product-code.type || - || - || N/A <ref name="notsupported">Eucalyptus does not support this field</ref>
 |-
-| &nbsp; || ramdisk-id || Y || - || DB filtering could be possible (full key in DB) <ref name="perhapsdbfilter"/>
+| &nbsp; || ramdisk-id || Y || Y ||
 |-
-| &nbsp; || reason || Y || - || DB filtering could be possible <ref name="perhapsdbfilter"/>
+| &nbsp; || reason || Y || - ||
 |-
 | &nbsp; || requester-id || - || - || N/A <ref name="notsupported">Eucalyptus does not support this field</ref>
 |-
 | &nbsp; || reservation-id || Y || Y ||
 |-
-| &nbsp; || root-device-name || - || - || TODO
+| &nbsp; || root-device-name || Y || - || 
 |-
-| &nbsp; || root-device-type || - || - || TODO
+| &nbsp; || root-device-type || Y || - || 
 |-
-| &nbsp; || source-dest-check || - || - || TODO
+| &nbsp; || source-dest-check || - || - || 
 |-
 | &nbsp; || spot-instance-request-id || - || - || N/A <ref name="nospot">
 |-
-| &nbsp; || state-reason-code || - || - || TODO
+| &nbsp; || state-reason-code || - || - || 
 |-
-| &nbsp; || state-reason-message || - || - || TODO
+| &nbsp; || state-reason-message || - || - || 
 |-
 | &nbsp; || subnet-id || - || - || N/A <ref name="notvpc"/>
 |-
@@ -495,11 +497,11 @@ To verify the predicates and criteria a unit test class should be implemented (G
 |-
 | &nbsp; || tag:'''key''' || Y || Y ||
 |-
-| &nbsp; || virtualization-type || - || - || TODO
+| &nbsp; || virtualization-type || - || - ||
 |-
 | &nbsp; || vpc-id || - || - || N/A <ref name="notvpc"/>
 |-
-| &nbsp; || hypervisor || - || - || TODO
+| &nbsp; || hypervisor || - || - ||
 |-
 | &nbsp; || network-interface.description || - || - || N/A <ref name="notvpc"/>
 |-
