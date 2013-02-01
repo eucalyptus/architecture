@@ -30,7 +30,7 @@ In Eucalyptus User Console, we use context-sensitive output escaping/encoding as
 * Whenever possible use '''text()''' to display untrusted data (no escaping is required)
 * Do not use untrusted data in event handler attributes like '''onclick''', '''onload''', '''onmouseover''', etc.
 * If have to use untrusted data in an unsafe sink, use '''escape<X>()''' methods defined in '''esapi/DefaultEncoder.js''' to escape data depending on the context in which it's used
-** Context-sensitive escaping rules from [[here|https://www.owasp.org/images/f/f4/ASDC12-Unraveling_some_of_the_Mysteries_around_DOMbased_XSS.pdf]] 
+** Context-sensitive escaping rules from [https://www.owasp.org/images/f/f4/ASDC12-Unraveling_some_of_the_Mysteries_around_DOMbased_XSS.pdf here] 
 {| 
 !Context 
 !Escaping 
@@ -61,6 +61,6 @@ In Eucalyptus User Console, we use context-sensitive output escaping/encoding as
 ** DO
  "fnRender" : function(oObj){ return DefaultEncoder().encodeForHTML(oObj.aData.description);}
 == Useful References ==
-* Aspect Security [[XSS and jQuery|https://www.owasp.org/images/f/f4/ASDC12-Unraveling_some_of_the_Mysteries_around_DOMbased_XSS.pdf]] - the best available resource on XSS protection in code written in jQuery 
-* OWASP [[XSS Prevention Cheatsheet|https://www.owasp.org/index.php/XSS_(Cross_Site_Scripting)_Prevention_Cheat_Sheet]]
-* OWASP [[DOM based XSS Prevention Cheatsheet|https://www.owasp.org/index.php/DOM_based_XSS_Prevention_Cheat_Sheet]]
+* Aspect Security [https://www.owasp.org/images/f/f4/ASDC12-Unraveling_some_of_the_Mysteries_around_DOMbased_XSS.pdf XSS and jQuery] - the best available resource on XSS protection in code written in jQuery 
+* OWASP [https://www.owasp.org/index.php/XSS_(Cross_Site_Scripting)_Prevention_Cheat_Sheet XSS Prevention Cheatsheet]
+* OWASP [https://www.owasp.org/index.php/DOM_based_XSS_Prevention_Cheat_Sheet DOM based XSS Prevention Cheatsheet]
