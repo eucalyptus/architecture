@@ -398,6 +398,14 @@ The set of migration states reported by the CC to the CLC is smaller than the se
 |Source of the migration is cleaning up after the migration
 |}
 
+=== NC-local States ===
+The following diagram depicts the state machine for migration as it exists local to a single NC which participates in the migration.  There are two participants (1) source and (2) destination whose states are indicated as appropriate.
+[[maintenance-mode-3.3-migration-cc-instance-state-machines.png]]
+
+=== CC States ===
+From the perspective of the CC a migration's state is contributed by two NCs and combine to define a single state machine which determines the progress of the migration.  The following diagram has this state machine.
+[[maintenance-mode-3.3-migration-cc-instance-state-machines.png]]
+
 
 == Misc ==
 
