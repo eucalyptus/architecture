@@ -1,0 +1,66 @@
+== Overview ==
+In Eucalyptus User Console, we use context-sensitive output escaping/encoding as the main XSS prevention technique. Starting with 3.3.0, UI proxy does not do any escaping on the server-side and all untrusted output is expected to be handled safely by the client-side code. This approach allows us to use context-sensitive escaping close to the sink of data when the exact context in which it's used is known.
+== Guidelines ==
+* Avoid using or escape untrusted data before passing it to the following jQuery methods
+{|
+| '''after()'''
+| '''prependTo()'''
+|-
+| '''append()'''
+| '''replaceAll()'''
+|-
+| '''appendTo()'''
+| '''replaceWith()'''
+|-
+| '''before()'''
+| '''unwrap()'''
+|-
+| '''html()'''
+| '''wrap()'''
+|-
+| '''insertAfter()'''
+| '''wrapAll()'''
+|-
+| '''insertBefore()'''
+| '''wrapInner()'''
+|-
+| '''prepend()'''
+| '''$()'''
+|}
+* Whenever possible use '''text()''' to display untrusted data (no escaping is required)
+* Do not use untrusted data in event handler attributes like '''onclick''', '''onload''', '''onmouseover''', etc.
+* If have to use untrusted data in an unsafe sink, use '''escape<X>()''' methods defined in '''esapi/DefaultEncoder.js''' to escape data depending on the context in which it's used
+** Context-sensitive escaping rules from [https://www.owasp.org/images/f/f4/ASDC12-Unraveling_some_of_the_Mysteries_around_DOMbased_XSS.pdf here] 
+{| 
+!Context 
+!Escaping 
+|-
+| HTML Element 
+| '''encodeForHTML()'''
+|-
+| HTML Attribute 
+| '''encodeForHTMLAttribute()'''
+|-
+| JavaScript 
+| '''encodeForJavaScript()'''
+|-
+| HTML Style 
+| '''encodeForCSS()'''
+|-
+| URI Attribute 
+| '''encodeForURL()''' 
+|}
+* Avoid HTML construction "by hand" and using string concatenation, use jQuery's specific setter methods (eg., '''attr()''' and '''val()''') instead
+** DON'T
+ $html =  "<span title='" + title + ">" + str + </span>;
+** DO
+ $html =  $('<span>').attr('title', title).text(str);
+* Do not put unescaped untrusted data into '''eucatable'''
+** DON'T
+ "mDataProp": "size"
+** DO
+ "fnRender" : function(oObj){ return DefaultEncoder().encodeForHTML(oObj.aData.description);}
+== Useful References ==
+* Aspect Security [https://www.owasp.org/images/f/f4/ASDC12-Unraveling_some_of_the_Mysteries_around_DOMbased_XSS.pdf XSS and jQuery] - the best available resource on XSS protection in code written in jQuery 
+* OWASP [https://www.owasp.org/index.php/XSS_(Cross_Site_Scripting)_Prevention_Cheat_Sheet XSS Prevention Cheatsheet]
+* OWASP [https://www.owasp.org/index.php/DOM_based_XSS_Prevention_Cheat_Sheet DOM based XSS Prevention Cheatsheet]
