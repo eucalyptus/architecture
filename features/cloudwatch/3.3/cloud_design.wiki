@@ -132,7 +132,7 @@ No specific packaging requirements.
 *Need feedback from the docs team
 
 = Security =
-No specific security concerns are noted for this design.
+Each operation must adhere with the Eucalyptus implementation of the IAM-compatible identity management system.
 
 = Testing =
 Testing should cover SOAP and Query APIs 
