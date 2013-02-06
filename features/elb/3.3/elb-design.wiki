@@ -1,0 +1,97 @@
+= ELB 3.3 Design Doc =
+
+== Overview ==
+
+This document presents the design of the load-balancers to be released in Eucalyptus 3.3. The design is affected by several considerations, notably:
+* API compatibility to AWS Elastic Load Balancing. The compatibility not only means the message-level, but also includes the semantics that dictates how load balancers should be implemented (e.g., round-robin dns, availability zones)
+*	The integration with the existing Eucalyptus components
+*	Quality attributes, such as security and the horizontal scalability
+*	Underlying SW load-balancers (e.g., haproxy)
+
+== Supported APIs ==
+
+Followings are the list of AWS APIs that’s currently qualified as the minimum viable product.
+CreateLoadBalancer
+DeleteLoadBalancer
+DescribeLoadBalancers
+RegisterInstancesWithLoadBalancer 
+DeregisterInstancesFromLoadBalancer
+CreateLoadBalancerListeners
+DeleteLoadBalancerListeners
+ConfigureHealthCheck
+DescribeInstanceHealth
+
+The MVP operations above make the following scenarios possible:
+* Create a new load-balancer (LB) with designated listener specification (e.g., protocol, port #)
+*	Designate one or multiple availability zones (clusters) to be associated with the created LB. Note this doesn’t include enable/disable-availability-zones, which means the allocated zones do not change over the lifetime of LBs.
+*	Get the description of load-balancers, including its listener spec, instances, availability zones, etc
+*	Register/Deregister instances while the LB is in service
+*	Create/Delete listeners while the LB is in service. We will support HTTP, HTTPS, and TCP as the listener protocol.
+*	Configure the health check while the LB is in service. Unhealthy instances will be automatically removed from the ELB pool.
+
+== Round-robin DNS ==
+When a new load-balancer is created, Eucalyptus will assign a unique DNS A record to the LB. After the underlying SW load-balancers are launched and configured, the IP address of their interface (i.e., IP of the LB VMs discussed later), will be added to the DNS name. If more than one zone is specified or to implement the horizontal scalability or the ELB failover, there can be more than one IP addresses mapped to the DNS name. The load-balancers in one zone will distribute the traffic to the instances only in the same zone. 
+The application users will query the application service using the DNS name and the Eucalyptus DNS service will respond to the query with the list of IP addresses round-robin basis. Note this does not mean that the application is only reachable through the cryptic, euca-generated DNS name (e.g., lb001.euca-cloud.yourcompany.com). Typically there will be a CNAME records that maps from the meaningful domain name (e.g., myservice.com) to the euca-generated DNS name. The CNAME records can be serviced anywhere on Internet (e.g., godaddy.com). 
+
+== Architecture ==
+Because a design document without a diagram is insane, we are adding one here.
+<img src="https://github.com/sangmin/architecture/blob/master/features/elb/3.3/elb-design/elb-design.png?raw=true">
+
+=== ELB as a Euca service === 
+The ELB (AS/CloudWatch as well) will be a distinct service, just as cloud, sc, or walrus is. This means the similar admin interface to enable/disable services will be used. Also it will be possible to deploy ELB services separate from the eucalyptus.  HOWEVER, WE HAVE NOT DECIDED IF 3.3 will support such flexible deployment scenario fully. Although the implementation follows the same component-based model that we’ve been using, the extra work to create the admin tools and the QA burden will make it quite possible that we cannot achieve in 3.3 time-frame. 
+
+=== VM as a balancer === 
+SW load-balancers will be prepackaged with the special, euca-provided VM image, and instances off the image will forward the HTTP(S)/TCP packets to the service instances. The VM-based balancers achieve the important quality attributes, such as load-balancer failover, horizontal scalability, manageability, and the security.  The balancer instances will be treated as system-owned euca instances, and no direct control by the owner of the LBs will be allowed (i.e., the elb implementation will delegate the controls to the LB owners appropriately).  Also the EMI containing the SW balancers will be also system-owned, and the normal users will not be able to launch it directly. 
+
+Note however the benefit comes with the cost:
+* A balancer VM will service only one load-balancer (multiple listeners of the load-balancer will be all handled by one VM).  This can be a non-trivial overhead harming the cloud capacity. In hypothetic deployment, if there are 10 users each creating and running 2 load-balancers, there will be 20 balancer VMs running in the backend. If we count multi-zones, balancer failover, and the scalability, the numbers will be multiplied. This implies three things:
+  - We should educate the users that they should use the ELB service prudently. If a user launches an ELB for the instances that barely gets traffic and forget to delete the LB, such behaviors will harm the cloud significantly. Note this is NOT the same expectation the users have on AWS ELB since the AWS’s scale is seemingly unlimited.
+  - We should provide cloud admins the interface to control the resource usage by LB VMs. That includes limiting # of LBs per user, configuring # of LB VMs per LB, etc.
+  - We should put efforts to make the LB VM’s footprint as small as possible. This could be a challenging (and stimulating) engineering effort since small footprint leads to the reduced per-VM performances. 
+*	There will be a delay between the ELB service is created (or the first service instance is registered with the ELB) and the ELB becomes operational. The delay will be roughly equivalent to the VM instantiation time. This delay is not expected (although API doesn’t preclude that) on AWS ELB, and our users will find it unpleasant.  We may try reducing this delay by implementing caching strategy where admin can specify # of LV VMs in standby mode (so it’s the pool of LB VMs). However this will add implementation complexity significantly and may increase Cloud’s overhead due to idling instances in standby mode. Currently this kind of optimization is not in MVP.
+
+=== Haproxy === 
+We investigated the existing SW load-balancers and performed benchmark on the two candidates: haproxy and nginx. Eventually we decided to use haproxy based on the two findings:
+* Haproxy covers the most (no known limitations yet) feature set required by AWS ELB apis. Nginx lacked the ssl support (plugin exists but might be risky to rely on since it’s not maintained actively).
+*	Haproxy outperforms nginx on http forwarding (and http would likely be the most important protocol)
+
+=== Load-balancer-servo ===
+This is the python-based software that will run inside the LB VMs. Upon the instantiation of the VMs, the software will kick off automatically and do the followings:
+* It invokes “describe-load-balancers” service method to the ELB and retrieve listeners that’s assigned to the LB VM. At this point, it’s likely that we can use the existing “describe-load-balancers” api by letting the service methods to handle the request from the VMs differently from the user request. We will inject system-generated credentials to the VM (or use metadata to get the credentials available) and use the special credential to authenticate and authorize the request from the service.
+*	Upon parsing the listener specification assigned to the VM, the servo will (re)configure haproxy without disruption to the service
+*	When service instances are registered/deregistered, the servo will (re)configure haproxy without disruption to the service
+*	It will “ping” the service instances using the health check configuration specified for the ELB. 
+*	It will POST the health check results periodically to the ELB service. This is through our own service API (i.e., post-health-check).
+*	It will POST the cloud-watch metrics such as request count.
+
+== Quality Attributes ==
+The VM-based load-balancer is able to satisfy the important quality attributes. Note however that currently there is no MVP defined around these quality attributes (as opposed to the functional requirements using the AWS API). While the implementation will make sure it’s flexible enough to accommodate the evolving quality requirements, we will not commit the end-to-end implementation until the quality requirements are fully spec’ed.
+* Failover: ELB across multiple zones achieves failover in the event of a zone’s outage. The applications will pick up the IP addresses of the load-balancers in the zone still in service. The failover of the LB VMs (haproxy) within a zone is attainable by launching multiple LB VMs in a zone. There should be administrator interface for this.
+*	Horizontal Scalability: if the application needs to scale out (i.e.,  more packets hitting the ELB and significant packet delay ensue), we can launch more LB VMs servicing the ELB. This is the great benefit that the VM-based approach can make possible.  HOWEVER, this is a challenging problem because:
+  - It is very difficult to determine “when” to scale out.  AWS does this automatically, but they have human operators who can “sense” when to scale out.
+  - We have CC, the software-based router, which can limit the effect of scaling-out. The performance modeling in the presence of the CC and LB VMs in a zone will be very difficult. The empirical performance will vary across deployments. 
+For these reasons, 3.3 will implement one of these options regarding the horizontal scalability.
+  -	No horizontal scalability. Only one LB VM is allocated per zone for a LB.
+  -	Manual, static scalability, by allowing admins to # of LB VMs per zone, and the setting is enforced only when the LB is created.
+  -	Manual, dynamic scalability, by allowing admins to change # of LB VMs per zone, and the setting is enforced at run time.
+
+* Security : The SSL termination at LB is part of AWS api, but it is currently not in scope for 3.3. In my opinion, it is very unlikely that we will release it in 3.3. The major challenge is that we need to implement IAM server certificate, on which the ELB’s SSL API depends, in addition to the SSL support on the LB and haproxy (haproxy has the support of it). Also we need rigorous security analysis before committing to the implementation because SSL support requires exchanging private keys across system components. 
+
+== CloudWatch Metrics ==
+ELB will collect the cloud-watch metrics from the load-balancer-servo and make it available to the Cloud watch service. We have not finalized the exact list of metrics (input is needed here). Most likely the following metrics will be added:
+* Request count
+*	Request latency
+*	(Un)Healthy host count
+
+== Admin Interfaces ==
+Unlike the AWS, we need to create the set of interfaces to let the Cloud administrator to configure the ELB services, and control the resource usages incurred by ELB. Choosing the right set of interfaces is very important and challenging because we have no luxury of AWS-defined APIs here. Note that the interfaces will evolve throughout the implementation. The developers and the product management team should keep communicating until we finalize them for the release. Here are the initial enumerations of them (note the list doesn’t imply they are MVP):
+* EMI of the LB VM 
+*	# of total ELBs in the cloud
+*	# of ELBs per account
+*	Minimum # of LB VMs per zone (for failover and the horizontal scalability)
+*	Maximum # of LB VMs per zone (for resource control)
+*	Desired # of  LB VMs per zone (if we implement dynamic setting of it)
+*	# of LB VMs in standby mode (to reduce the ELB instantiation delay)
+
+
+
