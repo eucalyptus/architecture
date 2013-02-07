@@ -1,6 +1,7 @@
 == Overview ==
 In Eucalyptus User Console, we use context-sensitive output escaping/encoding as the main XSS prevention technique. Starting with 3.3.0, UI proxy does not do any escaping on the server-side and all untrusted output is expected to be handled safely by the client-side code. This approach allows us to use context-sensitive escaping close to the sink of data when the exact context in which it's used is known.
 == Guidelines ==
+=== jQuery specific ===
 * Avoid using or escape untrusted data before passing it to the following jQuery methods
 {|
 | '''after()'''
@@ -27,7 +28,7 @@ In Eucalyptus User Console, we use context-sensitive output escaping/encoding as
 | '''prepend()'''
 | '''$()'''
 |}
-* Whenever possible use '''text()''' to display untrusted data (no escaping is required)
+* Whenever possible use '''text(danger)''' or '''val(danger)''' to display untrusted data (no escaping is required)
 * Do not use untrusted data in event handler attributes like '''onclick''', '''onload''', '''onmouseover''', etc.
 * If have to use untrusted data in an unsafe sink, use '''escape<X>()''' methods defined in '''esapi/DefaultEncoder.js''' to escape data depending on the context in which it's used
 ** Context-sensitive escaping rules from [https://www.owasp.org/images/f/f4/ASDC12-Unraveling_some_of_the_Mysteries_around_DOMbased_XSS.pdf here] 
@@ -55,11 +56,34 @@ In Eucalyptus User Console, we use context-sensitive output escaping/encoding as
  $html =  "<span title='" + title + ">" + str + </span>;
 ** DO
  $html =  $('<span>').attr('title', title).text(str);
+=== Handling of '''eucatable'''===
 * Do not put unescaped untrusted data into '''eucatable'''
 ** DON'T
  "mDataProp": "size"
 ** DO
  "fnRender" : function(oObj){ return DefaultEncoder().encodeForHTML(oObj.aData.description);}
+* When creating an instance of the '''eucatable'''
+** '''options.id''' MUST be a static string (eg., ''sgroup'', ''keypair'')
+** '''options.filters''' MUST not come from user input, for example
+ filters : [{name:"snap_state", options: ['all','in-progress','completed'], text: [snap_state_selector_all, snap_state_selector_in_progress, snap_state_selector_completed], filter_col:7, alias: {'in-progress':'pending','completed':'completed'}} ]
+=== Constructing notifications and messages to the user ===
+* escape any untrusted data before passing it to one of the following methods that are known to be using HTML rendering methods
+{|
+! Method
+|-
+| ''addNote()''
+|-
+| ''showFieldError()''
+|-
+| ''validateOnType()''
+|-
+| ''notifyError()''
+|-
+| ''notifySuccess()''
+|-
+| ''notifyMulti()''
+|}
+* escape any untrusted data when '''.i18n.prop()''' is used 
 == Useful References ==
 * Aspect Security [https://www.owasp.org/images/f/f4/ASDC12-Unraveling_some_of_the_Mysteries_around_DOMbased_XSS.pdf XSS and jQuery] - the best available resource on XSS protection in code written in jQuery 
 * OWASP [https://www.owasp.org/index.php/XSS_(Cross_Site_Scripting)_Prevention_Cheat_Sheet XSS Prevention Cheatsheet]
