@@ -213,4 +213,38 @@ Data Types :
   - Type: String
   - Length constraints: Minimum length of 1. Maximum length of 255.
 
+== MonitorInstances ==
 
+Description :
+Enables monitoring for a running instance(s).
+
+Request Parameters :
+
+*InstanceId.n 
+  - Type: String
+  - Default: None
+  - Required : Yes  
+
+== UnmonitorInstances ==
+
+Description : 
+Disables monitoring for a running instance(s).
+
+Request Parameters :
+
+*InstanceId.n 
+  - Type: String
+  - Default: None
+  - Required : Yes 
+
+== RunInstances (additional parameter) ==
+
+Description : 
+Enables monitoring for the instance.
+
+Request Parameters :
+
+*Monitoring.Enabled
+   - Type : Boolean
+   - Default : false
+   - Required : No
