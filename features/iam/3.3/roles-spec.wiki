@@ -85,5 +85,93 @@ $ iam-instanceprofilecreate -s s3access -r s3access arn:aws:iam::111111111111:in
 * run-instance support for  -p, --iam-profile arn|name
 *: The IAM instance profile to associate with the launched instance(s). IAM instance profiles enable you to manage permissions for applications running on EC2. This is either the Amazon Resource Name (ARN) of the instance profile (e.g., arn:aws:iam::111111111111:instance-profile/s3access) or the name of the role (e.g., s3access).
 
+== Discussion ==
+
+#. Summary of IAM roles related changes needed:
+##. STS: GetFederatedToken operation implementation [2].
+##. EC2: RunInstance with an IamInstanceProfile [3].
+##. IAM: Role related operations [4].
+##. Instance Metadata: Obtaining, refreshing, and giving access to federated tokens [5,6].
+
+#. Roles & GetFederatedToken subtleties
+##. Roles work by providing the policies for narrowing privileges in a way that RunInstance can obtain those policies and, subsequently and periodically, request GetFederatedToken's which have been restricted appropriately.
+##. Roles are not an authorizable entity in and of themselves -- the application of the role's policies is done through federated tokens.
+##. The semantics of privilege narrowing in GetFederatedToken imply that the delegating account is the same as the owner of the IamInstanceProfile.
+##. The Policy argument can be used to specify the restriction of access to be only the resource of the specific ELB.
+##. Obtaining the tokens will necessarily happen on the EC2 service side (either in instance state management or instance metadata) and need to happen periodically.
+##. For the EC2 service to be able to apply the right narrowing Policy it has to be able to identify that policy which is defined by ELB (!!)
+##. To expose the appropriate Policy the information has to be passed across the RunInstance API.
+##. It follows that an IamInstanceProfile be used as it is the only appropriate field in the RunInstance request.
+##. The IamInstanceProfile has associated with it IamRoles which have associated the relevant Policys.
+
+#. EC2/Instance Metadata & IAM Roles
+##. Providing access to the federated credentials will involve periodically calling GetFederatedToken.
+##. To narrow the delegated privileges for the federated tokens the right Policy has to be provided when calling GetFederatedToken.
+##. The only way to associate a Policy w/ an Instance is at RunInstance time -- indirectly by associating an iamRole with the Instance.
+##. The IamInstanceProfile, subsequently, has an IamRole and that has a list of Policys. (NOTE: despite being a list, an InstanceProfile can only ever have a single role associated with it [7])
+##. Using the IamInstanceProfile information and its policies GetFederatedToken can be used to obtain appropriate credentials.
+##. Instance metadata: When credentials are demanded using http://169.254.169.254/latest/meta-data/iam/security-credentials/${iamProfile} two things are needed:
+###. If no credentials are currently cached for the instance obtain new credentials.
+###. If cached credentials are expired obtain new credentials.
+##. Note that persisting tokens is not indicated as they are ephemeral, caching for the timeout period is sufficient.  For example Suppliers.memoizeWithExpiration( new FederatedTokenSupplier() {/**/}, timeOut, TimeUnit.MINUTES );
+##. The value for the timeout of tokens in this case is unspecified (anyone?) and should be a configurable value which is local to the EC2 service (as it would apply to all system run VMs).
+
+#. IAM Role related operations:  Based on the above discussion it seems to me like we need the following operations:
+##. Obtaining the instance profile is necessary as the EC2 service must not hardcode ELB specific policy information:
+###. EC2 uses GetInstanceProfile using the IamInstanceProfile given to RunInstances, yields the Role
+###. EC2 uses ListRolePolicies for the above obtained Role
+###. EC2 uses GetRolePolicy for each of the above obtained RolePolicies
+##. Creating the instance profile is needed as the IAM service must not hardcode ELB specific policy information:
+###. ELB uses CreateRole for LB instances.
+###. ELB uses PutRolePolicy to specify policy.
+###. ELB uses CreateInstanceProfile for LB instances.
+###. ELB uses AddRoleToInstanceProfile to associate role with instance profile.
+##. The related {List,Delete}Role, {List,Delete}InstanceProfile, {List,Delete}InstanceProfile are very desirable but not /necessary/ for functionality.  They should still be planned as they would be essential to operator control.
+
+#. Separation of concerns between ownership and authorization ==> IAM Policies ==> AssumeRole
+##. Handling request authorization should not be done based on request origin (i.e., examples where we do this now are wrong and are not a precedent for anything)
+##. A uniform (system-wide) IAM policy evaluation mechanism is possible (not all policies can be evaluated before starting processing of the request operation;  so IAM policy evaluation is still relevant and needed in operations)
+##. The ELB service is effectively a 3rd party which needs API access to act on behalf of some user w/in the restricted role of managing the LB instances.
+##. AssumeRole [8] makes it possible for ELB to manage LB instances using a role which is delegated from whatever owning account we wish (including possibly the user account that defined the logical ELB).
+##. In this way, the question of authorization (system-wide mechanism) is made distinct from LB instance ownership (ELB implementation specific)
+##. Also, ownership of the LB vms can be decided w/ a focus on the related considerations w/o being compromised.
+
+#. Ownership of the ELB instance:  this is a multi-faceted question with many implications.
+##. Operator (cloud admin) access and control; admins need to be able to identify, operate on, manage, and account for LB vms.
+##. ELB-User resource accounting; resource usage by ELB vms should be accounted against the user who created the ELB.
+##. Multi-tenancy:  for it to be possible then LB vms have to be managed in a cross-account fashion.
+##. Security Groups:  management of the security groups for the LB vms varies in complexity and risk exposure.
+
+#. Options for LB vm ownership:  I've tried to identify and discuss some of the options for LB vm ownership, please review, amend, comment.
+##. "eucalyptus" account owned:  LB vms run under the "eucalyptus" system account
+###. Direct cloud admin control of LB vms
+###. Trivial to handle from authorization perspective
+###. Compromises accountability
+###. Compatible with multi-tenant LB vms
+###. Security group management is co-mingled
+##. User account owned:  LB vms are just instances running w/in the ELB owning account,
+###. Would need policy filtering/restricting {Describe,Terminate}Instances operations for non-cloud-admin users.
+###. Delegated cloud admin control of LB vms localized to user owning the ELB
+###. Minor authorization work (AssumeRole) to switch to user when running LB vms
+###. Direct accountability w/in the user account
+###. Not suitable for multi-tenant LB vms
+###. Security group management is localized; needs policy filtering/restricting {Describe,Delete}SecurityGroups
+##. Special ELB-only per-UserAccount-account owned: ELB would create a special account specific to the Account which created the ELB and use it to run LB vms.
+###. Delegated cloud admin control of LB vms through an indirected account on a per-user
+###. Special authorization work (AssumeRole)
+###. One-to-one accountability between this account and the corresponding Account that created the ELB
+###. Not suitable for multi-tenant LB vms
+###. Security group management is localized; doesn't need special handling
+
+[1] https://github.com/eucalyptus/architecture/wiki/iam-3.3-roles-spec
+[2] http://docs.aws.amazon.com/STS/latest/APIReference/API_GetFederationToken.html
+[3] http://docs.aws.amazon.com/AWSEC2/latest/APIReference/ApiReference-query-RunInstances.html
+[4] http://docs.aws.amazon.com/IAM/latest/APIReference/API_InstanceProfile.html
+[5] http://docs.aws.amazon.com/IAM/latest/APIReference/API_Role.html
+[6] http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/UsingIAM.html#UsingIAMrolesWithAmazonEC2Instances
+[7] http://docs.aws.amazon.com/IAM/latest/UserGuide/instance-profiles.html
+[8] http://docs.aws.amazon.com/IAM/latest/UserGuide/cross-acct-access-thirdparty.html
+
+
 ----
 [[tag:rls-3.3]]
