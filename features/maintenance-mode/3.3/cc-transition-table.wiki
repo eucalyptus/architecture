@@ -1,0 +1,26 @@
+{|
+!colspan="11"| columns are SOURCE, rows are DEST
+|-
+| -  || EΦ || EP || ER || EM || EC || TΦ || TP || TR || TM || TC 
+|-
+| NO || x || x || PD || L || L || x || x || x || wtf<br> L || x
+|-
+| EP || CD || x || x || wtf<br>CD || wtf<br>CD || CD || CD || CD || CD || CD 
+|-
+| ER || CD || x || MS || x || wtf<br>CD || CD || CD || CD || CD || CD 
+|-
+| EM || CD || wtf<br>CD || L || x || x || x || wtf<br>CD || wtf<br>L || wtf<br>L || x
+|-
+| EΦ || wtf || wtf || L || x || x || x || wtf<br>L || wtf<br>L || wtf<br>L || x 
+|-
+| TΦ || x || EP || ER || EM || EC || TΦ || TP || TR || TM || TC 
+|-
+| TP || x || EP || ER || EM || EC || TΦ || TP || TR || TM || TC 
+|-
+| TR || x || EP || ER || EM || EC || TΦ || TP || TR || TM || TC 
+|-
+| TM || x || EP || ER || EM || EC || TΦ || TP || TR || TM || TC 
+|-
+| TC || x || EP || ER || EM || EC || TΦ || TP || TR || TM || TC 
+|-
+|}
