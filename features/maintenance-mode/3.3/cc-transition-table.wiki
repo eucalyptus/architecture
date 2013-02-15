@@ -1,5 +1,5 @@
 {|
-!colspan="2";float="right"| Instance State
+!colspan="2"| Instance State
 |-
 | E || Extant
 |-
@@ -8,7 +8,7 @@
 | N || No state
 |}
 {|
-!colspan="2";float="right"| Migration States
+!colspan="2"| Migration States
 |-
 | Φ || No state
 |-
@@ -21,7 +21,7 @@
 | C || Cleaning
 |}
 {|
-!colspan="2";float="right"| State Entries
+!colspan="2"| State Entries
 |-
 | L || Log it
 |-
