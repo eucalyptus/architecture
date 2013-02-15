@@ -50,7 +50,7 @@ columns are SOURCE, rows are DEST
 |-
 | EΦ || wtf || wtf || L || x || x || x || wtf<br>L || wtf<br>L || wtf<br>L || x 
 |-
-|color="red"| TΦ || x || EP || ER || EM || EC || TΦ || TP || TR || TM || TC 
+|style="color:red; background-color:#ff0000;" | TΦ || x || EP || ER || EM || EC || TΦ || TP || TR || TM || TC 
 |-
 | TP || x || EP || ER || EM || EC || TΦ || TP || TR || TM || TC 
 |-
