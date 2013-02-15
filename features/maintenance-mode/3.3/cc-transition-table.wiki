@@ -1,9 +1,25 @@
 {|
+! Instance State
+|-
+| E || Extant
+| T || Teardown
+| N || No state
+{|
+|-
+| <b>Migration States</b>
+|-
+| Φ || No state
+| P || Preparing
+| R || Ready
+| M || Migrating
+| C || Cleaning
+|}
+{|
 !colspan="11"| columns are SOURCE, rows are DEST
 |-
 | -  || EΦ || EP || ER || EM || EC || TΦ || TP || TR || TM || TC 
 |-
-| NO || x || x || PD || L || L || x || x || x || wtf<br> L || x
+| N  || x || x || PD || L || L || x || x || x || wtf<br> L || x
 |-
 | EP || CD || x || x || wtf<br>CD || wtf<br>CD || CD || CD || CD || CD || CD 
 |-
