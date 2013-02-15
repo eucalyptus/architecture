@@ -1,0 +1,66 @@
+= GMS Overview =
+Eucalyptus uses jgroups as a virtually synchronous<ref name="virtsync">http://en.wikipedia.org/wiki/Virtual_synchrony</ref> Group Membership System (GMS) <ref name="birman">http://www.springer.com/computer/communication+networks/book/978-0-387-21509-9</ref> to bootstrap hosts into the system.  Initially, hosts are running a <code>eucalyptus-cloud</code> process and need to become a part of the distributed system.  This act of ''join''ing the group then triggers a reconfiguration of the system as a whole based on what services are registered on the newly joining host (e.g., start the Walrus running there; sync the DB; etc.).  Conversely, when the process is stopped/killed or the host shuts down a complementary ''leave'' of the group occurs for the host.  Lastly, faults can cause a running <code>eucalyptus-cloud</code> process to become unreachable from other hosts in the system (network partion), unable to receive messages (null route), or to have the hosting node fail.  For each of these the system must react to remove that host from the system -- and this is driven by failure detection in jgroups.
+
+More background on group membership systems is available in "A History of the Virtual Synchrony Replication Model"<ref name="gms-history">[https://github.com/eucalyptus/architecture/tree/master/features/gms/3.3/gms-history.pdf History of GMS]</ref>.
+
+== Eucalyptus & GMS ==
+In Eucalyptus we depend upon the jgroups GMS to do a number of important things:
+
+=== Bootstrap & Host Discovery === 
+When starting the <code>eucalyptus-cloud</code> process we don't tell it anything about the rest of the system (i.e., we avoid localized configuration of distributed state like the plague).  Instead, the process uses IGMPv4 multicast groups to ''join'' a well known multicast group and advertise its cloud-specific identity.  This is, in effect, like the state of the hosts in the system were stored "in the network" (as opposed to on any particular host).
+
+=== Host state information ===
+As part of the GMS information we carry three bits along with each host in the system:
+# Has the host started up all the way yet?  That is, is the web services stack up, etc.;  can it respond to web-services requests.
+# Does the host run a database?  
+# If it does run a database, is it synchronized?
+
+=== Host Joins & Leaves ===
+When a host joins or leaves a Eucalyptus system some kind of action results.  Based on the above host state information the system will reconfigure itself appropriately:
+# Host w/o database joins the group:  it will setup database connections to all the hosts which do run a database.
+# Host w database joins the group:  there are two cases.
+## There is no other host with a database:  the newly joined host will start up normally.
+## There is another host with a database:  all hosts will block database operations, the newly joined host will synchronize from the other host with the database, it will mark its state as synchronized when that completes, then all hosts will setup connections to the new database.
+# Host w/o a database leaves the group:  if the host was running an ENABLED service the system will try to perform a failover if a spare is available.
+# Host w/ a database leaves the group:  everyone tears down their database connections to that host.
+
+=== Network Partitions & Merges ===
+It is the nature of networks that message delivery is not reliable.  Devices fail, misconfiguration occurs, cables get pulled.  When the network stops delivering messages which are going between two hosts w/in the Eucalyptus system a partition has occurred.  The GMS will detect the faulty host and remove the host from group.  This brings the system into a state with two independently operating regimes.  Subsequent repairs to the network will then restore communication between the affected hosts resulting in a ''merge''.  At this point, the GMS will provide each of the hosts with a view of the system before the merge having at least two subgroups.  Each host determines whether or not the merge would result in a potential inconsistency (e.g., when two CLCs are merged back together one of them must stop accepting writes).
+
+=== Key Characteristics of GMS ===
+# Starting from an intial view, subsequent views are reported in terms of adding and deleting members.
+# The group view changes only when reality changes.  Hosts only join if they are trying to join and only leave if they have failed or been deemed to fail by the GMS.
+# During any interval of time, group members all see the same uninterrupted sequence of view changes.
+# For a host, the sequence of views begins with the join of the group and ends with the explicit leave from the group or with the failure of the host.
+# Hosts can determine whether they are operating in a partitioned environment by consulting the GMS.
+
+== Current Implementation ==
+# UDP/IGMP
+# TCP/TCPGOSSIP
+
+=== Problems ===
+==== UDP/IGMP ====
+
+==== TCP/TCPGOSSIP ====
+It is, at /best/, a degenerate mode of operation.  Leaving aside other important issues which also demand attention, we briefly indicate the critical issues:
+1. Network partitioning does not imply disjoint strongly connected network subcomponents; in other words, GMS state does not correspond to node reachability (both node is reachable and not in GMS and vice versa).
+2. TCP for failure detection is not acceptable; connection state management is not possible under certain fault conditions.
+3. System state is not recoverable; e.g. crashed gossip routers can lead to inconsistency
+4. System configuration changes require a process restart to take effect.
+5. Bootstrap cannot _require_ site local configuration to start up; optional is OK.
+6. File backed configuration is prohibited for HA; never again.
+7. Bootstrap cannot depend upon completion of bootstrap to function (e.g., needed for coordinating GossipRouters to be HA).
+
+There are reasonable alternatives which also exceed TCPGOSSIP (and many that are worse).  Ultimately, some of these may need to be compromised, but each has big costs associated.
+
+
+== Network Capability Validation ==
+[https://github.com/eucalyptus/deveutils See eucalyptus/deveutils/]
+
+== Alternatives ==
+
+<references/>
+
+
+----
+[[tag:rls-3.3]]
