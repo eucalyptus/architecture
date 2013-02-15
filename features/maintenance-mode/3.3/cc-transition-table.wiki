@@ -1,15 +1,14 @@
 {|
-! Instance State
+!colspan="2";float="right"| Instance State
 |-
 | E || Extant
 |-
 | T || Teardown
 |-
 | N || No state
+|}
 {|
-|-
-| <b>Migration States</b>
-|-
+!colspan="2";float="right"| Migration States
 |-
 | Φ || No state
 |-
@@ -22,7 +21,22 @@
 | C || Cleaning
 |}
 {|
-!colspan="11"| columns are SOURCE, rows are DEST
+!colspan="2";float="right"| State Entries
+|-
+| L || Log it
+|-
+| x || Happy path
+|-
+| PD || Prepare Destination
+|-
+| CD || Clean Destination
+|-
+| MS || Migrate Source
+|}
+{|
+!colspan="11"| 
+columns are SOURCE, rows are DEST
+<br> INCOMPLETE: any cell with the name of the column (for easier navigation) is incomplete
 |-
 | -  || EΦ || EP || ER || EM || EC || TΦ || TP || TR || TM || TC 
 |-
