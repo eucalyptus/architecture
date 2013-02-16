@@ -1,5 +1,8 @@
 = GMS Overview =
-Eucalyptus uses jgroups as a virtually synchronous<ref name="virtsync">http://en.wikipedia.org/wiki/Virtual_synchrony</ref> Group Membership System (GMS) <ref name="birman">http://www.springer.com/computer/communication+networks/book/978-0-387-21509-9</ref> to bootstrap hosts into the system.  Initially, hosts are running a <code>eucalyptus-cloud</code> process and need to become a part of the distributed system.  This act of ''join''ing the group then triggers a reconfiguration of the system as a whole based on what services are registered on the newly joining host (e.g., start the Walrus running there; sync the DB; etc.).  Conversely, when the process is stopped/killed or the host shuts down a complementary ''leave'' of the group occurs for the host.  Lastly, faults can cause a running <code>eucalyptus-cloud</code> process to become unreachable from other hosts in the system (network partion), unable to receive messages (null route), or to have the hosting node fail.  For each of these the system must react to remove that host from the system -- and this is driven by failure detection in jgroups.
+Eucalyptus uses <ref name="jgroups">http://www.jgroups.org</ref> as a virtually synchronous<ref name="virtsync">http://en.wikipedia.org/wiki/Virtual_synchrony</ref> Group Membership System (GMS) <ref name="birman">http://www.springer.com/computer/communication+networks/book/978-0-387-21509-9</ref> to bootstrap and handle host membership in the system.  
+Initially, isolated hosts are running a <code>eucalyptus-cloud</code> process and need to become a part of the distributed system.  This act of ''join''ing the group then triggers a reconfiguration of the system, as a whole, based on what services are registered on the newly joining host (e.g., enable the Walrus service; sync the DB; etc.).  Conversely, when the process is stopped/killed or the host shuts down a complementary ''leave'' of the group occurs for the host.  
+
+Lastly, various faults can impact a host's ability to be useful for processing requests.  Host-level failure detection is driven by jgroups.  Faults can cause a running <code>eucalyptus-cloud</code> process to become unreachable from other hosts in the system (a partition), unable to receive messages (e.g., null route, NIC failure, MTU problem), or cause hosting node to fail.  For each of these the system must react to remove that host from the system, stop depending on the service which had been running there, and potentially promote services running elsewhere as replacements.
 
 More background on group membership systems is available in "A History of the Virtual Synchrony Replication Model"<ref name="gms-history">[https://github.com/eucalyptus/architecture/tree/master/features/gms/3.3/gms-history.pdf History of GMS]</ref>.
 
@@ -7,7 +10,7 @@ More background on group membership systems is available in "A History of the Vi
 In Eucalyptus we depend upon the jgroups GMS to do a number of important things:
 
 === Bootstrap & Host Discovery === 
-When starting the <code>eucalyptus-cloud</code> process we don't tell it anything about the rest of the system (i.e., we avoid localized configuration of distributed state like the plague).  Instead, the process uses IGMPv4 multicast groups to ''join'' a well known multicast group and advertise its cloud-specific identity.  This is, in effect, like the state of the hosts in the system were stored "in the network" (as opposed to on any particular host).
+When starting the <code>eucalyptus-cloud</code> process we don't tell it anything about the rest of the system.  Localized configuration of distributed state is intentionally avoided.  Instead, the process uses IGMPv4 multicast  to ''join'' a multicast group specific to that cloud installation.  The effect is to store the state of the hosts in the system "in the network" (as opposed to on any particular host).
 
 === Host state information ===
 As part of the GMS information we carry three bits along with each host in the system:
@@ -27,37 +30,56 @@ When a host joins or leaves a Eucalyptus system some kind of action results.  Ba
 === Network Partitions & Merges ===
 It is the nature of networks that message delivery is not reliable.  Devices fail, misconfiguration occurs, cables get pulled.  When the network stops delivering messages which are going between two hosts w/in the Eucalyptus system a partition has occurred.  The GMS will detect the faulty host and remove the host from group.  This brings the system into a state with two independently operating regimes.  Subsequent repairs to the network will then restore communication between the affected hosts resulting in a ''merge''.  At this point, the GMS will provide each of the hosts with a view of the system before the merge having at least two subgroups.  Each host determines whether or not the merge would result in a potential inconsistency (e.g., when two CLCs are merged back together one of them must stop accepting writes).
 
-=== Key Characteristics of GMS ===
-# Starting from an intial view, subsequent views are reported in terms of adding and deleting members.
-# The group view changes only when reality changes.  Hosts only join if they are trying to join and only leave if they have failed or been deemed to fail by the GMS.
-# During any interval of time, group members all see the same uninterrupted sequence of view changes.
-# For a host, the sequence of views begins with the join of the group and ends with the explicit leave from the group or with the failure of the host.
-# Hosts can determine whether they are operating in a partitioned environment by consulting the GMS.
 
-== Current Implementation ==
-# UDP/IGMP
-# TCP/TCPGOSSIP
+== Implementation ==
+Eucalyptus uses jgroups <ref name="jgroups"/> which is very configurable and in particular affects two characteristics of the system.
 
-=== Problems ===
-==== UDP/IGMP ====
+# Host bootstrap is Discovery vs. Configured:  When 
+# Failure detection possible with Stateless vs. Stateful protocols:
 
-==== TCP/TCPGOSSIP ====
-It is, at /best/, a degenerate mode of operation.  Leaving aside other important issues which also demand attention, we briefly indicate the critical issues:
-1. Network partitioning does not imply disjoint strongly connected network subcomponents; in other words, GMS state does not correspond to node reachability (both node is reachable and not in GMS and vice versa).
-2. TCP for failure detection is not acceptable; connection state management is not possible under certain fault conditions.
-3. System state is not recoverable; e.g. crashed gossip routers can lead to inconsistency
-4. System configuration changes require a process restart to take effect.
-5. Bootstrap cannot _require_ site local configuration to start up; optional is OK.
-6. File backed configuration is prohibited for HA; never again.
-7. Bootstrap cannot depend upon completion of bootstrap to function (e.g., needed for coordinating GossipRouters to be HA).
+The possible configurations are then:
 
-There are reasonable alternatives which also exceed TCPGOSSIP (and many that are worse).  Ultimately, some of these may need to be compromised, but each has big costs associated.
+# Multicast/UDP:  Discovered & Stateless
+# Unicast/UDP:  Configured & Stateless
+# Unicast/TCP:  Configured & Stateful
+# Gossip/TCP:  Partially Configured & Stateful
 
+=== Gossip ===
+A configuration option is to use a gossip server to add new group members. The gossip server maintains a list of the current members. New members contact the gossip server, which then distributes updated membership information to the new member as well as the rest of the group.
+
+Gossip servers are somewhat more complex to manage but work in cases where cluster membership changes regularly and multicast is not available.  The additional complexity comes from needing to configure the system, but has the attribute of only needing to have the possible coordinator hosts (CLCs) configured.
+
+That said, gossip server failures can cause problems with membership management.
+
+Additionally, having multiple GossipRouters would be implied.  This has the characteristic of allowing for "split-brain" scenarios where hosts are able to reach different CLCs (e.g., during a network partition).
+
+== Problems ==
+=== Network Problems ===
+
+# Misconfigurations which make a host unreachable.
+# Misconfigurations which make a host reachable but it cannot respond.
+# Misconfigurations which make a host unreachable but it can send.
+# Multicast throttling or blocking.
+# MTU misconfigurations.
+# Null routing/black hole.
+# Stateful connection time outs.
+
+=== Protocol Problems ===
+
+# Configured:  Inconsistent host addresses on different nodes will lead to unpredictable system behavior. Identifying this as the root cause is difficult.  Verifying this isn't possible when it is misconfigured.  Changing the system requires they be changed consistently as new hosts are added or old hosts are removed across all hosts in the system. 
+# Stateful:  If a fault causes the process to be unreachable but the TCP sockets are not closed reacting involves waiting for the socket's keepalive timeout and this might take 2 hrs.
+
+=== Tradeoffs ===
+The impact of the above problems on system behaviour varies across configuration options.  
+* Unicast and Gossip configurations:  Asymmetric misconfigurations impact membership.
+* Only Multicast configurations:  Throttling/blocking impacts membership.
+* Only TCP configurations:  Stateful connection time outs, Null routing/black holes, and MTU misconfigurations impact failure detection and membership.
+
+Notably, The the first 5 network problems can be tested for directly and remedied before a deployment.  The last two (#6 and #7) can be tested for, but are also inherent in the underlying protocol and may occur w/o a system or network administration mistake to trigger them.
 
 == Network Capability Validation ==
 [https://github.com/eucalyptus/deveutils See eucalyptus/deveutils/]
 
-== Alternatives ==
 
 <references/>
 
