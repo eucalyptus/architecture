@@ -38,7 +38,7 @@
 columns are SOURCE, rows are DEST
 <br> INCOMPLETE: any cell with the name of the column (for easier navigation) is incomplete
 |-
-| -  || ''EΦ'' || ''EP'' || ''ER'' || ''EM'' || ''EC'' || ''TΦ'' || ''TP'' || ''TR'' || ''TM'' || ''TC'' 
+| -  || **EΦ** || **EP** || **ER** || **EM** || **EC** || **TΦ** || **TP** || **TR** || **TM** || **TC** 
 |-
 | N  || x || x || P(D) || L() || L() || x || x || x || wtf<br> L() || x
 |-
@@ -60,7 +60,7 @@ columns are SOURCE, rows are DEST
 |-
 | TC || x || - || - || - || - || - || - || - || - || - 
 |-
-| -  || ''EΦ'' || ''EP'' || ''ER'' || ''EM'' || ''EC'' || ''TΦ'' || ''TP'' || ''TR'' || ''TM'' || ''TC'' 
+| -  || **EΦ** || **EP** || **ER** || **EM** || **EC** || **TΦ** || **TP** || **TR** || **TM** || **TC** 
 |-
 |}
 
