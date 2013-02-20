@@ -5,7 +5,7 @@
 |-
 | T || Teardown
 |-
-| N || No state
+| N || No Instance State
 |}
 {|
 !colspan="2"| Migration States
@@ -23,41 +23,47 @@
 {|
 !colspan="2"| State Entries
 |-
-| L || Log it
+| L() || Log it
 |-
 | x || Happy path
 |-
-| PD || Prepare Destination
+| P(D) || Prepare Destination
 |-
-| CD || Clean Destination
+| R(D) || Rollback Destination
 |-
-| MS || Migrate Source
+| M(S) || Migrate Source
 |}
 {|
 !colspan="11"| 
 columns are SOURCE, rows are DEST
 <br> INCOMPLETE: any cell with the name of the column (for easier navigation) is incomplete
 |-
-| -  || EΦ || EP || ER || EM || EC || TΦ || TP || TR || TM || TC 
+| -  || ''EΦ'' || ''EP'' || ''ER'' || ''EM'' || ''EC'' || ''TΦ'' || ''TP'' || ''TR'' || ''TM'' || ''TC'' 
 |-
-| N  || x || x || PD || L || L || x || x || x || wtf<br> L || x
+| N  || x || x || P(D) || L() || L() || x || x || x || wtf<br> L() || x
 |-
-| EP || CD || x || x || wtf<br>CD || wtf<br>CD || CD || CD || CD || CD || CD 
+| EP || R(D) || x || x || wtf<br>R(D) || wtf<br>R(D) || R(D) || R(D) || R(D) || R(D) || R(D) 
 |-
-| ER || CD || x || MS || x || wtf<br>CD || CD || CD || CD || CD || CD 
+| ER || R(D) || x || MS || x || wtf<br>R(D) || R(D) || R(D) || R(D) || R(D) || R(D) 
 |-
-| EM || CD || wtf<br>CD || L || x || x || x || wtf<br>CD || wtf<br>L || wtf<br>L || x
+| EM || R(D) || wtf<br>R(D) || L() || x || x || x || wtf<br>R(D) || wtf<br>L() || wtf<br>L() || x
 |-
-| EΦ || wtf || wtf || L || x || x || x || wtf<br>L || wtf<br>L || wtf<br>L || x 
+| EΦ || wtf || wtf || L() || x || x || x || wtf<br>L() || wtf<br>L() || wtf<br>L() || x 
 |-
-|style="color:red; background-color:#ff0000;" | TΦ || x || EP || ER || EM || EC || TΦ || TP || TR || TM || TC 
+| TΦ || x || - || -  || - || - || - || - || - || - || -
 |-
-| TP || x || EP || ER || EM || EC || TΦ || TP || TR || TM || TC 
+| TP || x || R(S) || R(S) || - || - || - || - || - || - || -
 |-
-| TR || x || EP || ER || EM || EC || TΦ || TP || TR || TM || TC 
+| TR || x || R(S) || R(S) || - || - || - || - || - || - || -
 |-
-| TM || x || EP || ER || EM || EC || TΦ || TP || TR || TM || TC 
+| TM || x || - || - || - || - || - || - || - || - || -
 |-
-| TC || x || EP || ER || EM || EC || TΦ || TP || TR || TM || TC 
+| TC || x || - || - || - || - || - || - || - || - || - 
+|-
+| -  || ''EΦ'' || ''EP'' || ''ER'' || ''EM'' || ''EC'' || ''TΦ'' || ''TP'' || ''TR'' || ''TM'' || ''TC'' 
 |-
 |}
+
+
+----
+[[tag:rls-3.3]]
