@@ -1,0 +1,13 @@
+What this boils down to is:  We have three "kinds" of code/modules in ./clc/modules:
+
+# '''Library''':  this code is at the root of the dependency tree and can't have forward references to module kind #2.
+# '''Component-common''':  this code other components or parts of the system w/ the bits needed to use the service.
+# '''Component''':  this code provides the implementation of the service or component.  
+
+= Library Code =
+
+= Service Code =
+Service/component code is made up of two parts:
+(e.g., handle registration/configuration, send messages, etc.)
+# '''modules/service-common''' directory: client code, these are types which must be shared and available to interact with, configure, reference the service; e.g., message types, component ids, service registration handling.  these should never include service implementation code, nor should there be a build order between these directories (i.e., there shouldn't be dependencies between the 
+# '''modules/service''' directory:  this code does whatever the service does

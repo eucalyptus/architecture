@@ -1,0 +1,46 @@
+= Java Build =
+This document describes the build system as it applies to the ./clc subdirectory and all linked modules.
+
+The focus here is the build and the organization of the code<ref name="source">[[general-architecture-java-code-structure|Java Code Structure]] is intimately related
+
+== Build-Deps ==
+* Running top-level ./configure for:
+** ./clc/eucadmin/setup.cfg.template.in
+** ./clc/eucadmin/eucadmin/__init__.py.in
+** ./clc/eucadmin/bin/euca_conf.in
+** ./clc/modules/postgresql/src/main/resources/postgresql-binaries.properties.in
+** ./clc/modules/bootstrap/src/main/resources/version.properties.in
+** ./clc/modules/bootstrap/src/main/native/arguments.ggo.in
+** ''TODO:''  record why there is this back reference in each instance.  Try to remove.
+* Presence of top-level ./VERSION file.
+* ./clc/Makefile depends on ./Makedefs
+* Runtime dependency that is not enforced in build is on ./util/euca_rootwrap
+** ./clc/modules/storage-controller/
+** ./clc/modules/storage-common/
+** ./eucadmin/
+** Also, vmware-broker
+* Runtime dependency that is not enforced in build is on ./util/faults
+* JDK, including JNI
+* ant
+* ivy
+* groovy
+
+== Basic Code/Build/Test Cycle ==
+An important characteristic of the java build is that it have a simple rinse-and-repeat usage cycle.
+* Compartmentalized builds to support concurrent work on multiple branches
+* User-mode (no root needed) build and install (the exceptions to this are not in ./clc and don't lend precedent for it)
+* Incremental:  only changed modules (and their transitive dependents) require a build.
+* Accurate:  all changed modules are built.
+* Non-volatile:  can be run non-destructively against the same destination repeatedly
+
+== Dependency Management ==
+''TODO''
+
+=== Repository Organization ===
+
+=== Adding a dependency ===
+''TODO''
+
+== Adding a Module to ./clc ==
+''TODO''
+

@@ -1,0 +1,41 @@
+= Trinity Use Case =
+Briefly, the use case is:
+# A horizontally scalable app whose instances are managed as an autoscaling group (ASG)
+# The ASG registers its instances w/ an ELB
+# The ELB produces metrics that are available through CloudWatch
+# The ELB metrics are used to compute a custom metric which factors in other values, too.
+# The custom metric is put back into CloudWatch
+# The custom metric is used to drive a CloudWatch alarm
+# The CloudWatch alarm action triggers the execution of the ASG's scaling policy.
+
+= Service Implications =
+* See [[autoscaling-3.3-spec|Autoscaling 3.3]]
+* See [[elb-3.3-spec|ELB 3.3]]
+* See [[cloudwatch-3.3-spec|CloudWatch 3.3]]
+
+== Autoscaling ==
+* Define an Autoscaling group
+* ASG definition identifies related load balancer
+* ASG can use ELB health check type
+* ASG scaling policies invokable through ExecutePolicy
+
+== CloudWatch ==
+* PutMetricData can be used to submit custom metric
+* GetMetricStatistics can be used on system and custom metrics
+* Alarms can be defined
+* Alarm actions are working
+
+== ELB ==
+* Registering instances is possible
+* Gathers AWS defined metrics for load balancers
+
+== Service Interactions ==
+* '''Autoscaling -> ELB:''' ASG registers member instances with ELB
+* '''ELB -> CW:''' AWS defined system metrics are submitted to CW
+* '''User -> CW:''' Can compute statistics on system metrics
+* '''User -> CW:''' Can submit custom metrics
+* '''CW -> Autoscaling:''' CW alarm action triggers scaling policy execution for autoscaling group
+
+
+----
+[[tag:rls-3.3]]
