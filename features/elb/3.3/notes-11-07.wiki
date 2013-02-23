@@ -35,16 +35,19 @@
 === DescribeInstanceHealth ===
 
 = 2nd Step =
+
 == LB Zone Control ==
 === DisableAvailabilityZonesForLoadBalancer ===
 === EnableAvailabilityZonesForLoadBalancer ===
 
+== SSL Support ==
+=== SetLoadBalancerListenerSSLCertificate ===
+
+= 3rd Step = 
+
 == HTTP Session Stickiness ==
 === CreateAppCookieStickinessPolicy ===
 === CreateLBCookieStickinessPolicy ===
-
-== SSL Support ==
-=== SetLoadBalancerListenerSSLCertificate ===
 
 == Load Balancer Policies == 
 === CreateLoadBalancerPolicy ===
@@ -53,6 +56,7 @@
 === DescribeLoadBalancerPolicyTypes ===
 === SetLoadBalancerPoliciesOfListener ===
 === SetLoadBalancerPoliciesForBackendServer ===
+
 
 = Unsupport =
 === AttachLoadBalancerToSubnets - VPC ===
