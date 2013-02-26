@@ -7,29 +7,29 @@
   Extant -> Teardown
   Extant -> Extant
   state Extant {
-    state "Preparing" as PreparingSource 
-    PreparingSource : Source NC
-    state "Migrating" as MigratingSource 
-    MigratingSource : Source NC
-    state "Ready" as ReadySource 
-    ReadySource : Source NC
-    state "Clean up" as Cleanup
-    Cleanup : Source NC
-    [*] -down-> PreparingSource
-    PreparingSource -down-> ReadySource
-    ReadySource -down-> MigratingSource
-    MigratingSource -down-> Cleanup
-    Cleanup -down-> [*] : Instance\ngoes to\nTeardown
+    state "preparing" as preparingSource 
+    preparingSource : Source NC
+    state "migrating" as migratingSource 
+    migratingSource : Source NC
+    state "ready" as readySource 
+    readySource : Source NC
+    state "Clean up" as cleanup
+    cleanup : Source NC
+    [*] -down-> preparingSource
+    preparingSource -down-> readySource
+    readySource -down-> migratingSource
+    migratingSource -down-> cleanup
+    cleanup -down-> [*] : Instance\ngoes to\nTeardown
     --
-    state "Preparing" as PreparingDest
-    PreparingDest : Destination NC
-    state "Migrating" as MigratingDest
-    MigratingDest : Destination NC
-    state "Ready" as ReadyDest
-    ReadyDest : Destination NC
-    [*] -down-> PreparingDest
-    PreparingDest -down-> ReadyDest
-    ReadyDest -down-> MigratingDest
-    MigratingDest -down-> [*] : Instance\ngoes to\nExtant
+    state "preparing" as preparingDest
+    preparingDest : Destination NC
+    state "migrating" as migratingDest
+    migratingDest : Destination NC
+    state "ready" as readyDest
+    readyDest : Destination NC
+    [*] -down-> preparingDest
+    preparingDest -down-> readyDest
+    readyDest -down-> migratingDest
+    migratingDest -down-> [*] : Instance\ngoes to\nExtant
   }
 @enduml

@@ -1,52 +1,52 @@
 @startuml
   title (Source,Dest) Migration State Tuples\nThe state machine from the CC PoV.
-  state "Pending,None" as pendingNone
-  state "Extant,None" as extantNone
-  state "Teardown,None" as teardownNone
+  state "Pending,none" as pendingnone
+  state "Extant,none" as extantnone
+  state "Teardown,none" as teardownnone
   state "Teardown,Extant" as teardownExtant
-  state "None,Extant" as noneExtant
-  state "None,Teardown" as noneTeardown
-  state "Extant (Preparing),None" as preparingNone
+  state "none,Extant" as noneExtant
+  state "none,Teardown" as noneTeardown
+  state "Extant (preparing),none" as preparingnone
   state "Extant,Extant" as extantExtant {
-    state "(Preparing,Preparing)" as preparingPreparing
-    state "(Ready,Ready)" as readyReady
-    state "(Preparing,Ready)" as preparingReady
-'    state "(Preparing,Failed)" as preparingFailed
-    state "(Ready,Preparing)" as readyPreparing
-'    state "(Ready,Failed)" as readyFailed
-    state "(Migrating,Ready)" as migratingReady
-    state "(Migrating,Migrating)" as migratingMigrating
-    state "(Cleaning,Migrating)" as cleaningMigrating
-    state "(Cleaning,None)" as cleaningNone
-    state "(None,None)" as noneNone
-    [*] -down-> preparingPreparing
-    [*] -down-> readyReady
-    [*] -right-> preparingReady
-    [*] -left-> readyPreparing
-    preparingPreparing -up-> preparingReady
-    preparingPreparing -up-> readyPreparing
-    preparingReady -down-> readyReady
-    readyPreparing -down-> readyReady
-    readyReady -down-> migratingReady : ncMigrateInstances:COMMIT\non Source NC
-    readyReady -down-> migratingMigrating : ncMigrateInstances:COMMIT\non Source NC
-    migratingReady -right-> migratingMigrating
-    migratingMigrating -down-> cleaningMigrating
-    migratingMigrating -down-> noneNone
-    migratingMigrating -down-> cleaningNone
-    cleaningNone -right-> noneNone
-    cleaningMigrating -right-> cleaningNone
-    noneNone -down-> [*]
+    state "(preparing,preparing)" as preparingpreparing
+    state "(ready,ready)" as readyready
+    state "(preparing,ready)" as preparingready
+'    state "(preparing,failed)" as preparingfailed
+    state "(ready,preparing)" as readypreparing
+'    state "(ready,failed)" as readyfailed
+    state "(migrating,ready)" as migratingready
+    state "(migrating,migrating)" as migratingmigrating
+    state "(cleaning,migrating)" as cleaningmigrating
+    state "(cleaning,none)" as cleaningnone
+    state "(none,none)" as nonenone
+    [*] -down-> preparingpreparing
+    [*] -down-> readyready
+    [*] -right-> preparingready
+    [*] -left-> readypreparing
+    preparingpreparing -up-> preparingready
+    preparingpreparing -up-> readypreparing
+    preparingready -down-> readyready
+    readypreparing -down-> readyready
+    readyready -down-> migratingready : ncMigrateInstances:COMMIT\non Source NC
+    readyready -down-> migratingmigrating : ncMigrateInstances:COMMIT\non Source NC
+    migratingready -right-> migratingmigrating
+    migratingmigrating -down-> cleaningmigrating
+    migratingmigrating -down-> nonenone
+    migratingmigrating -down-> cleaningnone
+    cleaningnone -right-> nonenone
+    cleaningmigrating -right-> cleaningnone
+    nonenone -down-> [*]
   }
-  [*] -down-> pendingNone
-  pendingNone -down-> extantNone
-  pendingNone -left-> teardownNone
-  extantNone -left-> teardownNone
-  extantNone -down-> preparingNone : ncMigrateInstances:PREPARE\non Source NC
-  preparingNone -down-> extantExtant : ncMigrateInstances:PREPARE\non Dest. NC
+  [*] -down-> pendingnone
+  pendingnone -down-> extantnone
+  pendingnone -left-> teardownnone
+  extantnone -left-> teardownnone
+  extantnone -down-> preparingnone : ncMigrateInstances:PREPARE\non Source NC
+  preparingnone -down-> extantExtant : ncMigrateInstances:PREPARE\non Dest. NC
   extantExtant -down-> teardownExtant
   teardownExtant -down-> noneExtant
   noneExtant -down-> noneTeardown
-  noneExtant -up-> extantNone : Another\ninstance\nmigration
+  noneExtant -up-> extantnone : Another\ninstance\nmigration
   noneTeardown -down-> [*]
-  teardownNone -down-> [*]
+  teardownnone -down-> [*]
 @enduml
