@@ -21,7 +21,12 @@ AutoScaling, ELB
 Database: eucalyptus_cloudwatch 
 
 Tables: 
-system_metricmetric_data (used for PutMetricData/GetMetricStatistics)
+
+system_metric_data_0, system_metric_data_1, ... system_metric_data_f 
+
+custom_metric_data_0, custom_metric_data_1, ... custom_metric_data_f
+
+32 tables with identical columns (metric_data is the template table) (used for PutMetricData/GetMetricStatistics)
 list_metrics (metrics for ListMetrics)
 
 CRUD design -- 
@@ -30,7 +35,8 @@ metric_data
 
 Create : An aggregation of raw data rows will be persisted with the following column definitions :
 
-Per row entry (hash code of each row for lookup == Dimensions (key:value)) - user, account, MetricName, MetricType(Predefined or User Custom), NameSpace, timestamp, units, SUM, sample points, max, min, dimension columns (dim_x_name, dim_x_value for x between 1 and 10)
+Per row entry (hash code of each row for lookup == Dimensions (key:value), metric_type : table used will be based on first character of sha1 hash of dimensions and metric type) - user, account, MetricName, MetricType(Predefined or User Custom), NameSpace, timestamp, units, SUM, sample points, max, min, dimension columns (dim_x_name, dim_x_value for x between 1 and 10)
+System metrics are "folded", one row per each dimension combination, custom metrics are single row entries.
 
 (Note, timestamp format :  http://en.wikipedia.org/wiki/ISO_8601 : Timestamps to be truncated to the previous minute)
 
@@ -40,11 +46,15 @@ Update : Not required
 
 Delete - removes rows in which have a time stamp that is equals (current system time - (current time + two weeks))
 
+Open Question - with dimension hash, is having the list of all actual dimensions in the tables necessary?  The 
+list_metrics table is updated at the same time as the above tables, and the dimension information is available 
+outside the tables at this point in time.
+
 list_metrics
 
 Create : The metric info (without metric value), will be persisted persisted with the following column definitions :
 
-Per row entry (hash code of each row for uniqueness, including user, account, MetricName, namespace, and dimensions (key:value)) - user, account, uuid, MetricName, NameSpace, timestamp (create and update), dimension columns (dim_x_name, dim_x_value for x between 1 and 10)
+Per row entry - account, uuid, MetricName, NameSpace, timestamp (create and update), dimension columns (dim_x_name, dim_x_value for x between 1 and 10)
 
 Read: Searches can be based on metric name, namespace, or a dimension list (dimension subset match is allowed).  
 Result will include the entire dimension list entered with the metric
@@ -53,7 +63,7 @@ Update: Only the update timestamp of the list_metrics row will be updated
 
 Delete - remove rows that have an update time stamp that is equals (current system time - (current time + two weeks)).
 
-Uniqueness_Constraints: Only the combination of account_id, user_id, metric_name, namespace, and dimension key/values (in order) need to be unique.  This is the purpose of the hash.
+Uniqueness_Constraints: Only the combination of account_id, metric_name, namespace, and dimension key/values (in order) need to be unique.  This is the purpose of the hash.
 
 === Service Impact ===
 
@@ -77,7 +87,7 @@ Must be HA compliant
 
 * Raw Data Queue -> FIFO queue
 
-* Aggregation -> Function to process an aggregation of one minute window of raw data to be inserted into the database
+* Aggregation -> Function to process an aggregation of one minute window of raw data to be inserted into the database.  Every put_metric_data call also updates the list_metrics table
 
 * Cleaner -> House keeping process to delete metric data from the database with a 2 week window  
 
@@ -93,13 +103,9 @@ Must be HA compliant
 
 * Cloud Watch Service -> Eucalyptus implementation of the Cloud Watch Service
 
-* Raw Data Queue -> FIFO queue
-
-* Aggregation -> Function to process an aggregation of one minute window of raw data to be inserted into the database (might use the same workflow as PutMetricData)
-
 * Cleaner -> House keeping process to delete metric data from the database with a 2 week window  
 
-* list_metrics and list_metrics_data -> Processed information (Any exact metric match in the database will have its timestamp updated)
+* list_metrics -> Processed information
 
 === Database Purge ===
 
