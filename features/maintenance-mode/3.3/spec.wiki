@@ -260,11 +260,11 @@ NC/VB impelements two operations related to maitenance mode:
 
 Migration of an instance from one hypervisor host to another is accomplished through a sequence of <tt>ncMigrateInstances</tt> requests issued to the source and destination NCs with different <tt>action</tt> parameters. The sequence is as follows:
 
-# Migrate request to the '''source''' with action set to ''Prepare'' and a set of all instances to be migrated as part of the user's request. The intention of this request is, at the very least, to permanently record the migration plan so that it can be implemented even if higher-level components restart or failover and lose state. Additionally, source NC may perform checks or any other activities that necessarily precede preparations on the destination. Once ready to send an instance, the source NC sets its migration state to ''ready''.
-# Migrate request to each '''destination''' with action set to ''Prepare'' and a set of instances destined for that NC. Using instance metadata and source node credetials included in the request, the NC performs everything necessary to receive an incoming migration: sets up the necessary directory structure, network devices, block devices, authorizes the anticipated incoming migration. Once cready to receive an instance, the destination NC sets its migration state to ''ready''.
-# Migrate request to the source with action set to ''Commit'' and the instance to migrate. This triggers the actual migration.
+# Migrate request to the '''source''' with action set to ''prepare'' and a set of all instances to be migrated as part of the user's request. The intention of this request is, at the very least, to permanently record the migration plan so that it can be implemented even if higher-level components restart or failover and lose state. Additionally, source NC may perform checks or any other activities that necessarily precede preparations on the destination. Once ready to send an instance, the source NC sets its migration state to ''ready''.
+# Migrate request to each '''destination''' with action set to ''prepare'' and a set of instances destined for that NC. Using instance metadata and source node credetials included in the request, the NC performs everything necessary to receive an incoming migration: sets up the necessary directory structure, network devices, block devices, authorizes the anticipated incoming migration. Once cready to receive an instance, the destination NC sets its migration state to ''ready''.
+# Migrate request to the source with action set to ''commit'' and the instance to migrate. This triggers the actual migration.
 
-In addition to driving the successful sequence, CC will detect error conditions and will request cleanup from source or destination NCs by using <tt>action</tt> set to ''Cancel''. Roughly, if destination fails to prepare, cancellation is sent to the source, while failure to migrate by the source leads to a cancellation sent to the destination.
+In addition to driving the successful sequence, CC will detect error conditions and will request cleanup (''rollback'') from source or destination NCs by using <tt>action</tt> set to ''rollback''. Roughly, if destination fails to prepare, cancellation (''rollback'') is sent to the source, while failure to migrate by the source leads to a cancellation sent to the destination.
 
 {|
 |+ '''Request Parameters'''
@@ -282,7 +282,7 @@ In addition to driving the successful sequence, CC will detect error conditions 
 | Specific migration-related action to perform.
 * Type: ''String''
 * Default: ''None''
-* Valid values: ''Prepare'', ''Commit'', ''Rollback''
+* Valid values: ''prepare'', ''commit'', ''rollback''
 | Yes
 |-
 | <tt>credentials</tt>&clubs;
@@ -292,7 +292,7 @@ In addition to driving the successful sequence, CC will detect error conditions 
 | Yes
 |}
 
-Successful response indicates that the request is valid. Additionally, a response to ''Prepare'' request to source indicates that the migration plan has been persisted to disk. Success of the actual operation can be determined asynchronously, based on the migration state reported in <tt>ncDescribeInstances</tt>:
+Successful response indicates that the request is valid. Additionally, a response to ''prepare'' request to source indicates that the migration plan has been persisted to disk. Success of the actual operation can be determined asynchronously, based on the migration state reported in <tt>ncDescribeInstances</tt>:
 * ''preparing'' -> ''ready''
 * ''migrating'' -> ''cleaning'' or ''none''
 
@@ -323,7 +323,7 @@ Requests to disable or enable a node controller are both implemented on the NC/V
 | The name of the state to set the Node Controller into.
 * Type: ''String''
 * Default: ''None''
-* Valid values: ''Enabled'', ''Disabled''
+* Valid values: ''enabled'', ''disabled''
 | Y
 |}
 
@@ -341,10 +341,6 @@ Successful response to <tt>ncModifyNode</tt> indicates that the node controller 
 * Default: ''None''
 | Yes
 |}
-
-
-
-
 
 
 == Migration states  ==
@@ -377,7 +373,7 @@ The set of migration states reported by the CC to the CLC is smaller than the se
 ! scope="col"| Component
 ! scope="col"| Description
 |-
-| ''None''
+| ''none''
 | NC/VB & CC
 | No current migration-related activities on the host
 |-

@@ -51,4 +51,4 @@ for f in ${TAGS}; do
 done
 (cd ${DESTDIR};${BASEDIR}//bin/tag-indexer.rb  -m tags)
 (cd ${DESTDIR}; git add ./*; git status -sb; git commit -m 'updated'; git push) 2>&1 | tee ${BASEDIR}/.wiki.log 
-(cd ${BASEDIR}; git add wiki; git commit -a -m 'update wiki'; git push ) 2>&1 | tee ${BASEDIR}/.wiki.log
+#(cd ${BASEDIR}; git add wiki; git commit -a -m 'update wiki'; git push ) 2>&1 | tee ${BASEDIR}/.wiki.log
