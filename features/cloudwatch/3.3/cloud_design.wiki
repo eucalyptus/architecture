@@ -21,21 +21,20 @@ AutoScaling, ELB
 Database: eucalyptus_cloudwatch 
 
 Tables: 
-metric_data (used for PutMetricData/GetMetricStatistics)
+system_metricmetric_data (used for PutMetricData/GetMetricStatistics)
 list_metrics (metrics for ListMetrics)
-list_metrics_dimensions
 
-CRUD design
+CRUD design -- 
 
 metric_data
 
 Create : An aggregation of raw data rows will be persisted with the following column definitions :
 
-Per row entry (hash code of each row for lookup == Dimensions (key:value)) - user, account, uuid, MetricName, MetricType(Predefined or User Custom), MetricActions?, (string), NameSpace, timestamp, SUM, sample points, max, min
+Per row entry (hash code of each row for lookup == Dimensions (key:value)) - user, account, MetricName, MetricType(Predefined or User Custom), NameSpace, timestamp, units, SUM, sample points, max, min, dimension columns (dim_x_name, dim_x_value for x between 1 and 10)
 
 (Note, timestamp format :  http://en.wikipedia.org/wiki/ISO_8601 : Timestamps to be truncated to the previous minute)
 
-Read : The key for search will be based on the a hash code that represents a possible combination of dimension (key:value), metric name, and namespace
+Read : The key for search will be based on the a hash code that represents a possible combination of dimension (key:value), metric name, namespace, metric type, and possibly units
 
 Update : Not required
 
@@ -45,8 +44,7 @@ list_metrics
 
 Create : The metric info (without metric value), will be persisted persisted with the following column definitions :
 
-Per row entry (hash code of each row for uniqueness, including user, account, MetricName, namespace, and dimensions (key:value)) - user, account, uuid, MetricName, NameSpace, timestamp (create and update)
-Create will also cascade into list_metrics_dimensions
+Per row entry (hash code of each row for uniqueness, including user, account, MetricName, namespace, and dimensions (key:value)) - user, account, uuid, MetricName, NameSpace, timestamp (create and update), dimension columns (dim_x_name, dim_x_value for x between 1 and 10)
 
 Read: Searches can be based on metric name, namespace, or a dimension list (dimension subset match is allowed).  
 Result will include the entire dimension list entered with the metric
@@ -54,20 +52,8 @@ Result will include the entire dimension list entered with the metric
 Update: Only the update timestamp of the list_metrics row will be updated
 
 Delete - remove rows that have an update time stamp that is equals (current system time - (current time + two weeks)).
-list_metric_dimensions will cascade delete.
 
 Uniqueness_Constraints: Only the combination of account_id, user_id, metric_name, namespace, and dimension key/values (in order) need to be unique.  This is the purpose of the hash.
-
-list_metrics_dimensions
-
-Create: A cascade insert from list_metrics will be persisted with the following column definitions:
-dimension_name, dimension_value, metric_id
-
-Read: Only supported through join with list_metrics
-
-Update: Not supported
-
-Delete: only supported through cascade delete with list_metrics
 
 === Service Impact ===
 
