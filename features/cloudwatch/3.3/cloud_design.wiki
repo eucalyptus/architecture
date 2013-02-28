@@ -31,26 +31,23 @@ list_metrics (metrics for ListMetrics)
 
 CRUD design -- 
 
-metric_data
+PutMetricData and GetMetricStatistics
 
-Create : An aggregation of raw data rows will be persisted with the following column definitions :
+Create : An aggregation queue will be used to aggregate whatever data points that can be combined within the window.
+For each data point, a table will be selected based on a hash of the dimensions (key:value) and metric type.  
+All tables have the following columns: account_id, user_id, namespace, metric_name, units, metric_type (system or custom), timestamp, dimension_hash, sample_sum, sample_max, sample_min, sample_size, dimensions (dim1name, dim1value, ... dim10name, dim10value) 
 
-Per row entry (hash code of each row for lookup == Dimensions (key:value), metric_type : table used will be based on first character of sha1 hash of dimensions and metric type) - user, account, MetricName, MetricType(Predefined or User Custom), NameSpace, timestamp, units, SUM, sample points, max, min, dimension columns (dim_x_name, dim_x_value for x between 1 and 10)
-System metrics are "folded", one row per each dimension combination, custom metrics are single row entries.
+System metrics may be "folded", that is not all dimensions need to be selected during a search.  To accomodate this, rows for each combination of dimensions for a given input will be created and placed into the table with the appropriate hash.  Current system metrics appear to have at most 4 dimensions which would result in at most 16 rows.  10 dimensions would result in 2^10 = 1024 rows.
 
 (Note, timestamp format :  http://en.wikipedia.org/wiki/ISO_8601 : Timestamps to be truncated to the previous minute)
 
-Read : The key for search will be based on the a hash code that represents a possible combination of dimension (key:value), metric name, namespace, metric type, and possibly units
+Read : Search will be done on equality on metric_name, metric_type, namespace, and units.  Dimensions will be searched against the dimension hash.  Custom metrics require all dimensions match, system metrics require only a subset.
 
 Update : Not required
 
 Delete - removes rows in which have a time stamp that is equals (current system time - (current time + two weeks))
 
-Open Question - with dimension hash, is having the list of all actual dimensions in the tables necessary?  The 
-list_metrics table is updated at the same time as the above tables, and the dimension information is available 
-outside the tables at this point in time.
-
-list_metrics
+ListMetrics
 
 Create : The metric info (without metric value), will be persisted persisted with the following column definitions :
 
@@ -63,7 +60,7 @@ Update: Only the update timestamp of the list_metrics row will be updated
 
 Delete - remove rows that have an update time stamp that is equals (current system time - (current time + two weeks)).
 
-Uniqueness_Constraints: Only the combination of account_id, metric_name, namespace, and dimension key/values (in order) need to be unique.  This is the purpose of the hash.
+Uniqueness_Constraints: Only the combination of account_id, metric_name, namespace, and dimension key/values (in order) need to be unique.
 
 === Service Impact ===
 
