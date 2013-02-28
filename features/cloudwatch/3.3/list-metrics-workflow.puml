@@ -7,17 +7,15 @@ rectangle {
 }
 () "Cloud Watch Service" --> (ListMetrics): response
 (ListMetrics) -down-> ()"Cloud Watch Service" : request
-() "Cloud Watch Service" -down-> [Raw Data Queue]
+(PutMetricData) --> [Raw Data Queue]
 [Raw Data Queue] --> (Aggregation)
 [Raw Data Queue] <-right- (Aggregation)
 database "eucalyptus_cloudwatch" {
 folder "List Metric Rows" {
-    [list_metrics_dimensions]
     [list_metrics]
   }
 }
-[list_metrics] --> [list_metrics_dimensions] : CASCADE(ONE-TO-MANY)
 [list_metrics] o-- (Aggregation) : INSERT/UPDATE
 (Cleaner) --left-> [list_metrics] : DELETE
+() "Cloud Watch Service" -down-> [list_metrics]: READ
 @enduml
-
