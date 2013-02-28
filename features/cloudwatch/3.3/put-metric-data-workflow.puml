@@ -12,7 +12,7 @@ rectangle {
 [Raw Data Queue] <-right- (Aggregation)
 database "eucalyptus_cloudwatch" {
 folder "Data Points Rows" {
-    [Calculated Data Query Type]
+    [Metric Data table (based on hash and metric type)]
   }
 }
 [Calculated Data Query Type] o-- (Aggregation) : INSERT
