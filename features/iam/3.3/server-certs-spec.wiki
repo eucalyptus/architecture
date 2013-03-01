@@ -23,14 +23,24 @@ Supporting SSL for ELB instances <ref name="elbsetcert">http://docs.aws.amazon.c
 TODO:  Desciption of key, cert, and trust chain; their requirements.
 
 === Private Key Security ===
-TODO:  Requirements handling of private keys in general
+Private key is a secret token and should be treated as such.
+* Access to a private key should be restricted to those who "need to know" it
+* A private key should not be sent over the wire or, if it cannot be avoided, only be sent in an encrypted form
+* A private key should only be communicated to a trusted/authenticated party
 
 ==== Private Key Storage ====
-TODO:  Requirements for storing private keys
+* when stored in eucalyptus database, a private key should be encrypted with the owning component's key (EUARE in this case)
 
 ==== Load Balancer VM Access to Private Keys ====
-TODO:  Requirements for storing private keys
-
+TODO:  Requirements for transfering private keys to LB VMs
+Possible scenarios:
+# sending the key over the metadata service
+** how to do it securely? 
+# injecting the key using CLC -> CC -> NC communications
+** note: the server key might be updated at runtime
+** advantage: explores existing trust relation in the system
+# communicating the key using internal LB-to-ELB API
+** concern: IAM does not give access to server private keys and roles do not give access to IAM, so internal API will require "special" privileges
 
 == Operations & Order-of-Operations ==
 
