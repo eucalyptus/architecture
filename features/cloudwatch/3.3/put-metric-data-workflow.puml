@@ -15,6 +15,6 @@ folder "Data Points Rows" {
     [Metric Data table (based on hash and metric type)]
   }
 }
-[Calculated Data Query Type] o-- (Aggregation) : INSERT
-(Cleaner) --left-> [Calculated Data Query Type] : DELETE
+[Metric Data table (based on hash and metric type)] <-- (Aggregation) : INSERT
+(Cleaner) --left-> [Metric Data table (based on hash and metric type)] : DELETE
 @enduml
