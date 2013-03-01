@@ -34,7 +34,8 @@ An important characteristic of the java build is that it have a simple rinse-and
 * Non-volatile:  can be run non-destructively against the same destination repeatedly
 
 == Dependency Management ==
-''TODO''
+
+Dependencies between the various Eucalyptus modules in ''./clc'' are managed using Ivy module configuration files. Using the ''ivy:buildlist'' Ant task we are able to read these configuration files and define a build order for the internal modules. Each configuration file defines the direct dependencies of a module.
 
 === Repository Organization ===
 
@@ -42,5 +43,9 @@ An important characteristic of the java build is that it have a simple rinse-and
 ''TODO''
 
 == Adding a Module to ./clc ==
-''TODO''
 
+When adding a new module, one will need to create an Ivy module configuration file. This file should reside in the root of the module directory and should be named ''ivy.xml''. A typical example of the configuration file content can be seen <a href="./example-ivy.xml">here</a>.
+
+When creating a module configuration, you'll need to set the ''module'' attribute of the ''info'' tag to the name of your module (this should be the name of the module directory prefixed with '''eucalyptus-''').
+
+You will also need to specify dependencies using the ''dependency'' tag as shown in the <a href="./example-ivy.xml">example configuration file</a>. For now, the module configuration is only used for managing inter-dependencies between Eucalyptus modules; no 3rd party modules should be specified here. The ''rev'' attribute of each dependency should always be set to the value ''latest.integration'' or it should be left off, since this is the default value.
