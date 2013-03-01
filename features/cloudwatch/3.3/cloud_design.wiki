@@ -88,7 +88,7 @@ Must be HA compliant
 
 * Cleaner -> House keeping process to delete metric data from the database with a 2 week window  
 
-* Data Points Rows -> Processed information
+* Data Points Rows / Metric Data Table -> A table is selected based on dimension hash and metric type, processed information.
 
 === List Metrics Workflow ===
 
@@ -103,6 +103,8 @@ Must be HA compliant
 * Cleaner -> House keeping process to delete metric data from the database with a 2 week window  
 
 * list_metrics -> Processed information
+
+* PutMetricData -> Previous workflow also populates list_metrics table
 
 === Database Purge ===
 
