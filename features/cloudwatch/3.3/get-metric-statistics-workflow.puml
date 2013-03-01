@@ -1,0 +1,18 @@
+@startuml
+
+title Get Metric Statistics Workflow
+
+rectangle {
+    ()"Cloud Watch Service"
+}
+() "Cloud Watch Service" --> (GetMetricStatistics): response
+(GetMetricStatistics) -down-> ()"Cloud Watch Service" : request
+() "Cloud Watch Service" --> (Aggregation)
+database "eucalyptus_cloudwatch" {
+folder "Data Points Rows" {
+    [Metric Data table (based on hash and metric type)]
+  }
+}
+[Metric Data table (based on hash and metric type)] <-- (Aggregation) : READ
+@enduml
+
