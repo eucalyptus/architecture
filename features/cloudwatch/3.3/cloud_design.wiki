@@ -106,6 +106,20 @@ Must be HA compliant
 
 * PutMetricData -> Previous workflow also populates list_metrics table
 
+=== Get Metric Workflow ===
+
+[[get-metric-statistics-workflow.png]] 
+
+=== Get Metric Workflow Diagram Definitions === 
+
+* GetMetricStatistics -> user created request 
+
+* Cloud Watch Service -> Eucalyptus implementation of the Cloud Watch Service
+
+* Aggregation -> Function to convert one or more raw data rows into an aggregated statistic based on the period selected
+
+* Data Points Rows / Metric Data Table -> A table is selected based on dimension hash and metric type, processed information.
+
 === Database Purge ===
 
 Global period data deletion after 2 weeks.
