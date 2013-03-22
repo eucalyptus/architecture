@@ -1,0 +1,77 @@
+= Server Certificate Handling =
+Supporting SSL for ELB instances <ref name="elbsetcert">http://docs.aws.amazon.com/ElasticLoadBalancing/latest/APIReference/API_SetLoadBalancerListenerSSLCertificate.html</ref> 
+<ref name="elbcreating">http://docs.aws.amazon.com/ElasticLoadBalancing/latest/DeveloperGuide/creating_lb_QueryAPI.html</ref> 
+<ref name="elbcreatelbcert">http://docs.aws.amazon.com/ElasticLoadBalancing/latest/DeveloperGuide/US_SettingUpLoadBalancerHTTPS.html</ref> 
+<ref name="elbupdatecert">http://docs.aws.amazon.com/ElasticLoadBalancing/latest/DeveloperGuide/US_UpdatingLoadBalancerSSL.html</ref> implies having:
+
+# The ability to provide the system w/ (1) the certificate, (2) the private key, (3) the trust chain <ref name="uploadcert" http://docs.aws.amazon.com/IAM/latest/UserGuide/InstallCert.html#UploadSignedCert</ref>
+# Policy for storing the private key securely.
+# Enabling secure access/transfer of the private key to the 
+
+== Private Keys and Certificates ==
+* Key length: 1024, 2048-bit and 4096-bit encryption.
+* Keys, Certificates, and Trust Chain must in PEM format.
+* Certificates must follow the X.509 PEM format.
+* The current date must be between the certificate’s start and end date.
+* Public and private certificate files must contain only a single certificate.
+* The private key must match the public key that is in the digital server certificate.
+* The private key must be an RSA private key in PEM format, where the PEM header is BEGIN RSA PRIVATE KEY and the footer is END RSA PRIVATE KEY (as shown in Sample Certificates).
+* The private key cannot be encrypted with a password.
+* A certificate chain starts with the immediate signing certificate and is then followed by any intermediaries in order. Intermediaries that are not involved in the trust path must not be included. The trusted root certificate can be optionally included as the last certificate.
+
+=== Key, Cert, and Trust Chain 
+TODO:  Desciption of key, cert, and trust chain; their requirements.
+
+=== Private Key Security ===
+Private key is a secret token and should be treated as such.
+* Access to a private key should be restricted to those who "need to know" 
+* A private key should not be sent over the wire or, if it cannot be avoided, only be sent in an encrypted form
+* A private key should only be communicated to a trusted/authenticated party
+
+==== Private Key Storage ====
+* when stored in the eucalyptus database, a private key should be encrypted with the owning component's key (i.e., EUARE's key)
+
+==== Load Balancer VM Access to Private Keys ====
+TODO:  Requirements for transferring private keys to LB VMs
+
+Possible scenarios:
+* sending the key over the metadata service
+** how to do it securely? 
+* injecting the key using the CLC -> CC -> NC communication path
+** ''note'': the server key might be updated at runtime
+** ''advantage'': explores existing trust relation in the system
+* communicating the key using internal LB-to-ELB API
+** ''concern'': IAM does not give access to server private keys and roles do not give access to IAM, so internal API will require "special" privileges
+
+== Operations & Order-of-Operations ==
+
+=== iam-servercertgetattributes ===
+TODO:  Review & Summarize reference <ref name="iamcertattr">http://docs.aws.amazon.com/IAM/latest/CLIReference/servercertgetattributes.html</ref>
+
+=== UploadServerCertificate ===
+TODO:  Review & Summarize reference <ref name="iamcertupload">http://docs.aws.amazon.com/IAM/latest/APIReference/API_UploadServerCertificate.html</ref>
+
+=== CreateLoadBalancer ===
+TODO:  Review & Summarize reference <ref name="elbcreatecert"/> <ref name="elbcreating"/>
+
+=== SetLoadBalancerListenerSSLCertificate ===
+TODO:  Review & Summarize reference <ref name="elbupdatecert"/>
+
+=== DescribeLoadBalancerPolicies ===
+TODO:  Review & Summarize reference <ref name="elbdescribepolicies">http://docs.aws.amazon.com/ElasticLoadBalancing/latest/APIReference/API_DescribeLoadBalancerPolicies.html</ref>
+
+=== CreateLoadBalancerPolicy ===
+TODO:  Review & Summarize reference <ref name="elbdescribepolicies">http://docs.aws.amazon.com/ElasticLoadBalancing/latest/APIReference/API_CreateLoadBalancerPolicy.html</ref>
+
+=== SetLoadBalancerPoliciesOfListener ===
+TODO:  Review & Summarize reference <ref name="elbdescribepolicies">http://docs.aws.amazon.com/ElasticLoadBalancing/latest/APIReference/API_SetLoadBalancerPoliciesOfListener.html</ref>
+
+=== ConfigureHealthCheck ===
+TODO:  Review & Summarize reference <ref name="elbdescribepolicies">http://docs.aws.amazon.com/ElasticLoadBalancing/latest/APIReference/API_ConfigureHealthCheck.html</ref>
+
+
+= References =
+<references />
+
+----
+[[tag:rls-3.3]]
