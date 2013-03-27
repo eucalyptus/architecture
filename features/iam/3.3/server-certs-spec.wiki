@@ -18,6 +18,7 @@ Supporting SSL for ELB instances <ref name="elbsetcert">http://docs.aws.amazon.c
 * The private key must be an RSA private key in PEM format, where the PEM header is BEGIN RSA PRIVATE KEY and the footer is END RSA PRIVATE KEY (as shown in Sample Certificates).
 * The private key cannot be encrypted with a password.
 * A certificate chain starts with the immediate signing certificate and is then followed by any intermediaries in order. Intermediaries that are not involved in the trust path must not be included. The trusted root certificate can be optionally included as the last certificate.
+* Names of server certificates must be alphanumeric, including the following common characters: plus (+), equal (=), comma (,), period (.), at (@), and dash (-).
 
 === Key, Cert, and Trust Chain 
 TODO:  Desciption of key, cert, and trust chain; their requirements.
@@ -36,12 +37,13 @@ TODO:  Requirements for transferring private keys to LB VMs
 
 Possible scenarios:
 * sending the key over the metadata service
-** how to do it securely? 
+** ''cons'': how to do it securely? 
 * injecting the key using the CLC -> CC -> NC communication path
-** ''note'': the server key might be updated at runtime
-** ''advantage'': explores existing trust relation in the system
+** ''cons'': the server key might need to be updated at runtime
+** ''pros'': explores existing trust relation in the system
 * communicating the key using internal LB-to-ELB API
-** ''concern'': IAM does not give access to server private keys and roles do not give access to IAM, so internal API will require "special" privileges
+** ''cons'': temprorary credentials are distributed to LBs via an insecure channel (metadata service), so they should not be used to give access to a data with a higher sensitivity level like server certs, which are external to Eucalyptus and generally have a longer lifetime than a load balancer 
+
 
 == Operations & Order-of-Operations ==
 
