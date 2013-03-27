@@ -21,32 +21,37 @@ AutoScaling, ELB
 Database: eucalyptus_cloudwatch 
 
 Tables: 
-metric_data (used for PutMetricData/GetMetricStatistics)
+
+system_metric_data_0, system_metric_data_1, ... system_metric_data_f 
+
+custom_metric_data_0, custom_metric_data_1, ... custom_metric_data_f
+
+32 tables with identical columns (metric_data is the template table) (used for PutMetricData/GetMetricStatistics)
 list_metrics (metrics for ListMetrics)
-list_metrics_dimensions
 
-CRUD design
+CRUD design -- 
 
-metric_data
+PutMetricData and GetMetricStatistics
 
-Create : An aggregation of raw data rows will be persisted with the following column definitions :
+Create : An aggregation queue will be used to aggregate whatever data points that can be combined within the window.
+For each data point, a table will be selected based on a hash of the dimensions (key:value) and metric type.  
+All tables have the following columns: account_id, user_id, namespace, metric_name, units, metric_type (system or custom), timestamp, dimension_hash, sample_sum, sample_max, sample_min, sample_size, dimensions (dim1name, dim1value, ... dim10name, dim10value) 
 
-Per row entry (hash code of each row for lookup == Dimensions (key:value)) - user, account, uuid, MetricName, MetricType(Predefined or User Custom), MetricActions?, (string), NameSpace, timestamp, SUM, sample points, max, min
+System metrics may be "folded", that is not all dimensions need to be selected during a search.  To accomodate this, rows for each combination of dimensions for a given input will be created and placed into the table with the appropriate hash.  Current system metrics appear to have at most 4 dimensions which would result in at most 16 rows.  10 dimensions would result in 2^10 = 1024 rows.
 
 (Note, timestamp format :  http://en.wikipedia.org/wiki/ISO_8601 : Timestamps to be truncated to the previous minute)
 
-Read : The key for search will be based on the a hash code that represents a possible combination of dimension (key:value), metric name, and namespace
+Read : Search will be done on equality on metric_name, metric_type, namespace, and units.  Dimensions will be searched against the dimension hash.  Custom metrics require all dimensions match, system metrics require only a subset.
 
 Update : Not required
 
 Delete - removes rows in which have a time stamp that is equals (current system time - (current time + two weeks))
 
-list_metrics
+ListMetrics
 
 Create : The metric info (without metric value), will be persisted persisted with the following column definitions :
 
-Per row entry (hash code of each row for uniqueness, including user, account, MetricName, namespace, and dimensions (key:value)) - user, account, uuid, MetricName, NameSpace, timestamp (create and update)
-Create will also cascade into list_metrics_dimensions
+Per row entry - account, uuid, MetricName, NameSpace, timestamp (create and update), dimension columns (dim_x_name, dim_x_value for x between 1 and 10)
 
 Read: Searches can be based on metric name, namespace, or a dimension list (dimension subset match is allowed).  
 Result will include the entire dimension list entered with the metric
@@ -54,20 +59,8 @@ Result will include the entire dimension list entered with the metric
 Update: Only the update timestamp of the list_metrics row will be updated
 
 Delete - remove rows that have an update time stamp that is equals (current system time - (current time + two weeks)).
-list_metric_dimensions will cascade delete.
 
-Uniqueness_Constraints: Only the combination of account_id, user_id, metric_name, namespace, and dimension key/values (in order) need to be unique.  This is the purpose of the hash.
-
-list_metrics_dimensions
-
-Create: A cascade insert from list_metrics will be persisted with the following column definitions:
-dimension_name, dimension_value, metric_id
-
-Read: Only supported through join with list_metrics
-
-Update: Not supported
-
-Delete: only supported through cascade delete with list_metrics
+Uniqueness_Constraints: Only the combination of account_id, metric_name, namespace, and dimension key/values (in order) need to be unique.
 
 === Service Impact ===
 
@@ -91,11 +84,11 @@ Must be HA compliant
 
 * Raw Data Queue -> FIFO queue
 
-* Aggregation -> Function to process an aggregation of one minute window of raw data to be inserted into the database
+* Aggregation -> Function to process an aggregation of one minute window of raw data to be inserted into the database.  Every put_metric_data call also updates the list_metrics table
 
 * Cleaner -> House keeping process to delete metric data from the database with a 2 week window  
 
-* Data Points Rows -> Processed information
+* Data Points Rows / Metric Data Table -> A table is selected based on dimension hash and metric type, processed information.
 
 === List Metrics Workflow ===
 
@@ -107,13 +100,25 @@ Must be HA compliant
 
 * Cloud Watch Service -> Eucalyptus implementation of the Cloud Watch Service
 
-* Raw Data Queue -> FIFO queue
-
-* Aggregation -> Function to process an aggregation of one minute window of raw data to be inserted into the database (might use the same workflow as PutMetricData)
-
 * Cleaner -> House keeping process to delete metric data from the database with a 2 week window  
 
-* list_metrics and list_metrics_data -> Processed information (Any exact metric match in the database will have its timestamp updated)
+* list_metrics -> Processed information
+
+* PutMetricData -> Previous workflow also populates list_metrics table
+
+=== Get Metric Workflow ===
+
+[[get-metric-statistics-workflow.png]] 
+
+=== Get Metric Workflow Diagram Definitions === 
+
+* GetMetricStatistics -> user created request 
+
+* Cloud Watch Service -> Eucalyptus implementation of the Cloud Watch Service
+
+* Aggregation -> Function to convert one or more raw data rows into an aggregated statistic based on the period selected
+
+* Data Points Rows / Metric Data Table -> A table is selected based on dimension hash and metric type, processed information.
 
 === Database Purge ===
 
