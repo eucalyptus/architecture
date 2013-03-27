@@ -403,6 +403,16 @@ From the perspective of the CC a migration's state is contributed by two NCs and
 [[maintenance-mode-3.3-migration-cc-instance-state-machines.png]]
 
 
+== Node to Node Communication and Authentication ==
+* NCs should mutually authenticate each other before performing a migration
+* credentials should
+** be unique to a migration
+** uniquely identify an NC
+** provide limited access to an NC
+** have a limited lifetime 
+** be valid only for the duration of a migration
+* inter-NCs communications should be encrypted
+
 == Misc ==
 
 * terminate/run mode for instance store is out; no loss of in memory state
