@@ -74,7 +74,7 @@ Must be HA compliant
 
 === Put Metric Workflow ===
 
-[[put-metric-data-workflow.png]] 
+[[File:put-metric-data-workflow.png]] 
 
 === Put Metric Workflow Diagram Definitions === 
 
@@ -92,7 +92,7 @@ Must be HA compliant
 
 === List Metrics Workflow ===
 
-[[list-metrics-workflow.png]] 
+[[File:list-metrics-workflow.png]] 
 
 === List Metrics Workflow Diagram Definitions === 
 
@@ -108,7 +108,7 @@ Must be HA compliant
 
 === Get Metric Workflow ===
 
-[[get-metric-statistics-workflow.png]] 
+[[File:get-metric-statistics-workflow.png]] 
 
 === Get Metric Workflow Diagram Definitions === 
 
