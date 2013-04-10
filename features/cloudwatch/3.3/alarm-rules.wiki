@@ -1,0 +1,98 @@
+Overview
+
+  Amazon Web Services (AWS) provides an Alarm function in its Cloud Watch application that monitors the state of metrics can perform certain actions if a metric value exceeds a threshold for an extended period of time, such as send an SNS action or execute an Auto Scaling policy action.  Actions may also occur in other states.  In implementing an AWS compatible Cloud Watch service, documentation was sufficient to implement the standard use case (threshold exceeded for a specified number of periods) but there were certain other operations, most notably how to specifically define INSUFFICIENT_DATA that required a bit of experimentation and some assumptions to be made to complete the implementation.  These assumptions are based on open questions and experimentation.  The document below will discuss the open questions and show the final rule set that is used to evaluate alarm states in the Eucalyptus Cloud Watch Implementation.
+
+Definitions
+
+  An alarm is a named entity that watches the value of a metric over time.  An alarm consists of a name, a Cloud Watch metric (and all of its associated fields), an evaluation rule (which will be expanded on below), a number of periods to evaluate over, and a period length.  The evaluation rule is something of the form: "The <statistic> of the metric is <comparison operator> the <threshold value>".  An example could be "The Average of the metric is Greater Than 30."  (This is over a single period).  Valid statistic values are Average, Minimum, Maximum, SampleCount, and Sum.  Valid comparison operators are GreaterThanThreshold, GreaterThanOrEqualToThreshold, LessThanThreshold, LessThanOrEqualToThreshold.  Once a value is calculated for the statistic for the metric, evaluating the evaluation rule is straighforward.
+
+  AWS defines thress state values for an alarm.  These values are (as per the AWS spec)
+
+  OK - The value of the statistic does not exceed the threshold.
+  ALARM - The value of the statistic does exceed the threshold.
+  INSUFFICIENT_DATA - There is no data for the statistic.  This may be because the alarm has just started or the metric does not exist.
+
+  One must distinguish between the evaluation rule result for a single period and the global state of the alarm.  An alarm is set to the ALARM state if for a certain number of consecutive periods the
+evaluation rule shows that the threshold value has been exceeded.  Thus, an alarm may be in the OK state even if the previous period value has exceeded the threshold, as shown in the graph below.
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+Discussion Questions
+
+  It is clear from the above that an alarm should be in the ALARM state as shown above, if the threshold has been exceeded for the specified number of consecutive periods.  But that is the only rule that is defined in the previous section.  This leads to some of the following questions.
+
+- What are the period boundaries for evaluation?  (i.e. at time t, what is the start and end time of the periods to be evaluated?)
+- When exactly should we change the state of the alarm to OK?  
+- When exactly should we change the state of the alarm to INSUFFICIENT_DATA?
+- When exactly should we change the state of the alarm to ALARM? (We know the case where we have exceeded the threshold for a certain number of periods, but is that the only case?)
+- How often do we evaluate the state of the alarm?
+- What happens if the alarm is currently in the ALARM state, and we receive some new data points with timestamps in the past, which if re-evaluated would cause previous periods to no longer exceed the threshold? 
+- When an alarm state is evaluated, does the "old" state play a part?  This could be an issue as there is an API method called "setAlarmState()" which allows for a temporary setting of the alarm state.
+
+Experiment 1 (new old data)
+
+  The first experiment was to see what happened at AWS when we triggered an alarm and added old data afterwards. We created an alarm against metric "Experiment-1", theshold: 30, number of evaluation periods: 5, period: 120 (seconds), statistic: average.  This means that the alarm state should be set to ALARM after 5 periods if the threshold was exceeded.  We sent the following data
+00:00 create alarm (or some time before we start)
+00:00-10:00 Every 30 seconds, send a data point with the value 40.0 (at 10:00 this should cause the alarm state to be set to alarm)
+10:00-14:00 Keep sending a data point every 30 seconds with the value 40.0
+14:00 Send a bunch of data points, with the timestamps 0:00-10:00 (one every 30 seconds) but with a value of 10.0, so that the average from 0:00-10:00 will no longer be above 40.
+14:00-18:00 Keep sending a data point every 30 seconds with the value 40.0
+
+What should happen here is that if old data is used in the evaluation, around 10:00 the state of the alarm should be set to ALARM, but at 14:00 or so, those old intervals should no longer exceed the
+threshold, so the state of the alarm should no longer be set to alarm.
+
+What actually happens
+00:00 Alarm Created and set to INSUFFICIENT_DATA state
+07:00 Alarm set to ALARM state
+15:00 Alarm set to OK state
+29:00 Alarm set to ALARM state
+35:00 Alarm set to INSUFFICIENT_DATA state
+
+How does this match up against our expectations?  We had assumed that the alarm state would trigger after 10 minutes, as that would be 5 periods of alarm activity.  7 minutes seems short, but it is possible to line up period boundaries to allow for such an occurrence.  If our periods were:
+-01:30-0:30 (1 point in this range at time 00:00)
+00:30-01:30 (Enough points in this range)
+01:30-03:30 (Enough points in this range)
+03:30-05:30 (Enough points in this range)
+05:30-07:30 (Even though this period hadn't finished yet, it had a data point in it and at the time the alarm was set that period was over the threshold)
+
+then we could justify the alarm state.  It seems a bit of a stretch, but it can be made to fit in the rules.
+
+At 14 minutes in, we flood the past with old data that will retroactively make the state in the old interval fit below the threshold.  Within a minute, the alarm is set back into the OK state.
+Thus we can safely make the following assumption.
+
+Assumption 1: Data from previous intervals are evaluated again at every alarm evaluation invocation.  
+
+At 18 minutes in, we stop sending data.  We do not see an INSUFFICIENT_DATA state in the alarm for another 17 minutes (with an alarm state in the middle).  What this means is as follows.
+
+Observation 1: A single period with no data is not enough to trigger the INSUFFICIENT_DATA state.  (Otherwise, we would have seen an INSUFFICIENT_DATA trigger before 20 minutes or so).
+Observation 2: Even as many periods as the evaluation period with no data is not enough to trigger the INSUFFICIENT_DATA state.  (We had 10 minutes of no data from 18 minutes to 28 minutes, and even if the period boundaries were such that we just started a period at 18 minutes, we still didn't trigger that state until 35 minutes in).
+
+One other point of interest.  The alarm state was triggered at 29 minutes in.  If you look at the period from 19 to 29 minutes in, there is no data at all, certainly not 5 periods of alarm threshold.  This leads to the next observation.
+
+Observation 3: There are other situations than the threshold being exceeded for the specified number of periods that can trigger the alarm state.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
