@@ -27,19 +27,7 @@ AWS defines three state values for an alarm.  These values are (per the AWS spec
 One must distinguish between the evaluation rule result for a single period and the global state of the alarm.  An alarm is set to the ALARM state if for a certain number of consecutive periods the
 evaluation rule shows that the threshold value has been exceeded.  Thus, an alarm may be in the OK state even if the previous period value has exceeded the threshold, as shown in the graph below.
 
-
-
-
-
-
-
-
-
-
- 
-
-
-
+[[File:alarm-rules-graph-1.png]]
 
 ==Discussion Questions==
 
