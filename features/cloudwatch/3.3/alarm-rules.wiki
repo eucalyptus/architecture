@@ -1,18 +1,30 @@
-Overview
+==Overview==
 
-  Amazon Web Services (AWS) provides an Alarm function in its Cloud Watch application that monitors the state of metrics can perform certain actions if a metric value exceeds a threshold for an extended period of time, such as send an SNS action or execute an Auto Scaling policy action.  Actions may also occur in other states.  In implementing an AWS compatible Cloud Watch service, documentation was sufficient to implement the standard use case (threshold exceeded for a specified number of periods) but there were certain other operations, most notably how to specifically define INSUFFICIENT_DATA that required a bit of experimentation and some assumptions to be made to complete the implementation.  These assumptions are based on open questions and experimentation.  The document below will discuss the open questions and show the final rule set that is used to evaluate alarm states in the Eucalyptus Cloud Watch Implementation.
+Amazon Web Services (AWS) provides an Alarm function in its Cloud Watch application that monitors the state of metrics can perform certain actions if a metric value exceeds a threshold for an extended period of time, such as send an SNS action or execute an Auto Scaling policy action.  Actions may also occur in other states.  In implementing an AWS compatible Cloud Watch service, documentation was sufficient to implement the standard use case (threshold exceeded for a specified number of periods) but there were certain other operations, most notably how to specifically define INSUFFICIENT_DATA that required a bit of experimentation and some assumptions to be made to complete the implementation.  These assumptions are based on open questions and experimentation.  The document below will discuss the open questions and show the final rule set that is used to evaluate alarm states in the Eucalyptus Cloud Watch Implementation.
 
-Definitions
+==Definitions==
 
-  An alarm is a named entity that watches the value of a metric over time.  An alarm consists of a name, a Cloud Watch metric (and all of its associated fields), an evaluation rule (which will be expanded on below), a number of periods to evaluate over, and a period length.  The evaluation rule is something of the form: "The <statistic> of the metric is <comparison operator> the <threshold value>".  An example could be "The Average of the metric is Greater Than 30."  (This is over a single period).  Valid statistic values are Average, Minimum, Maximum, SampleCount, and Sum.  Valid comparison operators are GreaterThanThreshold, GreaterThanOrEqualToThreshold, LessThanThreshold, LessThanOrEqualToThreshold.  Once a value is calculated for the statistic for the metric, evaluating the evaluation rule is straighforward.
+An ''alarm'' is a named entity that watches the value of a metric over time.  An alarm consists of a ''name'', a Cloud Watch ''metric'' (and all of its associated fields), an ''evaluation rule'' (which will be expanded on below), a ''number of periods'' to evaluate over'', and a ''period length''.  
 
-  AWS defines thress state values for an alarm.  These values are (as per the AWS spec)
+The evaluation rule is a rule of the form: 
+:'''The STATISTIC of the metric is COMPARISON_OPERATOR THRESHOLD_VALUE.'''
 
-  OK - The value of the statistic does not exceed the threshold.
-  ALARM - The value of the statistic does exceed the threshold.
-  INSUFFICIENT_DATA - There is no data for the statistic.  This may be because the alarm has just started or the metric does not exist.
+Valid statistics are ''Average'', ''Minimum'', ''Maximum'', ''SampleCount'', and ''Sum''.  
 
-  One must distinguish between the evaluation rule result for a single period and the global state of the alarm.  An alarm is set to the ALARM state if for a certain number of consecutive periods the
+Valid comparison operators are ''GreaterThan'', ''LessThan'', ''GreaterThanOrEqualTo'' and ''LessThanOrEqualTo''.
+
+A concrete evaluation rule is
+:The Average of the metric is Greater Than 30.
+
+These rules are applied over a single period.
+
+AWS defines three state values for an alarm.  These values are (per the AWS spec)
+*OK - The value of the statistic does not exceed the threshold.
+*ALARM - The value of the statistic does exceed the threshold.
+*INSUFFICIENT_DATA - There is no data for the statistic.  This may be because the alarm has just started or the metric does not exist.
+
+
+One must distinguish between the evaluation rule result for a single period and the global state of the alarm.  An alarm is set to the ALARM state if for a certain number of consecutive periods the
 evaluation rule shows that the threshold value has been exceeded.  Thus, an alarm may be in the OK state even if the previous period value has exceeded the threshold, as shown in the graph below.
 
 
@@ -29,7 +41,7 @@ evaluation rule shows that the threshold value has been exceeded.  Thus, an alar
 
 
 
-Discussion Questions
+==Discussion Questions==
 
   It is clear from the above that an alarm should be in the ALARM state as shown above, if the threshold has been exceeded for the specified number of consecutive periods.  But that is the only rule that is defined in the previous section.  This leads to some of the following questions.
 
@@ -41,7 +53,7 @@ Discussion Questions
 - What happens if the alarm is currently in the ALARM state, and we receive some new data points with timestamps in the past, which if re-evaluated would cause previous periods to no longer exceed the threshold? 
 - When an alarm state is evaluated, does the "old" state play a part?  This could be an issue as there is an API method called "setAlarmState()" which allows for a temporary setting of the alarm state.
 
-Experiment 1 (new old data)
+==Experiment 1 (new old data)==
 
   The first experiment was to see what happened at AWS when we triggered an alarm and added old data afterwards. We created an alarm against metric "Experiment-1", theshold: 30, number of evaluation periods: 5, period: 120 (seconds), statistic: average.  This means that the alarm state should be set to ALARM after 5 periods if the threshold was exceeded.  We sent the following data
 00:00 create alarm (or some time before we start)
