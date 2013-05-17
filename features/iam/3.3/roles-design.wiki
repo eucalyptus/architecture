@@ -1,0 +1,182 @@
+= Overview =
+This design covers our implementation of AWS IAM roles and instance profiles.
+
+== Tracking ==
+
+{|
+! Status || Draft || 
+|-
+! Created || 2013/04/09 || Initial document, content for post sprint 5
+|}
+
+== Out of Scope ==
+Implementation of the following items is beyond the scope of this design:
+
+* STS AssumeRoles Policy parameter (for supplemental policies)
+
+== Related Features ==
+This feature relates to the following features in this release:
+
+* ElasticLoadBalancing - Uses IAM roles for service access from ELB instances
+
+= Analysis =
+== Open Issues ==
+* How should credentials be cached in the instance metadata?
+
+== Resolved Issues ==
+
+= Design =
+This section provides design details relevant to developers.
+
+== Implementation Summary ==
+
+{|
+! Item !! Value !! Notes
+|-
+| DB || eucalyptus_auth || Existing IAM/STS database
+|-
+| IAM service class || EuareService || Existing service class updated
+|-
+| STS service class || TokensService || Existing service class updated
+|- 
+|}
+
+== Entities ==
+
+The following entities will be added:
+
+* Role
+* Instance profile
+
+== ARNs ==
+Ern is updated to allow ARNs for the following resource types:
+
+* '''role'''
+* '''instance-profile'''
+
+Accounts is updated with utility methods to construct ARNs from IAM resources.
+
+== Token Format ==
+The security token format is updated to allow reference to the IAM role for the credential.
+
+== Role Authentication ==
+''RoleUser'' is added to expose a Role as a User for compatibility with existing permission enforcement.
+
+== Resource Attached Policies ==
+Previously we only supported identity attached policices. For roles it is necessary to support resource attached policies (for assume role policies).
+
+''PolicyParser'' is updated to support the attachment type of the policy. The attachement type determines the required parts of the policy, for example a resource attached policy must specify the identities to which it applies.
+
+== Deny Statements ==
+Cross account deny policy statements are now supported (See [http://docs.aws.amazon.com/IAM/latest/UserGuide/cross-acct-access-walkthrough-creategroup.html Modifying Group Permissions] in the Enabling Cross-Account API Access Walkthrough)
+
+= Function =
+This section provides implementation details and descriptions of any functionality beyond the core AWS features.
+
+== Service Summary ==
+
+{|
+|-
+! Item !! Value !! Notes
+|- 
+| IAM Version || 2010-05-08 || Version of IAM API supported
+|- 
+| STS Version || 2011-06-15 || Version of STS API supported
+|- 
+|}
+
+== Supported Actions ==
+This sections describes implemented service actions.
+
+For more information on administrative support by action, see Administrative Functionality below.
+
+=== IAM ===
+{|
+! Action !! Admin Enabled !! Notes 
+|-
+| AddRoleToInstanceProfile || Y || 
+|-
+| CreateInstanceProfile || Y || 
+|-
+| CreateRole || Y || 
+|-
+| DeleteInstanceProfile || Y || 
+|-
+| DeleteRole || Y || 
+|-
+| DeleteRolePolicy || Y || 
+|-
+| GetInstanceProfile || Y || 
+|-
+| GetRole || Y || 
+|-
+| GetRolePolicy || Y || 
+|-
+| ListInstanceProfiles || Y || 
+|-
+| ListInstanceProfilesForRole || Y || 
+|-
+| ListRolePolicies || Y || 
+|-
+| ListRoles || Y || 
+|-
+| PutRolePolicy || Y || 
+|-
+| RemoveRoleFromInstanceProfile || Y || 
+|-
+| UpdateAssumeRolePolicy || Y || 
+|}
+
+
+=== STS ===
+{|
+! Action !! Admin Enabled !! Notes 
+|-
+| AssumeRole ||  || Supplemental policy not supported.
+|}
+
+== Eucalyptus Extensions ==
+We will extend the standard functionality for administrative purposes.
+
+=== IAM ===
+Support for quotas:
+
+{|
+! Item !! Value !! Notes 
+|-
+| Quotas || iam:quota-instanceprofilenumber ||
+|-
+| &nbsp; || iam:quota-rolenumber ||
+|}
+
+=== Delegation ===
+System administrators can perform actions on behalf of other accounts using a special delegation parameter, this applies to all actions noted as ''Admin Enabled'' above.
+
+= Configuration =
+No configuration changes noted.
+
+= Upgrade =
+No upgrade impact noted.
+
+= Packaging =
+No specific packaging requirements.
+
+= Documentation =
+Administrative functionality should be documented.
+
+= Security =
+This feature has significant security risks. Some specific risks are:
+
+* Assuming a role from an instance providing access to another accounts resources
+* Token service errors allowing access to another accounts resources
+* An assumed role not limiting access to the (policy) defined permissions
+
+= Testing =
+No specific test cases noted.
+
+= References =
+* [http://docs.aws.amazon.com/IAM/latest/UserGuide/WorkingWithRoles.html Working with roles (amazon.com)]
+* [http://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRole.html STS AssumeRole (amazon.com)]
+
+[[tag:rls-3.3]]
+

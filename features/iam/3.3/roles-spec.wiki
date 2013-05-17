@@ -1,5 +1,5 @@
 = IAM Roles =
-Roles allow for automatic provisioning of federated tokens for use by instance-hosted applications.  Using roles for instances, access keys and control the associated permissions (IAM profile).
+Roles allow for automatic provisioning of security tokens for use by instance-hosted applications.  Using roles for instances, access keys and control the associated permissions (IAM profile).
 
 Things to know about roles and their use from instances:
 * AWS access keys are automatically made available to running instances.
@@ -8,12 +8,11 @@ Things to know about roles and their use from instances:
 * Roles can be used with all Windows and Linux AMIs.
 * The instance metadata service is used to expose access keys to the instances.
 * Precautions to restrict instance metadata service should be taken on role-based instances which run services that might interact with the metadata service (e.g., HTTP proxies).
-* 
 
 == Launching an instance with a role ==
-# Create roles using the IAM APIs ([[http://docs.amazonwebservices.com/IAM/latest/UserGuide/CreateRole.html See creating a role]])
-# Launch an instance while specifying the role ([[http://docs.amazonwebservices.com/AWSEC2/latest/UserGuide/launching-an-instance.html See launching an instance with a role]])
-# Use the metadata service from the instance to obtain the federated credentials ([[http://docs.amazonwebservices.com/AWSEC2/latest/UserGuide/UsingIAM.html#UsingTemporarySecurityCredentials_EC2 See using temporary security credentials]])
+# Create roles using the IAM APIs ([http://docs.amazonwebservices.com/IAM/latest/UserGuide/CreateRole.html See creating a role])
+# Launch an instance while specifying the role ([http://docs.amazonwebservices.com/AWSEC2/latest/UserGuide/launching-an-instance.html See launching an instance with a role])
+# Use the metadata service from the instance to obtain the credentials ([http://docs.amazonwebservices.com/AWSEC2/latest/UserGuide/UsingIAM.html#UsingTemporarySecurityCredentials_EC2 See using temporary security credentials])
 ```bash
 $ iam-rolecreate -r s3access -s ec2.amazonaws.com
 
@@ -29,7 +28,7 @@ $ iam-instanceprofilecreate -s s3access -r s3access arn:aws:iam::111111111111:in
 *** Role related operations
 *** InstanceProfile related operations
 ** STS
-*** GetFederatedToken
+*** AssumeRole
 ** EC2
 *** running an instance with a profile
 *** using the profile information to populate the instance metadata service credentials periodically
@@ -42,31 +41,31 @@ $ iam-instanceprofilecreate -s s3access -r s3access arn:aws:iam::111111111111:in
 
 == IAM Operations ==
 ----
-* [[http://docs.amazonwebservices.com/IAM/latest/APIReference/API_Operations.html API Reference]]
-** [[http://docs.amazonwebservices.com/IAM/latest/APIReference/API_AddRoleToInstanceProfile.html AddRoleToInstanceProfile]]
-** [[http://docs.amazonwebservices.com/IAM/latest/APIReference/API_CreateInstanceProfile.html CreateInstanceProfile]]
-** [[http://docs.amazonwebservices.com/IAM/latest/APIReference/API_CreateRole.html CreateRole]]
-** [[http://docs.amazonwebservices.com/IAM/latest/APIReference/API_DeleteInstanceProfile.html DeleteInstanceProfile]]
-** [[http://docs.amazonwebservices.com/IAM/latest/APIReference/API_DeleteRole.html DeleteRole]]
-** [[http://docs.amazonwebservices.com/IAM/latest/APIReference/API_DeleteRolePolicy.html DeleteRolePolicy]]
-** [[http://docs.amazonwebservices.com/IAM/latest/APIReference/API_GetInstanceProfile.html GetInstanceProfile]]
-** [[http://docs.amazonwebservices.com/IAM/latest/APIReference/API_GetRole.html GetRole]]
-** [[http://docs.amazonwebservices.com/IAM/latest/APIReference/API_GetRolePolicy.html GetRolePolicy]]
-** [[http://docs.amazonwebservices.com/IAM/latest/APIReference/API_ListInstanceProfiles.html ListInstanceProfiles]]
-** [[http://docs.amazonwebservices.com/IAM/latest/APIReference/API_ListInstanceProfilesForRole.html ListInstanceProfilesForRole]]
-** [[http://docs.amazonwebservices.com/IAM/latest/APIReference/API_ListRolePolicies.html ListRolePolicies]]
-** [[http://docs.amazonwebservices.com/IAM/latest/APIReference/API_ListRoles.html ListRoles]]
-** [[http://docs.amazonwebservices.com/IAM/latest/APIReference/API_PutRolePolicy.html PutRolePolicy]]
-** [[http://docs.amazonwebservices.com/IAM/latest/APIReference/API_RemoveRoleFromInstanceProfile.html API_RemoveRoleFromInstanceProfile]]
-** [[http://docs.amazonwebservices.com/IAM/latest/APIReference/API_UpdateAssumeRolePolicy.html UpdateAssumeRolePolicy]]
+* [http://docs.amazonwebservices.com/IAM/latest/APIReference/API_Operations.html API Reference]
+** [http://docs.amazonwebservices.com/IAM/latest/APIReference/API_AddRoleToInstanceProfile.html AddRoleToInstanceProfile]
+** [http://docs.amazonwebservices.com/IAM/latest/APIReference/API_CreateInstanceProfile.html CreateInstanceProfile]
+** [http://docs.amazonwebservices.com/IAM/latest/APIReference/API_CreateRole.html CreateRole]
+** [http://docs.amazonwebservices.com/IAM/latest/APIReference/API_DeleteInstanceProfile.html DeleteInstanceProfile]
+** [http://docs.amazonwebservices.com/IAM/latest/APIReference/API_DeleteRole.html DeleteRole]
+** [http://docs.amazonwebservices.com/IAM/latest/APIReference/API_DeleteRolePolicy.html DeleteRolePolicy]
+** [http://docs.amazonwebservices.com/IAM/latest/APIReference/API_GetInstanceProfile.html GetInstanceProfile]
+** [http://docs.amazonwebservices.com/IAM/latest/APIReference/API_GetRole.html GetRole]
+** [http://docs.amazonwebservices.com/IAM/latest/APIReference/API_GetRolePolicy.html GetRolePolicy]
+** [http://docs.amazonwebservices.com/IAM/latest/APIReference/API_ListInstanceProfiles.html ListInstanceProfiles]
+** [http://docs.amazonwebservices.com/IAM/latest/APIReference/API_ListInstanceProfilesForRole.html ListInstanceProfilesForRole]
+** [http://docs.amazonwebservices.com/IAM/latest/APIReference/API_ListRolePolicies.html ListRolePolicies]
+** [http://docs.amazonwebservices.com/IAM/latest/APIReference/API_ListRoles.html ListRoles]
+** [http://docs.amazonwebservices.com/IAM/latest/APIReference/API_PutRolePolicy.html PutRolePolicy]
+** [http://docs.amazonwebservices.com/IAM/latest/APIReference/API_RemoveRoleFromInstanceProfile.html API_RemoveRoleFromInstanceProfile]
+** [http://docs.amazonwebservices.com/IAM/latest/APIReference/API_UpdateAssumeRolePolicy.html UpdateAssumeRolePolicy]
 
 == STS Operations ==
 ----
-* [[http://docs.amazonwebservices.com/STS/latest/APIReference/API_Operations.html API Reference]]
-** [[http://docs.amazonwebservices.com/STS/latest/APIReference/API_GetFederationToken.html GetFederationToken]]
+* [http://docs.amazonwebservices.com/STS/latest/APIReference/API_Operations.html API Reference]
+** [http://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRole.html AssumeRole]
 
 == EC2 Changes ==
-* [[http://docs.amazonwebservices.com/AWSEC2/latest/APIReference/ApiReference-query-RunInstances.html RunInstances]]
+* [http://docs.amazonwebservices.com/AWSEC2/latest/APIReference/ApiReference-query-RunInstances.html RunInstances]
 ** IamInstanceProfile.Arn
 **: Amazon resource name (ARN) of the IAM Instance Profile (IIP) to associate with the instances. Type: String, Default: None
 ** IamInstanceProfile.Name
@@ -88,15 +87,14 @@ $ iam-instanceprofilecreate -s s3access -r s3access arn:aws:iam::111111111111:in
 == Discussion ==
 
 #. Summary of IAM roles related changes needed:
-##. STS: GetFederatedToken operation implementation [2].
+##. STS: AssumeRole operation implementation [2].
 ##. EC2: RunInstance with an IamInstanceProfile [3].
 ##. IAM: Role related operations [4].
-##. Instance Metadata: Obtaining, refreshing, and giving access to federated tokens [5,6].
+##. Instance Metadata: Obtaining, refreshing, and giving access to security tokens [5,6].
 
-#. Roles & GetFederatedToken subtleties
-##. Roles work by providing the policies for narrowing privileges in a way that RunInstance can obtain those policies and, subsequently and periodically, request GetFederatedToken's which have been restricted appropriately.
-##. Roles are not an authorizable entity in and of themselves -- the application of the role's policies is done through federated tokens.
-##. The semantics of privilege narrowing in GetFederatedToken imply that the delegating account is the same as the owner of the IamInstanceProfile.
+#. Roles & AssumeRole subtleties
+##. Roles work by providing the policies for narrowing privileges in a way that RunInstance can obtain those policies and, subsequently and periodically, request AssumeRole's which have been restricted appropriately.
+##. Roles are not an authorizable entity in and of themselves -- the application of the role's policies is done through security tokens.
 ##. The Policy argument can be used to specify the restriction of access to be only the resource of the specific ELB.
 ##. Obtaining the tokens will necessarily happen on the EC2 service side (either in instance state management or instance metadata) and need to happen periodically.
 ##. For the EC2 service to be able to apply the right narrowing Policy it has to be able to identify that policy which is defined by ELB (!!)
@@ -105,15 +103,15 @@ $ iam-instanceprofilecreate -s s3access -r s3access arn:aws:iam::111111111111:in
 ##. The IamInstanceProfile has associated with it IamRoles which have associated the relevant Policys.
 
 #. EC2/Instance Metadata & IAM Roles
-##. Providing access to the federated credentials will involve periodically calling GetFederatedToken.
-##. To narrow the delegated privileges for the federated tokens the right Policy has to be provided when calling GetFederatedToken.
-##. The only way to associate a Policy w/ an Instance is at RunInstance time -- indirectly by associating an iamRole with the Instance.
+##. Providing access to the credentials will involve periodically calling AssumeRole.
+##. To narrow the delegated privileges for the security tokens the right Policy has to be provided when calling AssumeRole.
+##. The only way to associate a Policy w/ an Instance is at RunInstance time -- indirectly by associating an IamInstanceProfile with the Instance.
 ##. The IamInstanceProfile, subsequently, has an IamRole and that has a list of Policys. (NOTE: despite being a list, an InstanceProfile can only ever have a single role associated with it [7])
-##. Using the IamInstanceProfile information and its policies GetFederatedToken can be used to obtain appropriate credentials.
+##. Using the IamInstanceProfile information and its policies AssumeRole can be used to obtain appropriate credentials.
 ##. Instance metadata: When credentials are demanded using http://169.254.169.254/latest/meta-data/iam/security-credentials/${iamProfile} two things are needed:
 ###. If no credentials are currently cached for the instance obtain new credentials.
 ###. If cached credentials are expired obtain new credentials.
-##. Note that persisting tokens is not indicated as they are ephemeral, caching for the timeout period is sufficient.  For example Suppliers.memoizeWithExpiration( new FederatedTokenSupplier() {/**/}, timeOut, TimeUnit.MINUTES );
+##. Note that persisting tokens is not indicated as they are ephemeral, caching for the timeout period is sufficient.  For example Suppliers.memoizeWithExpiration( new TokenSupplier() {/**/}, timeOut, TimeUnit.MINUTES );
 ##. The value for the timeout of tokens in this case is unspecified (anyone?) and should be a configurable value which is local to the EC2 service (as it would apply to all system run VMs).
 
 #. IAM Role related operations:  Based on the above discussion it seems to me like we need the following operations:
@@ -164,7 +162,7 @@ $ iam-instanceprofilecreate -s s3access -r s3access arn:aws:iam::111111111111:in
 ###. Security group management is localized; doesn't need special handling
 
 [1] https://github.com/eucalyptus/architecture/wiki/iam-3.3-roles-spec
-[2] http://docs.aws.amazon.com/STS/latest/APIReference/API_GetFederationToken.html
+[2] http://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRole.html
 [3] http://docs.aws.amazon.com/AWSEC2/latest/APIReference/ApiReference-query-RunInstances.html
 [4] http://docs.aws.amazon.com/IAM/latest/APIReference/API_InstanceProfile.html
 [5] http://docs.aws.amazon.com/IAM/latest/APIReference/API_Role.html
