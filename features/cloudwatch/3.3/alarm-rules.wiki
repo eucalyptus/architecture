@@ -25,25 +25,43 @@ AWS defines three state values for an alarm.  These values are (per the AWS spec
 
 
 One must distinguish between the evaluation rule result for a single period and the global state of the alarm.  An alarm is set to the ALARM state if for a certain number of consecutive periods the
-evaluation rule shows that the threshold value has been exceeded.  Thus, an alarm may be in the OK state even if the previous period value has exceeded the threshold, as shown in the graph below.
+evaluation rule shows that the threshold value has been exceeded.  Thus, an alarm may be in the OK state even if the previous period value has exceeded the threshold, as shown in the graph below.  (The number of evaluation periods is 5, and the threshold is 30).
 
 [[File:alarm-rules-graph-1.png]]
 
 ==Discussion Questions==
 
-  It is clear from the above that an alarm should be in the ALARM state as shown above, if the threshold has been exceeded for the specified number of consecutive periods.  But that is the only rule that is defined in the previous section.  This leads to some of the following questions.
+What the above graph shows is the normal ALARM case.  An alarm should be in the ALARM state if the threshold has been exceeded for the specified number of consecutive periods.  But this is only part of the story.  Here are some questions that need to be answered to completely determine what the current alarm state "should" be.
+# What are the period boundaries for evaluation?  (i.e. at time t, what is the start and end time of the periods to be evaluated?)
+# When exactly should we change the state of the alarm to OK?  
+# When exactly should we change the state of the alarm to INSUFFICIENT_DATA?
+# When exactly should we change the state of the alarm to ALARM? We know the case where we have exceeded the threshold for a certain number of periods, but is that the only case?)
+# How often do we evaluate the state of the alarm?
+# What happens if the alarm is currently in the ALARM state, and we receive some new data points with timestamps in the past, which if re-evaluated would cause previous periods to no longer exceed the threshold? 
+# When an alarm state is evaluated, does the "old" state play a part?  This could be an issue as there is an API method called "setAlarmState()" which allows for a temporary setting of the alarm state.
 
-- What are the period boundaries for evaluation?  (i.e. at time t, what is the start and end time of the periods to be evaluated?)
-- When exactly should we change the state of the alarm to OK?  
-- When exactly should we change the state of the alarm to INSUFFICIENT_DATA?
-- When exactly should we change the state of the alarm to ALARM? (We know the case where we have exceeded the threshold for a certain number of periods, but is that the only case?)
-- How often do we evaluate the state of the alarm?
-- What happens if the alarm is currently in the ALARM state, and we receive some new data points with timestamps in the past, which if re-evaluated would cause previous periods to no longer exceed the threshold? 
-- When an alarm state is evaluated, does the "old" state play a part?  This could be an issue as there is an API method called "setAlarmState()" which allows for a temporary setting of the alarm state.
+We decided to see what AWS does for the above questions with a series of experiments.
 
-==Experiment 1 (new old data)==
+==Experiment 1 (OK DATA)==
 
-  The first experiment was to see what happened at AWS when we triggered an alarm and added old data afterwards. We created an alarm against metric "Experiment-1", theshold: 30, number of evaluation periods: 5, period: 120 (seconds), statistic: average.  This means that the alarm state should be set to ALARM after 5 periods if the threshold was exceeded.  We sent the following data
+The first experiment sent some data for a metric that was "below" the threshold for a certain period of time.  Our suspicion is that this should cause the alarm to go into an OK state.
+We stop putting any data in at all, and we expect eventually the alarm to go back into the INSUFFICIENT_DATA state.
+Here is our experiment:
+
+*Time 00:00 create an alarm (5 evaluation periods, period 300 seconds threshold 20.0)
+*Time 03:00 put metric data, value of 20 (keep doing this every 30 seconds)
+*Time 17:30 put last metric data value of 20 in.
+
+Once the data was entered, alarm state was observed.
+*Time 00:00 alarm state was INSUFFICIENT_DATA
+*Time 03:35 alarm state changed to OK
+*Time 43:35 alarm state changes to INSUFFICIENT_DATA.
+
+Here is a graph of the experiment.
+
+
+
+was to see what happened at AWS when we triggered an alarm and added old data afterwards. We created an alarm against metric "Experiment-1", theshold: 30, number of evaluation periods: 5, period: 120 (seconds), statistic: average.  This means that the alarm state should be set to ALARM after 5 periods if the threshold was exceeded.  We sent the following data
 00:00 create alarm (or some time before we start)
 00:00-10:00 Every 30 seconds, send a data point with the value 40.0 (at 10:00 this should cause the alarm state to be set to alarm)
 10:00-14:00 Keep sending a data point every 30 seconds with the value 40.0
