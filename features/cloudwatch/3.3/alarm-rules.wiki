@@ -48,7 +48,7 @@ The first experiment sent some data for a metric that was "below" the threshold 
 We stop putting any data in at all, and we expect eventually the alarm to go back into the INSUFFICIENT_DATA state.
 Here is our experiment:
 
-*Time 00:00 create an alarm (5 evaluation periods, period 300 seconds threshold 20.0)
+*Time 00:00 create an alarm (5 evaluation periods, period 300 seconds threshold 30.0)
 *Time 03:00 put metric data, value of 20 (keep doing this every 30 seconds)
 *Time 17:30 put last metric data value of 20 in.
 
@@ -58,7 +58,7 @@ Once the data was entered, alarm state was observed.
 *Time 43:35 alarm state changes to INSUFFICIENT_DATA.
 
 Here is a graph of the experiment.
-
+[[File:alarm-rules-graph-2.png]]
 
 
 was to see what happened at AWS when we triggered an alarm and added old data afterwards. We created an alarm against metric "Experiment-1", theshold: 30, number of evaluation periods: 5, period: 120 (seconds), statistic: average.  This means that the alarm state should be set to ALARM after 5 periods if the threshold was exceeded.  We sent the following data
