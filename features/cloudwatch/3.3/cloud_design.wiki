@@ -350,11 +350,11 @@ Table Operations
 *Uniqueness Constraints: dimension_name, dimension_value, metric_name, and namespace must be unique together.
 
 == Workflows ==
-=== Put Metric Workflow ===
+=== Put Metric Data Workflow ===
 
 [[File:put-metric-data-workflow.png]] 
 
-=== Put Metric Workflow Diagram Definitions === 
+=== Put Metric Data Workflow Diagram Definitions === 
 
 * PutMetricData -> user created request 
 
@@ -470,22 +470,50 @@ Table Operations
 
 * Alarms -> database table used to store alarms
 
+=== Describe Alarm History Workflow ===
+
+[[File:describe-alarm-history-workflow.png]] 
+
+=== Describe Alarm History Workflow Diagram Definitions === 
+
+* DescribeAlarmHistory -> user created request 
+
+* Cloud Watch Service -> Eucalyptus implementation of the Cloud Watch Service
+
+* Alarm History -> database table used to store alarm history
+
+* Cleaner -> House keeping process to delete metric data from the database with a 2 week window  
+
+* Alarm CRUD Operation -> A change in state to an alarm, alarm creation, alarm deletion, or executed action.
+
+
 === Database Purge ===
 
 Global period data deletion after 2 weeks.
 
+=== Alarm State Evaluation ===
+Once a minute, every alarm is read out of the database and put into a queue for evaluation.  There are currently 5 queue workers.  Each queue worker evaluates the state of it's alarm, according to the alarm rules.  (See [[alarm-rules.wiki]]).  If alarm actions need to be executed, the queue workers do that as well.
 
+=== System Metric Folding ===
+Because AWS allows some metrics to be aggregated or "folded", system metrics are inserted into the database with every possible parameter combination.  For example, a system metric of "CPUUtilization", with dimensions "{ImageId=emi-12345, InstanceId=i-1234567, InstanceType=m1.small} and value 20.0 is actually inserted into the database 8 times, with all possible dimension parameters (i.e.
+*{}
+*{ImageId=emi-12345}
+*{InstanceId=i-1234567}
+*{InstanceType=m1.small} 
+*{ImageId=emi-12345, InstanceId=i-1234567}
+*{ImageId=emi-12345, InstanceType=m1.small}
+*{InstanceId=i-1234567, InstanceType=m1.small}
+*{ImageId=emi-12345, InstanceId=i-1234567, InstanceType=m1.small} 
+
+This is 2^n metrics for a metric with n dimensions.  At present there are no more than 4 dimensions for any system metrics, so at most 16 points are entered.  Metrics are also put into the list_metrics table in this fashion.
+One caveat with the folding approach is that while it is true that all combinations of dimenisons are entered into the metric data tables, the dimension hash is based on the dimension permutation, but the list of dimensions in the table is the complete list of dimensions.  This distinguishes metrics entered directly from folded dimensions.
+
+
+'''Update:''' It appears AWS does not aggregate all combinations of system metrics.  Using the approach above caused EucaLobo to not function properly.  For EBS and EC2 metrics, while data is still folded in the metric data tables, the list_metrics table only shows metrics with zero or one dimension for EBS and EC2 metrics.  We may wish to reconsider folding metrics in the future and make the metric provider responsible for adding whatever aggregated metrics they want to allow.
 
 
 == Service Impact ==
 New SOAP / Query API user facing services are added.
-
-
-
-=== Entity Model ===
-
-
-System metrics may be "folded", that is not all dimensions need to be selected during a search.  To accomodate this, rows for each combination of dimensions for a given input will be created and placed into the table with the appropriate hash.  Current system metrics appear to have at most 4 dimensions which would result in at most 16 rows.  10 dimensions would result in 2^10 = 1024 rows.
 
 === Service Impact ===
 
