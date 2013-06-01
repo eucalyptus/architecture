@@ -48,7 +48,7 @@ The first experiment sent some data for a metric that was "below" the threshold 
 We stop putting any data in at all, and we expect eventually the alarm to go back into the INSUFFICIENT_DATA state.
 Here is our experiment:
 
-*Time 00:00 create an alarm (5 evaluation periods, period 300 seconds threshold 30.0)
+*Time 00:00 create an alarm (3 evaluation periods, period 300 seconds threshold 30.0)
 *Time 03:00 put metric data, value of 20 (keep doing this every 30 seconds)
 *Time 17:30 put last metric data value of 20 in.
 
@@ -60,6 +60,88 @@ Once the data was entered, alarm state was observed.
 Here is a graph of the experiment.
 [[File:alarm-rules-graph-2.png]]
 
+The green brackets indicate the length of a single period (5 minutes or 300 seconds) and the length of the "evaluation window", the total length of time the threshold must be exceeded for the ALARM state to be triggered.
+There are a few things to note from this graph.  First, the alarm state was changed to OK within 1 minute of entering data.  This is consistently true for different experiments as well.  This suggests that alarm evaluation is not done once per period, but once per minute.  This is our first observation.
+:Observation 1 -- Alarm evaluation is done once per minute.
+
+Another point of interest on the graph is the time at which the final INSUFFICIENT_DATA state is reached.  If having one period of insufficient data within the evaluation window was sufficient to trigger the INSUFFICIENT_DATA state, it would have triggered much earlier, near the 23 minute mark.  What's more surprising is that even having the entire evaluation window contain no data is not enough to trigger the INSUFFICIENT_DATA state, it takes longer than that. (Approximately 10 more minutes).  Doing this same experiment with different period lengths shows that it takes on average 2 periods longer than the evaluation window, or 5 minutes, whichever is greater, before the INSUFFICIENT_DATA state is triggered.  This leads us to our second observation.
+:Observation 2 -- Transition to the INSUFFICIENT_DATA state takes 2 periods or 5 minutes longer (whichever is greater) than the evaluation window from the point that data is no longer received.
+
+So we have discovered a couple of things about the INSUFFICIENT_DATA state.  Let's run another experiment with an alarm.
+
+==Experiment 2 (ALARM DATA)==
+
+The second experiment sent some data for a metric that was "above" the threshold for a certain period of time.  Our suspicion is that this should cause the alarm to go into an ALARM state.
+We stop putting any data in at all, and we expect eventually the alarm to go back into the INSUFFICIENT_DATA state.
+Here is our experiment:
+
+*Time 00:00 create an alarm (3 evaluation periods, period 300 seconds threshold 30.0)
+*Time 03:00 put metric data, value of 40 (keep doing this every 30 seconds)
+*Time 18:30 put last metric data value of 40 in.
+
+Once the data was entered, alarm state was observed.
+*Time 00:00 alarm state was INSUFFICIENT_DATA
+*Time 09:09 alarm state changed to ALARM
+*Time 44:09 alarm state changes to INSUFFICIENT_DATA.
+
+Here is a graph of the experiment.
+[[File:alarm-rules-graph-3.png]]
+
+The INSUFFICIENT_DATA case is almost identical as in the previous experminet, taking 10 minutes longer than the 
+evaluation window for all the alarm data to be "cleared out" before it returns to the INSUFFICIENT_DATA state.  
+One thing to note here is that for a large portion of this experiment the alarm was in the ALARM state, even though 
+it was not strictly true that the previous 3 intervals had data that exceeded the threshold in it.  
+In addition, the first ALARM state was triggered just over 6 minutes after the alarm data was put in.  
+This seems counter-intuitive, as we don't have 3 periods of data that has exceeded the threshold.  
+But if we look closely, we can construct such a scenario.  Let's divide the time into 3 intervals.
+*From one minute before alarm creation, to 04:00.  There is a data point at 03:00, so that first interval has exceeded the threshold.
+*From 04:00 to 09:00 there are several data points that exceed the threshold, and the average does as well.
+*From 09:00 to 14:00 we already have one data point (09:00).  That is the only data point, but the average exceeds the threshold.
+That is three intervals.  We have learned the following.
+:Observation 3 -- Transition to the INSUFFICIENT_DATA state still takes 2 periods or 5 minutes longer (whichever is greater) than the evaluation window from the point that data is no longer received, even if the previous data was ALARM data.
+:Observation 4 -- It is not strictly necessary for there to be ALARM data in the previous 3 consective periods (or # of evaluation periods in general) for the ALARM state to "stay" on.
+:Observation 5 -- One data point in an interval is sufficient for that whole interval to be considered "exceeded" or "not exceeded" the threshold.
+:Observation 6 -- Evaluation periods may include data in the future.  '''This observation will not hold true for Eucalyptus.'''
+
+It was a bit of a stretch to get 3 periods out of the above to trigger the alarm, so to see if it is general policy to trigger the alarm early, we tried another experiment.
+==Experiment 3 (ALARM DATA (LONGER))==
+
+The third experiment sent some data for a metric that was "above" the threshold for a certain period of time, checking to see how long it took to go into the ALARM_STATE.
+Here is our experiment:
+
+*Time 00:00 create an alarm (5 evaluation periods, period 300 seconds threshold 30.0)
+*Time 03:00 put metric data, value of 40 (keep doing this every 30 seconds)
+*Time 28:30 put last metric data value of 40 in.
+
+Once the data was entered, alarm state was observed.
+*Time 00:00 alarm state was INSUFFICIENT_DATA
+*Time 18:36 alarm state changed to ALARM
+*Time 64:36 alarm state changes to INSUFFICIENT_DATA.
+
+Here is a graph of the experiment.
+[[File:alarm-rules-graph-4.png]]
+
+In this case, it takes a little over 15 minutes 30 seconds to trigger the alarm, but this can also be cut into 5 intervals, the same way as before.  However, this combined with the last experiment shows us the following.
+:Observation 7 -- If the previous set of consecutive periods contain both ALARM and INSUFFICIENT_DATA periods, there are situations where the alarm state is INSUFFICIENT_DATA (in the beginning) and those that are ALARM (at the end).  Having the alarm be in the OK state appears to require an OK interval in the previous interval evaluation.
+
+We have seen that a combination of INSUFFICIENT_DATA and ALARM data in intervals will make the alarm state either ALARM or INSUFFICIENT_DATA.
+Here are some of the configurations.  (Assuming 3 evaluation periods)
+*(INSUFFICIENT_DATA, INSUFFICIENT_DATA, INSUFFICIENT_DATA) -> INSUFFICIENT_DATA (assuming previous data is also INSUFFICIENT_DATA)
+*(INSUFFICIENT_DATA, INSUFFICIENT_DATA, ALARM) -> INSUFFICIENT_DATA (assuming previous data is also INSUFFICIENT_DATA)
+*(ALARM, ALARM, ALARM) -> ALARM (this is by definition)
+*(ALARM, ALARM, INSUFFICIENT_DATA) -> ALARM (if the previous data is also ALARM)
+
+This suggests that INSUFFICIENT_DATA can be a placeholder for an "ALARM" state during the evaluation, assuming we have seen an ALARM period in the past.
+
+We have one final experminet before we can make out final decisions on what our alarm evaluation rules will be.
+
+
+in the past.
+
+Restating the above, for a given alarm state evaluation, if we consider the previous periods, it is as though we can make the following statements.  
+INSUFFICIENT_DATA, INSUFFICIENT_DATA, ALARM -> INSUFFICIENT_DATA 
+
+we do.  If we evaluate the data at 09:09, we can consider the intervals -01:00-04:00, 04:00-09:00, 09:00-14:00.  
 
 was to see what happened at AWS when we triggered an alarm and added old data afterwards. We created an alarm against metric "Experiment-1", theshold: 30, number of evaluation periods: 5, period: 120 (seconds), statistic: average.  This means that the alarm state should be set to ALARM after 5 periods if the threshold was exceeded.  We sent the following data
 00:00 create alarm (or some time before we start)
