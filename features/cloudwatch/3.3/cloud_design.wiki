@@ -1,18 +1,36 @@
 = Overview =
 
-Implement an AWS compatible Cloud Watch solution.
+This design covers our implementation of AWS Cloud Watch. 
 
 == Out of Scope ==
+Implementation of items related to features that we do not support are out of scope. These features are:
 
-VPC, SNS, DynamoDB, Billing, ElastiCache, ElasticMapReduce, RDS, SQS, StorageGateway
+* Placement groups
+* Spot Instances
+* SNS
+* VPC
+* VPC
+* SNS
+* DynamoDB
+* Billing
+* ElastiCache
+* ElasticMapReduce
+* RDS
+* SQS
+* StorageGateway
 
 == Feature Dependencies ==
-
-Ground true data collection per each system-defined metric.
+* EC2 - Data collection for system-defined metrics.
+* EBS - Data collection for EBS disk system-defined metrics.
+* AS - Support execution of autoscaling policies from alarm triggers, and collection of system metrics.
+* ELB - Data collection for ELB system metrics.
 
 == Related Features ==
-
-AutoScaling, ELB
+This feature relates to the following features in this release:
+* EC2
+* ELB
+* AS
+* ELB
 
 = Design =
 
