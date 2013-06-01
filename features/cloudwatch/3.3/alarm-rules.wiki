@@ -133,66 +133,103 @@ Here are some of the configurations.  (Assuming 3 evaluation periods)
 
 This suggests that INSUFFICIENT_DATA can be a placeholder for an "ALARM" state during the evaluation, assuming we have seen an ALARM period in the past.
 
-We have one final experminet before we can make out final decisions on what our alarm evaluation rules will be.
+We have not tried a trial with OK, INSUFFICIENT_DATA, and ALARM periods in our data set.  We will try this next.
+
+==Experiment 4 (MIXED DATA)==
+
+The fourth experiment sent some data for a metric that was "above" the threshold, some what was "below" the threshold, and periods of no data at all.
+We may see all alarm states, but we don't have any predictions.
+
+Here is our experiment:
+
+*Time 00:00 create an alarm (3 evaluation periods, period 300 seconds threshold 30.0)
+*Time 03:00 put metric data, value of 20 (keep doing this every 30 seconds)
+*Time 07:30 put last metric data value of 20 in.
+*Time 08:00 put metric data, value of 40 (keep doing this every 30 seconds)
+*Time 12:30 put last metric data value of 40 in.
+*Time 13:00 put metric data, value of 20 (keep doing this every 30 seconds)
+*Time 17:30 put last metric data value of 20 in.
+*Time 18:00 put no data in for a while
+*Time 32:30 stop putting no data in (start up in 30 seconds)
+*Time 33:00 put metric data, value of 40 (keep doing this every 30 seconds)
+*Time 37:30 put last metric data value of 40 in.
+*Time 38:00 put no data in for a while
+*Time 42:30 stop putting no data in (start up in 30 seconds)
+*Time 43:00 put metric data, value of 40 (keep doing this every 30 seconds)
+*Time 47:30 put last metric data value of 40 in.
+*Time 48:00 put no data in for a while
+*Time 52:30 stop putting no data in (start up in 30 seconds)
+*Time 53:00 put metric data, value of 20 (keep doing this every 30 seconds)
+*Time 57:30 put last metric data value of 20 in.
+*Time 58:00 stop putting any data in
+*Time 73:00 delete alarm
+
+Once the data was entered, alarm state was observed.
+*Time 00:00 alarm state was INSUFFICIENT_DATA
+*Time 03:57 alarm state changed to OK
+*Time 42:57 alarm state changes to ALARM
+*Time 53:57 alarm state changed to OK
+*Time 73:57 alarm deleted
+
+Here is a graph of the experiment.
+[[File:alarm-rules-graph-5.png]]
+
+A couple of things to note here.  First, the final INSUFFICIENT_DATA state doesn't occur, would probably occur somewhere around
+83:00 or 84:00 (Evaluation window of 15 minutes + 2 more periods of 10 minutes = 25 minutes after 58:00, last data point).  This is consistent with what we have seen so far.
+In addition, adding OK data will cause the alarm state to change to OK within a minute.  In addition, the 42:57 ALARM state change consists of ALARM and INSUFFICIENT_DATA periods.
+This leads to the following two observations.
+:Observation 8 -- When OK, INSUFFICIENT_DATA, and ALARM periods all exist within an evaluation window, the alarm state will be OK.  Specifically, if there is even one OK period in the evaluation window, the state value will be OK.
+:Observation 9 -- Combinations of INSUFFICIENT_DATA and ALARM periods can trigger an ALARM state.  We can consider an INSUFFICIENT_DATA period to be equivalent to an ALARM period if it is preceeded by an alarm period.
+
+This gives us just about enough data to evaluate our rules.  Our final experiment deals with retroactive data.
+
+==Experiment 5 (RETROACTIVE DATA)==
+Our fifth experiment was to see what happened at AWS when we triggered an alarm and added old data afterwards. 
 
 
-in the past.
+We created an alarm against metric "Experiment-1", theshold: 30, number of evaluation periods: 5, period: 120 (seconds), statistic: average.  This means that the alarm state should be set to ALARM after 5 periods if the threshold was exceeded.  We sent the following data
 
-Restating the above, for a given alarm state evaluation, if we consider the previous periods, it is as though we can make the following statements.  
-INSUFFICIENT_DATA, INSUFFICIENT_DATA, ALARM -> INSUFFICIENT_DATA 
-
-we do.  If we evaluate the data at 09:09, we can consider the intervals -01:00-04:00, 04:00-09:00, 09:00-14:00.  
-
-was to see what happened at AWS when we triggered an alarm and added old data afterwards. We created an alarm against metric "Experiment-1", theshold: 30, number of evaluation periods: 5, period: 120 (seconds), statistic: average.  This means that the alarm state should be set to ALARM after 5 periods if the threshold was exceeded.  We sent the following data
-00:00 create alarm (or some time before we start)
-00:00-10:00 Every 30 seconds, send a data point with the value 40.0 (at 10:00 this should cause the alarm state to be set to alarm)
-10:00-14:00 Keep sending a data point every 30 seconds with the value 40.0
-14:00 Send a bunch of data points, with the timestamps 0:00-10:00 (one every 30 seconds) but with a value of 10.0, so that the average from 0:00-10:00 will no longer be above 40.
-14:00-18:00 Keep sending a data point every 30 seconds with the value 40.0
+Here is our experiment:
+*Time 00:00 create an alarm (5 evaluation periods, period 120 seconds threshold 30.0)
+*Time 00:00 put metric data, value of 40 (keep doing this every 30 seconds)
+*Time 14:00 put a bunch of metric data in, post-dated, a value of 10.0 (from 00:00-10:00 spaced every 30 seconds).  This will make the average for these periods 25.0)
+*Time 14:00 continue put metric data, value of 40, present time (every 30 seconds)
+*Time 18:00 put last data point value of 40.0 in
 
 What should happen here is that if old data is used in the evaluation, around 10:00 the state of the alarm should be set to ALARM, but at 14:00 or so, those old intervals should no longer exceed the
 threshold, so the state of the alarm should no longer be set to alarm.
 
-What actually happens
-00:00 Alarm Created and set to INSUFFICIENT_DATA state
-07:00 Alarm set to ALARM state
-15:00 Alarm set to OK state
-29:00 Alarm set to ALARM state
-35:00 Alarm set to INSUFFICIENT_DATA state
+Once the data was entered, alarm state was observed.
+*Time 00:00 Alarm Created and set to INSUFFICIENT_DATA state
+*Time 07:43 Alarm set to ALARM state
+*Time 14:43 Alarm set to OK state
+*Time 29:43 Alarm set to ALARM state
+*Time 35:43 Alarm set to INSUFFICIENT_DATA state
 
-How does this match up against our expectations?  We had assumed that the alarm state would trigger after 10 minutes, as that would be 5 periods of alarm activity.  7 minutes seems short, but it is possible to line up period boundaries to allow for such an occurrence.  If our periods were:
--01:30-0:30 (1 point in this range at time 00:00)
-00:30-01:30 (Enough points in this range)
-01:30-03:30 (Enough points in this range)
-03:30-05:30 (Enough points in this range)
-05:30-07:30 (Even though this period hadn't finished yet, it had a data point in it and at the time the alarm was set that period was over the threshold)
+Here is a graph of the experiment.
+[[File:alarm-rules-graph-6.png]]
 
-then we could justify the alarm state.  It seems a bit of a stretch, but it can be made to fit in the rules.
+The 07:43 initial ALARM state is as before, we can divvy up the intervals in such a way as to have 5 intervals that are in the ALARM state.  In addition, within a minute of the retroactive data being added, the alarm state is re-evaluated, and set to the OK state.
+Notice in addition, that the ALARM state is set very late.  The OK data had to fall off the evaluation window.  The INSUFFICIENT_DATA evaluation is the same as before.  We only have one real observation to make here.
+:Observation 9 -- Alarm state is evaluated every minute, and data is not cached.  New retroactive values are taken into account.
 
-At 14 minutes in, we flood the past with old data that will retroactively make the state in the old interval fit below the threshold.  Within a minute, the alarm is set back into the OK state.
-Thus we can safely make the following assumption.
-
-Assumption 1: Data from previous intervals are evaluated again at every alarm evaluation invocation.  
-
-At 18 minutes in, we stop sending data.  We do not see an INSUFFICIENT_DATA state in the alarm for another 17 minutes (with an alarm state in the middle).  What this means is as follows.
-
-Observation 1: A single period with no data is not enough to trigger the INSUFFICIENT_DATA state.  (Otherwise, we would have seen an INSUFFICIENT_DATA trigger before 20 minutes or so).
-Observation 2: Even as many periods as the evaluation period with no data is not enough to trigger the INSUFFICIENT_DATA state.  (We had 10 minutes of no data from 18 minutes to 28 minutes, and even if the period boundaries were such that we just started a period at 18 minutes, we still didn't trigger that state until 35 minutes in).
-
-One other point of interest.  The alarm state was triggered at 29 minutes in.  If you look at the period from 19 to 29 minutes in, there is no data at all, certainly not 5 periods of alarm threshold.  This leads to the next observation.
-
-Observation 3: There are other situations than the threshold being exceeded for the specified number of periods that can trigger the alarm state.
+==CONCLUSION==
+With the data described above, these are the rules that Eucalyptus determined that most match the AWS case and that are internally consistent.
+#Alarm state is evaluated once per minute.
+#The global alarm state is completely determined by the alarm state of the previous several periods, and not by the alarm's previous global state.
+#At any point t, given a period length of p, and a number of evaluation periods of n, the evaluation window is defined to be from t' - pn to t', where t' is t rounded down to the lowest minute.  The period start times are then t' - np, t' - (n-1)p, t' - (n-2)p, ..., t'-p.  As an example, suppose the current time is 05:05:03, our period length is 120 seconds, and our number of evaluation periods is 5.  In this case n is 5, p is 120, t' is 05:05:00.  Our window is from 04:55:00 to 05:05:00 and our period start times are 04:55:00, 04:57:00, 04:59:00, 05:01:00, 05:03:00.  In the next minute all of our period start times will shift forward one minute.
+#In addition to our n evaluation periods, we add a buffer, a number of periods prior to our n periods.  (Typically 2 periods, or 5 minutes, whichever is greater, but always a whole number of periods).  Specifically, if p is 60 seconds, we add 5 periods.  If p is 120 seconds, we add 3 periods.  If p is 180 seconds or higher we add two periods.  This is used for "smoothing over", which will be described next.
+#Starting with the beginning of the buffer period, we "smooth over" any periods that are considered INSUFFICIENT_DATA.  If a given period evaluates to INSUFFICIENT_DATA, it's smoothed over value is the value of the closest non-INSUFFICIENT_DATA period before it in time it can find in the evaluation window and the buffer.  For example, if the oldest period in the buffer is evaluated as OK, and the rest of the following periods are INSUFFICIENT_DATA, all the periods afterwards will have a smoothed over value of "OK".  A period may have a smoothed-over state of INSUFFICIENT_DATA if all previous periods have an actual state of INSUFFICIENT_DATA.
+#With the "smoothed-over" values taken into account, if there is a single OK period in the evaluation window (no longer including the buffer but having used the buffer to compute the "smoothed over" values), the global state is OK.  If every period in the evaluation window has a smoothed over value of "ALARM" the global state is ALARM.  Otherwise the global state is INSUFFICIENT_DATA.
 
 
+==RULES (a bit more code-like) ==
+#Let n be the number of evaluation periods.  Let m be the number of "buffer periods (typically 2).
+#Create a state array a[0]..a[n+m-1], a[0] being the alarm state of the oldest period in the evaluation window + the buffer .
+#Create a second array b[0]..b[n+m], and calculate the value of b[i] as follows.  b[i] = a[i] if a[i] != INSUFFICIENT_DATA.  if a[i] == INSUFFICIENT_DATA, b[i] = a[k] where k is the largest value &lt; i such that a[k] != INSUFFICIENT_DATA if k exists, otherwise b[i] = INSUFFICIENT_DATA
+#The value of the global array state = OK if at least one of b[m]...b[n+m-1] == OK, ALARM if all of b[m]...b[n+m-1] == ALARM, INSUFFICIENT_DATA otherwise.
 
-
-
-
-
-
-
-
-
-
+==PREVIOUS ALARM STATE CONSIDERATIONS==
+The global state of the alarm in the previous alarm evaluation is generally not used for current alarm evaluation except in the following situation.  Actions are triggered on state change, so if the previous state is different than what the new state has been evaluated as, the appropriate actions will be taken.  In addition, some actions need to take place once per period.  (For example, autoscaling actions).  If a state change has not occurred, the last time an action has been taken against the current state is noted, and if it has been more than a period, the actions that need to be acted on once per period (autoscaling actions) will be executed again.
 
 
