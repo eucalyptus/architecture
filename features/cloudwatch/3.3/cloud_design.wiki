@@ -33,6 +33,185 @@ This feature relates to the following features in this release:
 * ELB
 
 = Design =
+This section provides design details relevant to developers.
+
+== Implementation Summary ==
+
+{|
+|-
+| DB || eucalyptus_cloudwatch ||
+|-
+| Source modules || cloudwatch || Contents under '''com.eucalyptus.cloudwatch''' package
+|-
+| &nbsp; || cloudwatch-common || Contents under '''com.eucalyptus.cloudwatch.common''' package
+|-
+| Service class || CloudWatchService ||
+|-
+| Component ID class || CloudWatch ||
+|-
+| Service type name || cloudwatch ||
+|-
+| Internal URI || /internal/CloudWatch || Internal SOAP
+|- 
+|}
+
+== Entities ==
+
+The following entities will be added:
+
+* Dimension
+* Metric Data
+* List Metrics
+* Alarm
+* Alarm History
+* Absolute Metric History
+
+=== Dimension ===
+So many entities have a Dimension collection as an attribute that a class called '''AbstractPersistentWithDimensions''' was created.  It adds the following fields to tables.
+{|
+|-
+| dim_1_name || character varying(255) || Name of dimension 1
+|-
+| dim_1_value || character varying(255) || Value of dimension 1
+|-
+| dim_2_name || character varying(255) || Name of dimension 2
+|-
+| dim_2_value || character varying(255) || Value of dimension 2
+|-
+| dim_3_name || character varying(255) || Name of dimension 3
+|-
+| dim_3_value || character varying(255) || Value of dimension 3
+|-
+| dim_4_name || character varying(255) || Name of dimension 4
+|-
+| dim_4_value || character varying(255) || Value of dimension 4
+|-
+| dim_5_name || character varying(255) || Name of dimension 5
+|-
+| dim_5_value || character varying(255) || Value of dimension 5
+|-
+| dim_6_name || character varying(255) || Name of dimension 6
+|-
+| dim_6_value || character varying(255) || Value of dimension 6
+|-
+| dim_7_name || character varying(255) || Name of dimension 7
+|-
+| dim_7_value || character varying(255) || Value of dimension 7
+|-
+| dim_8_name || character varying(255) || Name of dimension 8
+|-
+| dim_8_value || character varying(255) || Value of dimension 8
+|-
+| dim_9_name || character varying(255) || Name of dimension 9
+|-
+| dim_9_value || character varying(255) || Value of dimension 9
+|-
+| dim_10_name || character varying(255) || Name of dimension 10
+|-
+| dim_10_value || character varying(255) || Value of dimension 10
+|- 
+|}
+
+This design is limited to 10 dimensions and may appear to be hard coded, but it allows a collection implementation within a single table, which allows for fast lookups and deletes.
+There are getter/setter methods for each field, but the important methods are ''getDimensions()'' and ''setDimensions()'' for this class.  Dimensions are generally sorted alphabetically by name before calling ''setDimensions()'' to make comparisons faster.
+=== Metric Data ===
+The Metric entity represents metrics, together with timed data values. '''MetricEntity''' extends '''AbstractPersistentWithDimensions''' so in addition to the dimension fields all tables representing metric data have the following fields.
+{|
+|-
+| account_id || character varying(255) || Id associated with the account
+|-
+| namespace || character varying(255) || Namespace for the metric
+|-
+| metric_name || character varying(255) || Name of the metric
+|-
+| dimension_hash || character varying(255) || hash of all the dimension name/values (more below)
+|-
+| units || character varying(255) || Enumeration of possible unit values (see spec)
+|-
+| metric_type || character varying(255) || Enumeration of SYSTEM or CUSTOM metric
+|-
+| timestamp || timestamp without time zone || Timestamp of the statistic set
+|-
+| sample_size || double precision || number of data points in the statistic set 
+|-
+| sample_max || double precision || Maximum value in the statistic set
+|-
+| sample_min || double precision || Minimum value in the statistic set
+|-
+| sample_sum || double precision || Sum of all the values in the statistic set
+|-
+|}
+
+Metric data can either be entered as a single value, or a statistic set, which constains a max, min, sum, and sample_count of data points.  Since all data is used in calculation, in the table, a single data point is turned into a statistic set of size 1, with equal max, min, and sum.
+
+The dimension hash is a quick method to search on an exact dimension match.  Given a collection of dimensions, the dimension hash is constructed as
+SHA-1(dim_1_name + "|" + dim_1_value + "|" + dim_2_name + "|" + dim_2_value + "|" + ...) for each dimension, after the dimensions have been sorted alphabetically by key.  There is a final "|" in the string, and a null or empty collection hashes against an empty string (no "|" characters).
+
+Note: Due to dimension folding (discussed below) the dimension hash is not always the hash of the dimensions in the table row.
+
+To eventually allow database delegation and scalability, the rows are placed into certain tables depending on dimension hash and metric type.  Here are the tables.  (All have identical fields).
+* custom_metric_data_0
+* custom_metric_data_1
+* custom_metric_data_2
+* custom_metric_data_3
+* custom_metric_data_4
+* custom_metric_data_5
+* custom_metric_data_6
+* custom_metric_data_7
+* custom_metric_data_8
+* custom_metric_data_9
+* custom_metric_data_a
+* custom_metric_data_b
+* custom_metric_data_c
+* custom_metric_data_d
+* custom_metric_data_e
+* custom_metric_data_f
+* system_metric_data_0
+* system_metric_data_1
+* system_metric_data_2
+* system_metric_data_3
+* system_metric_data_4
+* system_metric_data_5
+* system_metric_data_6
+* system_metric_data_7
+* system_metric_data_8
+* system_metric_data_9
+* system_metric_data_a
+* system_metric_data_b
+* system_metric_data_c
+* system_metric_data_d
+* system_metric_data_e
+* system_metric_data_f
+
+The dimension hash is converted to a hexadecimal string (which is how it is stored).  The first character of the string, together with the metric type, determines which table above the row is stored in.
+=== List Metric ===
+The List Metric entity represents a list of all metrics in the system, without data points.  It is a list of all metrics one can call GetMetricStatistics against. Data is stored in the ''list_metrics'' table.  '''ListMetric''' extends '''AbstractPersistentWithDimensions''' so in addition to the dimension fields the table has the folowing fields.
+
+{|
+|-
+| account_id || character varying(255) || Id associated with the account
+|-
+| metric_type || character varying(255) || Enumeration of SYSTEM or CUSTOM metric
+|-
+| metric_name || character varying(255) || Name of the metric
+|-
+| namespace || character varying(255) || Namespace for the metric
+|-
+|}
+
+Searches can be based on metric name, namespace, or a dimension list (dimension subset match is allowed).  
+Result will include the entire dimension list entered with the metric.
+
+
+Launch configuration
+* Auto scaling group
+* Auto scaling instance
+* Auto scaling policy
+* Scaling activity
+* Tag / Auto scaling group tag
+
+== Service Impact ==
+New SOAP / Query API user facing services are added.
 
 === Entity Model ===
 
