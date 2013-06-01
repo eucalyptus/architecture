@@ -1,0 +1,15 @@
+@startuml
+
+title Describe Alarms Workflow
+
+rectangle {
+    ()"Cloud Watch Service"
+}
+() "Cloud Watch Service" --> (DescribeAlarms): response
+(DescribeAlarms) -down-> ()"Cloud Watch Service" : request
+() "Cloud Watch Service" --> (Alarms) : READ
+database "eucalyptus_cloudwatch" {
+folder "Alarms" {
+  }
+}
+@enduml

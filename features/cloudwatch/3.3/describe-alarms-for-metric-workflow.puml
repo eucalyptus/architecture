@@ -1,0 +1,15 @@
+@startuml
+
+title Describe Alarms For Metric Workflow
+
+rectangle {
+    ()"Cloud Watch Service"
+}
+() "Cloud Watch Service" --> (DescribeAlarmsForMetric): response
+(DescribeAlarmsForMetric) -down-> ()"Cloud Watch Service" : request
+() "Cloud Watch Service" --> (Alarms) : READ
+database "eucalyptus_cloudwatch" {
+folder "Alarms" {
+  }
+}
+@enduml

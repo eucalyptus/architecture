@@ -1,0 +1,17 @@
+@startuml
+
+title Delete Alarms Workflow
+
+rectangle {
+    ()"Cloud Watch Service"
+}
+() "Cloud Watch Service" --> (DeleteAlarms): response
+(DeleteAlarms) -down-> ()"Cloud Watch Service" : request
+() "Cloud Watch Service" --> (Alarms) : DELETE
+database "eucalyptus_cloudwatch" {
+folder "Alarms" {
+  }
+}
+@enduml
+
+
