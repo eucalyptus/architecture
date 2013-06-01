@@ -62,7 +62,7 @@ The following entities will be added:
 * Dimension
 * Metric Data
 * List Metrics
-* Alarm
+* Alarms
 * Alarm History
 * Absolute Metric History
 
@@ -202,13 +202,83 @@ The List Metric entity represents a list of all metrics in the system, without d
 Searches can be based on metric name, namespace, or a dimension list (dimension subset match is allowed).  
 Result will include the entire dimension list entered with the metric.
 
+=== Alarms ===
+The Alarm Entity represents alarms in the system.  Alarms are associated with a metric, so have most of the fields associated with it.  '''AlarmEntity''' extends '''AbstractPersistentWithDimensions''' so in addition to the dimension fields, alarms are stored in the table ''alarms'' and have the following fields.
+{|
+|-
+| account_id || character varying(255) || Id associated with the account
+|-
+| actions_enabled || boolean || True if the actions associated with this alarm should be execute
+|-
+| alarm_action_1 || text || ARN of the first action to be taken when the alarm goes into the ALARM state.
+|-
+| alarm_action_2 || text || ARN of the second action to be taken when the alarm goes into the ALARM state.
+|-
+| alarm_action_3 || text || ARN of the third action to be taken when the alarm goes into the ALARM state.
+|-
+| alarm_action_4 || text || ARN of the fourth action to be taken when the alarm goes into the ALARM state.
+|-
+| alarm_action_5 || text || ARN of the fifth action to be taken when the alarm goes into the ALARM state.
+|-
+| alarm_configuration_updated_timestamp || timestamp without time zone || Last time this alarm configuration was updated
+|-
+| alarm_description || character varying(255) || description for the alarm
+|-
+| alarm_name || character varying(255) || name for the alarm
+|-
+| comparison_operator || character varying(255) || Enumeration representing the comparison operator used to determine alarm state
+|-
+| evaluation_periods || integer || The number of consecutive periods an alarm must exceed the threshold before moving to the ALARM state.
+|-
+| evaluation_periods || integer || The number of consecutive periods an alarm must exceed the threshold before moving to the ALARM state.
+|-
+| insufficient_data_action_1 || text || ARN of the first action to be taken when the alarm goes into the INSUFFICIENT_DATA state.
+|-
+| insufficient_data_action_2 || text || ARN of the second action to be taken when the alarm goes into the INSUFFICIENT_DATA state.
+|-
+| insufficient_data_action_3 || text || ARN of the third action to be taken when the alarm goes into the INSUFFICIENT_DATA state.
+|-
+| insufficient_data_action_4 || text || ARN of the fourth action to be taken when the alarm goes into the INSUFFICIENT_DATA state.
+|-
+| insufficient_data_action_5 || text || ARN of the fifth action to be taken when the alarm goes into the INSUFFICIENT_DATA state.
+|-
+| last_actions_executed_timestamp || timestamp without time zone || The last time an action was executed (used to determine if more than one period has passed)
+|-
+| metric_name || character varying(255) || Name of the metric
+|-
+| metric_type || character varying(255) || Enumeration of SYSTEM or CUSTOM metric
+|-
+| namespace || character varying(255) || Namespace for the metric
+|-
+| ok_action_1 || text || ARN of the first action to be taken when the alarm goes into the OK state.
+|-
+| ok_action_2 || text || ARN of the second action to be taken when the alarm goes into the OK state.
+|-
+| ok_action_3 || text || ARN of the third action to be taken when the alarm goes into the OK state.
+|-
+| ok_action_4 || text || ARN of the fourth action to be taken when the alarm goes into the OK state.
+|-
+| ok_action_5 || text || ARN of the fifth action to be taken when the alarm goes into the OK state.
+|-
+| period || integer || The number of seconds of one evaluation period
+|-
+| state_reason || character varying(1023) || The reason the alarm is in the current state
+|-
+| state_reason_data || character varying(1023) || A JSON string representing the reason the alarm is in the current state.
+|-
+| state_updated_timestamp || timestamp without time zone || Time the alarm state was last updated
+|-
+| state_value || character varying(255) || Enumeration of current alarm state (ALARM, OK, INSUFFICIENT_DATA)
+|-
+| statistic || character varying(255) || Enumeration of possible statistics (Average, Maximum, Minimum, Sample Count, Sum) used for alarm state evaluation
+|-
+| threshold || double precision || The threshold value used for alarm state evaluation
+|-
+| unit || character varying(255) || Enumeration of valid unit values
+|}
 
-Launch configuration
-* Auto scaling group
-* Auto scaling instance
-* Auto scaling policy
-* Scaling activity
-* Tag / Auto scaling group tag
+
+
 
 == Service Impact ==
 New SOAP / Query API user facing services are added.
