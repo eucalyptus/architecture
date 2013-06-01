@@ -398,7 +398,77 @@ Table Operations
 
 * Data Points Rows / Metric Data Table -> A table is selected based on dimension hash and metric type, processed information.
 
+=== Put Metric Alarm Workflow ===
 
+[[File:put-metric-alarm-workflow.png]] 
+
+=== Put Metric Alarm Workflow Diagram Definitions === 
+
+* PutMetricAlarm -> user created request 
+
+* Cloud Watch Service -> Eucalyptus implementation of the Cloud Watch Service
+
+* Alarms -> database table used to store alarms
+
+=== Describe Alarms Workflow ===
+
+[[File:describe-alarms-workflow.png]] 
+
+=== Describe Alarms Workflow Diagram Definitions === 
+
+* DescribeAlarms -> user created request 
+
+* Cloud Watch Service -> Eucalyptus implementation of the Cloud Watch Service
+
+* Alarms -> database table used to store alarms
+
+=== Describe Alarms FOr Metric Workflow ===
+
+[[File:describe-alarms-for-metric-workflow.png]] 
+
+=== Describe Alarms For Metric Workflow Diagram Definitions === 
+
+* DescribeAlarmsForMetric -> user created request 
+
+* Cloud Watch Service -> Eucalyptus implementation of the Cloud Watch Service
+
+* Alarms -> database table used to store alarms
+
+=== Enable Alarm Actions Workflow ===
+
+[[File:enable-alarm-actions-workflow.png]] 
+
+=== Enable Alarm Actions For Metric Workflow Diagram Definitions === 
+
+* EnableAlarmActions -> user created request 
+
+* Cloud Watch Service -> Eucalyptus implementation of the Cloud Watch Service
+
+* Alarms -> database table used to store alarms
+
+=== Disable Alarm Actions Workflow ===
+
+[[File:disable-alarm-actions-workflow.png]] 
+
+=== Disable Alarm Actions For Metric Workflow Diagram Definitions === 
+
+* DisableAlarmActions -> user created request 
+
+* Cloud Watch Service -> Eucalyptus implementation of the Cloud Watch Service
+
+* Alarms -> database table used to store alarms
+
+=== Set Alarm State Workflow ===
+
+[[File:set-alarm-state-workflow.png]] 
+
+=== Set Alarm State For Metric Workflow Diagram Definitions === 
+
+* DisableAlarmActions -> user created request 
+
+* Cloud Watch Service -> Eucalyptus implementation of the Cloud Watch Service
+
+* Alarms -> database table used to store alarms
 
 === Database Purge ===
 
