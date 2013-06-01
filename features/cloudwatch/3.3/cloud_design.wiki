@@ -184,6 +184,14 @@ To eventually allow database delegation and scalability, the rows are placed int
 * system_metric_data_f
 
 The dimension hash is converted to a hexadecimal string (which is how it is stored).  The first character of the string, together with the metric type, determines which table above the row is stored in.
+
+Table Operations
+*Create : An aggregation queue will be used to aggregate whatever data points that can be combined within the window.  For each data point, a table will be selected based on a hash of the dimensions (key:value) and metric type.
+*Read : Search will be done on equality on metric_name, metric_type, namespace, and units.  Dimensions will be searched against the dimension hash.  Custom metrics require all dimensions match, system metrics require only a subset.
+*Update : Not required
+*Delete : removes rows in which have a time stamp that is more than two weeks old
+*Uniqueness Constraints: None
+
 === List Metric ===
 The List Metric entity represents a list of all metrics in the system, without data points.  It is a list of all metrics one can call GetMetricStatistics against. Data is stored in the ''list_metrics'' table.  '''ListMetric''' extends '''AbstractPersistentWithDimensions''' so in addition to the dimension fields the table has the folowing fields.
 
@@ -199,8 +207,12 @@ The List Metric entity represents a list of all metrics in the system, without d
 |-
 |}
 
-Searches can be based on metric name, namespace, or a dimension list (dimension subset match is allowed).  
-Result will include the entire dimension list entered with the metric.
+Table Operations
+*Create : The metric info (without metric value), will be persisted after the data is inserted into the metric data tables.
+*Read: Searches can be based on metric name, namespace, or a dimension list (dimension subset match is allowed).  Result will include the entire dimension list entered with the metric
+*Update: Only the update timestamp of the list_metrics row will be updated (after data is inserted into the metric data tables).
+*Delete : removes rows in which have a time stamp that is more than two weeks old
+*Uniqueness Constraints: Only the combination of account_id, metric_name, namespace, and dimension key/values (in order) need to be unique.
 
 === Alarms ===
 The Alarm Entity represents alarms in the system.  Alarms are associated with a metric, so have most of the fields associated with it.  '''AlarmEntity''' extends '''AbstractPersistentWithDimensions''' so in addition to the dimension fields, alarms are stored in the table ''alarms'' and have the following fields.
@@ -276,69 +288,68 @@ The Alarm Entity represents alarms in the system.  Alarms are associated with a 
 |-
 | unit || character varying(255) || Enumeration of valid unit values
 |}
+Most of the fields in this table map to the equivalent fields in the AWS CLoudwatch Alarm API definition.  The only item of note is that the AWS CloudWatch Alarms consist of a collection of
+''okActions'', ''alarmActions'', and ''insufficientDataActions''.  These fields are handled the same way in this table as dimensions are handled in the '''AbstractPersistentWithDimensions''' class.  It is a single table, limited to a collection of size 5 for each collection.  There are getters and setters for each individual field, but the getters and setters are usually done on the collections.
 
+Table Operations
+*Create : A row is created when a ''putMetricAlarm()'' request is made on an alarm that does not exist yet.
+*Read: Searches can be done via the ''describeAlarms()'' or ''describeAlarmsForMetric()'' requests.  Alarms can be searched by alarm name, alarm name prefix, action prefix (ARN of one of the ok, alarm, or insufficient data actions), or state value.  Alarms for a certain metric can be searched by metric name, namespace, period, units, or statistic.
+*Update: The table is updated by many factors, alarm state evaluation, ''putMetricAlarm()'' on an existing alarm, or any of the ''disableAlarmActions()'', ''enableAlarmActions()'' or ''setAlarmState()'' requests.
+*Delete : A row is deleted when a ''deleteMetricAlarms()'' request is made on that alarm.  Alarm history (shown below) is not deleted.
+*Uniqueness Constraints: Only the combination of account_id, and alarm_name need to be unique.
 
+=== Alarm History ===
+The Alarm History Entity represents the history of alarm operations in the system.  This includes things like alarm creation, deletion, and state update.  Alarm history is stored in the ''alarm_history'' table, which has the following fields.
+{|
+|-
+| account_id || character varying(255) || Id associated with the account
+|-
+| alarm_name || character varying(255) || name for the alarm
+|-
+| history_data || character varying(4095) || A JSON string representing this history data item
+|-
+| history_item_type || character varying(255) || Enumeration of valid history item types (Configuration Update, State Change, Action)
+|-
+| history_summary || character varying(255) || A summary of the history item.
+|-
+| timestamp || timestamp without time zone || Timestamp of the alarm history item.
+|}
+Most of the fields in this table map to the equivalent fields in the AWS CLoudwatch Alarm API definition.  
 
+Table Operations
+*Create : A row is created when an alarm action is executed, alarm configuration is updated, an alarm is created or deleted, or the alarm state is updated.
+*Read: Searches can be done via the ''describeAlarmHistory()'' request.  Alarm History can be searched by timestamp (start and end time), alarm name, or history item type.
+*Update: Not required.
+*Delete : removes rows in which have a time stamp that is more than two weeks old.  Rows are not deleted just because an alarm is deleted.
+*Uniqueness Constraints: None
 
-== Service Impact ==
-New SOAP / Query API user facing services are added.
+=== Absolute Metric History ===
+Some system metrics that come in are cumulative metrics.  For example ''DiskReadOps'' return the total number of disk reads since the instance started, not the number of reads since the last metric was recorded.  To put the non-cumulative value in the metric data, a delta against the last cumulative (absolute) value of the metric is computed.  The previous cumulative value of a given metric is stored in the ''absolute_metric_history'' table.  The fields are shown below.
+{|
+|-
+| dimension_name || character varying(255) || The (primary) name of the dimension associated with the metric
+|-
+| dimension_value || character varying(255) || The (primary) value of the dimension associated with the metric
+|-
+| last_metric_value || character varying(4095) || The last (cumulative) metric value associated with the metirc
+|-
+| metric_name || character varying(255) || Name of the metric
+|-
+| namespace || character varying(255) || Namespace of the metric
+|-
+| timestamp || timestamp without time zone || Timestamp of the last recorded data point for the metric
+|}
 
-=== Entity Model ===
+Most of the cumulative system metrics that come in have one primary dimenison associated with this metric.  Items stored in this table are of this type.  
 
-Database: eucalyptus_cloudwatch 
+Table Operations
+*Create : Every time a new system metric comes in that is cumulative, the table is checked for a previous data point.  If none is in the table, a new row is created.
+*Read: A read is done to compute the delta when the a new cumulative system metric is put in.
+*Update: Row is updated when a new cumulative system metric is put in.
+*Delete : Right now rows are never deleted, but should be deleted every two weeks.
+*Uniqueness Constraints: dimension_name, dimension_value, metric_name, and namespace must be unique together.
 
-Tables: 
-
-system_metric_data_0, system_metric_data_1, ... system_metric_data_f 
-
-custom_metric_data_0, custom_metric_data_1, ... custom_metric_data_f
-
-32 tables with identical columns (metric_data is the template table) (used for PutMetricData/GetMetricStatistics)
-list_metrics (metrics for ListMetrics)
-
-CRUD design -- 
-
-PutMetricData and GetMetricStatistics
-
-Create : An aggregation queue will be used to aggregate whatever data points that can be combined within the window.
-For each data point, a table will be selected based on a hash of the dimensions (key:value) and metric type.  
-All tables have the following columns: account_id, user_id, namespace, metric_name, units, metric_type (system or custom), timestamp, dimension_hash, sample_sum, sample_max, sample_min, sample_size, dimensions (dim1name, dim1value, ... dim10name, dim10value) 
-
-System metrics may be "folded", that is not all dimensions need to be selected during a search.  To accomodate this, rows for each combination of dimensions for a given input will be created and placed into the table with the appropriate hash.  Current system metrics appear to have at most 4 dimensions which would result in at most 16 rows.  10 dimensions would result in 2^10 = 1024 rows.
-
-(Note, timestamp format :  http://en.wikipedia.org/wiki/ISO_8601 : Timestamps to be truncated to the previous minute)
-
-Read : Search will be done on equality on metric_name, metric_type, namespace, and units.  Dimensions will be searched against the dimension hash.  Custom metrics require all dimensions match, system metrics require only a subset.
-
-Update : Not required
-
-Delete - removes rows in which have a time stamp that is equals (current system time - (current time + two weeks))
-
-ListMetrics
-
-Create : The metric info (without metric value), will be persisted persisted with the following column definitions :
-
-Per row entry - account, uuid, MetricName, NameSpace, timestamp (create and update), dimension columns (dim_x_name, dim_x_value for x between 1 and 10)
-
-Read: Searches can be based on metric name, namespace, or a dimension list (dimension subset match is allowed).  
-Result will include the entire dimension list entered with the metric
-
-Update: Only the update timestamp of the list_metrics row will be updated
-
-Delete - remove rows that have an update time stamp that is equals (current system time - (current time + two weeks)).
-
-Uniqueness_Constraints: Only the combination of account_id, metric_name, namespace, and dimension key/values (in order) need to be unique.
-
-=== Service Impact ===
-
-CLC -> Consume general jvm resource the cloud controller
-
-DB -> additional jdbc connections 
-
-Alarms -> additional duty cycle in which will spawn more threads
-
-Must be HA compliant 
-
+== Workflows ==
 === Put Metric Workflow ===
 
 [[File:put-metric-data-workflow.png]] 
@@ -387,9 +398,34 @@ Must be HA compliant
 
 * Data Points Rows / Metric Data Table -> A table is selected based on dimension hash and metric type, processed information.
 
+
+
 === Database Purge ===
 
 Global period data deletion after 2 weeks.
+
+
+
+
+== Service Impact ==
+New SOAP / Query API user facing services are added.
+
+
+
+=== Entity Model ===
+
+
+System metrics may be "folded", that is not all dimensions need to be selected during a search.  To accomodate this, rows for each combination of dimensions for a given input will be created and placed into the table with the appropriate hash.  Current system metrics appear to have at most 4 dimensions which would result in at most 16 rows.  10 dimensions would result in 2^10 = 1024 rows.
+
+=== Service Impact ===
+
+CLC -> Consume general jvm resource the cloud controller
+
+DB -> additional jdbc connections 
+
+Alarms -> additional duty cycle in which will spawn more threads
+
+Must be HA compliant 
 
 === Discovery ===
 Filters should be discovered, whether individually, per type or per API.
