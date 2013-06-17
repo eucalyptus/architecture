@@ -1,0 +1,17 @@
+@startuml
+
+title Put Metric Alarm Workflow
+
+rectangle {
+    ()"Cloud Watch Service"
+}
+() "Cloud Watch Service" --> (PutMetricAlarm): response
+(PutMetricAlarm) -down-> ()"Cloud Watch Service" : request
+() "Cloud Watch Service" --> (Alarms) : CREATE/UPDATE
+database "eucalyptus_cloudwatch" {
+folder "Alarms" {
+  }
+}
+@enduml
+
+

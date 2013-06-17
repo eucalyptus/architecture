@@ -1,0 +1,17 @@
+@startuml
+
+title Enable Alarm Actions Workflow
+
+rectangle {
+    ()"Cloud Watch Service"
+}
+() "Cloud Watch Service" --> (EnableAlarmActions): response
+(EnableAlarmActions) -down-> ()"Cloud Watch Service" : request
+() "Cloud Watch Service" --> (Alarms) : UPDATE
+database "eucalyptus_cloudwatch" {
+folder "Alarms" {
+  }
+}
+@enduml
+
+

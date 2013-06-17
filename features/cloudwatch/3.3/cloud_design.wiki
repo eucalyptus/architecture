@@ -1,82 +1,360 @@
 = Overview =
 
-Implement an AWS compatible Cloud Watch solution.
+This design covers our implementation of AWS Cloud Watch. 
 
 == Out of Scope ==
+Implementation of items related to features that we do not support are out of scope. These features are:
 
-VPC, SNS, DynamoDB, Billing, ElastiCache, ElasticMapReduce, RDS, SQS, StorageGateway
+* Placement groups
+* Spot Instances
+* SNS
+* VPC
+* VPC
+* SNS
+* DynamoDB
+* Billing
+* ElastiCache
+* ElasticMapReduce
+* RDS
+* SQS
+* StorageGateway
 
 == Feature Dependencies ==
-
-Ground true data collection per each system-defined metric.
+* EC2 - Data collection for system-defined metrics.
+* EBS - Data collection for EBS disk system-defined metrics.
+* AS - Support execution of autoscaling policies from alarm triggers, and collection of system metrics.
+* ELB - Data collection for ELB system metrics.
 
 == Related Features ==
-
-AutoScaling, ELB
+This feature relates to the following features in this release:
+* EC2
+* ELB
+* AS
+* ELB
 
 = Design =
+This section provides design details relevant to developers.
 
-=== Entity Model ===
+== Implementation Summary ==
 
-Database: eucalyptus_cloudwatch 
+{|
+|-
+| DB || eucalyptus_cloudwatch ||
+|-
+| Source modules || cloudwatch || Contents under '''com.eucalyptus.cloudwatch''' package
+|-
+| &nbsp; || cloudwatch-common || Contents under '''com.eucalyptus.cloudwatch.common''' package
+|-
+| Service class || CloudWatchService ||
+|-
+| Component ID class || CloudWatch ||
+|-
+| Service type name || cloudwatch ||
+|-
+| Internal URI || /internal/CloudWatch || Internal SOAP
+|- 
+|}
 
-Tables: 
+== Entities ==
 
-system_metric_data_0, system_metric_data_1, ... system_metric_data_f 
+The following entities will be added:
 
-custom_metric_data_0, custom_metric_data_1, ... custom_metric_data_f
+* Dimension
+* Metric Data
+* List Metrics
+* Alarms
+* Alarm History
+* Absolute Metric History
 
-32 tables with identical columns (metric_data is the template table) (used for PutMetricData/GetMetricStatistics)
-list_metrics (metrics for ListMetrics)
+=== Dimension ===
+So many entities have a Dimension collection as an attribute that a class called '''AbstractPersistentWithDimensions''' was created.  It adds the following fields to tables.
+{|
+|-
+| dim_1_name || character varying(255) || Name of dimension 1
+|-
+| dim_1_value || character varying(255) || Value of dimension 1
+|-
+| dim_2_name || character varying(255) || Name of dimension 2
+|-
+| dim_2_value || character varying(255) || Value of dimension 2
+|-
+| dim_3_name || character varying(255) || Name of dimension 3
+|-
+| dim_3_value || character varying(255) || Value of dimension 3
+|-
+| dim_4_name || character varying(255) || Name of dimension 4
+|-
+| dim_4_value || character varying(255) || Value of dimension 4
+|-
+| dim_5_name || character varying(255) || Name of dimension 5
+|-
+| dim_5_value || character varying(255) || Value of dimension 5
+|-
+| dim_6_name || character varying(255) || Name of dimension 6
+|-
+| dim_6_value || character varying(255) || Value of dimension 6
+|-
+| dim_7_name || character varying(255) || Name of dimension 7
+|-
+| dim_7_value || character varying(255) || Value of dimension 7
+|-
+| dim_8_name || character varying(255) || Name of dimension 8
+|-
+| dim_8_value || character varying(255) || Value of dimension 8
+|-
+| dim_9_name || character varying(255) || Name of dimension 9
+|-
+| dim_9_value || character varying(255) || Value of dimension 9
+|-
+| dim_10_name || character varying(255) || Name of dimension 10
+|-
+| dim_10_value || character varying(255) || Value of dimension 10
+|- 
+|}
 
-CRUD design -- 
+This design is limited to 10 dimensions and may appear to be hard coded, but it allows a collection implementation within a single table, which allows for fast lookups and deletes.
+There are getter/setter methods for each field, but the important methods are ''getDimensions()'' and ''setDimensions()'' for this class.  Dimensions are generally sorted alphabetically by name before calling ''setDimensions()'' to make comparisons faster.
+=== Metric Data ===
+The Metric entity represents metrics, together with timed data values. '''MetricEntity''' extends '''AbstractPersistentWithDimensions''' so in addition to the dimension fields all tables representing metric data have the following fields.
+{|
+|-
+| account_id || character varying(255) || Id associated with the account
+|-
+| namespace || character varying(255) || Namespace for the metric
+|-
+| metric_name || character varying(255) || Name of the metric
+|-
+| dimension_hash || character varying(255) || hash of all the dimension name/values (more below)
+|-
+| units || character varying(255) || Enumeration of possible unit values (see spec)
+|-
+| metric_type || character varying(255) || Enumeration of SYSTEM or CUSTOM metric
+|-
+| timestamp || timestamp without time zone || Timestamp of the statistic set
+|-
+| sample_size || double precision || number of data points in the statistic set 
+|-
+| sample_max || double precision || Maximum value in the statistic set
+|-
+| sample_min || double precision || Minimum value in the statistic set
+|-
+| sample_sum || double precision || Sum of all the values in the statistic set
+|-
+|}
 
-PutMetricData and GetMetricStatistics
+Metric data can either be entered as a single value, or a statistic set, which constains a max, min, sum, and sample_count of data points.  Since all data is used in calculation, in the table, a single data point is turned into a statistic set of size 1, with equal max, min, and sum.
 
-Create : An aggregation queue will be used to aggregate whatever data points that can be combined within the window.
-For each data point, a table will be selected based on a hash of the dimensions (key:value) and metric type.  
-All tables have the following columns: account_id, user_id, namespace, metric_name, units, metric_type (system or custom), timestamp, dimension_hash, sample_sum, sample_max, sample_min, sample_size, dimensions (dim1name, dim1value, ... dim10name, dim10value) 
+The dimension hash is a quick method to search on an exact dimension match.  Given a collection of dimensions, the dimension hash is constructed as
+SHA-1(dim_1_name + "|" + dim_1_value + "|" + dim_2_name + "|" + dim_2_value + "|" + ...) for each dimension, after the dimensions have been sorted alphabetically by key.  There is a final "|" in the string, and a null or empty collection hashes against an empty string (no "|" characters).
 
-System metrics may be "folded", that is not all dimensions need to be selected during a search.  To accomodate this, rows for each combination of dimensions for a given input will be created and placed into the table with the appropriate hash.  Current system metrics appear to have at most 4 dimensions which would result in at most 16 rows.  10 dimensions would result in 2^10 = 1024 rows.
+Note: Due to dimension folding (discussed below) the dimension hash is not always the hash of the dimensions in the table row.
 
-(Note, timestamp format :  http://en.wikipedia.org/wiki/ISO_8601 : Timestamps to be truncated to the previous minute)
+To eventually allow database delegation and scalability, the rows are placed into certain tables depending on dimension hash and metric type.  Here are the tables.  (All have identical fields).
+* custom_metric_data_0
+* custom_metric_data_1
+* custom_metric_data_2
+* custom_metric_data_3
+* custom_metric_data_4
+* custom_metric_data_5
+* custom_metric_data_6
+* custom_metric_data_7
+* custom_metric_data_8
+* custom_metric_data_9
+* custom_metric_data_a
+* custom_metric_data_b
+* custom_metric_data_c
+* custom_metric_data_d
+* custom_metric_data_e
+* custom_metric_data_f
+* system_metric_data_0
+* system_metric_data_1
+* system_metric_data_2
+* system_metric_data_3
+* system_metric_data_4
+* system_metric_data_5
+* system_metric_data_6
+* system_metric_data_7
+* system_metric_data_8
+* system_metric_data_9
+* system_metric_data_a
+* system_metric_data_b
+* system_metric_data_c
+* system_metric_data_d
+* system_metric_data_e
+* system_metric_data_f
 
-Read : Search will be done on equality on metric_name, metric_type, namespace, and units.  Dimensions will be searched against the dimension hash.  Custom metrics require all dimensions match, system metrics require only a subset.
+The dimension hash is converted to a hexadecimal string (which is how it is stored).  The first character of the string, together with the metric type, determines which table above the row is stored in.
 
-Update : Not required
+Table Operations
+*Create : An aggregation queue will be used to aggregate whatever data points that can be combined within the window.  For each data point, a table will be selected based on a hash of the dimensions (key:value) and metric type.
+*Read : Search will be done on equality on metric_name, metric_type, namespace, and units.  Dimensions will be searched against the dimension hash.  Custom metrics require all dimensions match, system metrics require only a subset.
+*Update : Not required
+*Delete : removes rows in which have a time stamp that is more than two weeks old
+*Uniqueness Constraints: None
 
-Delete - removes rows in which have a time stamp that is equals (current system time - (current time + two weeks))
+=== List Metric ===
+The List Metric entity represents a list of all metrics in the system, without data points.  It is a list of all metrics one can call GetMetricStatistics against. Data is stored in the ''list_metrics'' table.  '''ListMetric''' extends '''AbstractPersistentWithDimensions''' so in addition to the dimension fields the table has the folowing fields.
 
-ListMetrics
+{|
+|-
+| account_id || character varying(255) || Id associated with the account
+|-
+| metric_type || character varying(255) || Enumeration of SYSTEM or CUSTOM metric
+|-
+| metric_name || character varying(255) || Name of the metric
+|-
+| namespace || character varying(255) || Namespace for the metric
+|-
+|}
 
-Create : The metric info (without metric value), will be persisted persisted with the following column definitions :
+Table Operations
+*Create : The metric info (without metric value), will be persisted after the data is inserted into the metric data tables.
+*Read: Searches can be based on metric name, namespace, or a dimension list (dimension subset match is allowed).  Result will include the entire dimension list entered with the metric
+*Update: Only the update timestamp of the list_metrics row will be updated (after data is inserted into the metric data tables).
+*Delete : removes rows in which have a time stamp that is more than two weeks old
+*Uniqueness Constraints: Only the combination of account_id, metric_name, namespace, and dimension key/values (in order) need to be unique.
 
-Per row entry - account, uuid, MetricName, NameSpace, timestamp (create and update), dimension columns (dim_x_name, dim_x_value for x between 1 and 10)
+=== Alarms ===
+The Alarm Entity represents alarms in the system.  Alarms are associated with a metric, so have most of the fields associated with it.  '''AlarmEntity''' extends '''AbstractPersistentWithDimensions''' so in addition to the dimension fields, alarms are stored in the table ''alarms'' and have the following fields.
+{|
+|-
+| account_id || character varying(255) || Id associated with the account
+|-
+| actions_enabled || boolean || True if the actions associated with this alarm should be execute
+|-
+| alarm_action_1 || text || ARN of the first action to be taken when the alarm goes into the ALARM state.
+|-
+| alarm_action_2 || text || ARN of the second action to be taken when the alarm goes into the ALARM state.
+|-
+| alarm_action_3 || text || ARN of the third action to be taken when the alarm goes into the ALARM state.
+|-
+| alarm_action_4 || text || ARN of the fourth action to be taken when the alarm goes into the ALARM state.
+|-
+| alarm_action_5 || text || ARN of the fifth action to be taken when the alarm goes into the ALARM state.
+|-
+| alarm_configuration_updated_timestamp || timestamp without time zone || Last time this alarm configuration was updated
+|-
+| alarm_description || character varying(255) || description for the alarm
+|-
+| alarm_name || character varying(255) || name for the alarm
+|-
+| comparison_operator || character varying(255) || Enumeration representing the comparison operator used to determine alarm state
+|-
+| evaluation_periods || integer || The number of consecutive periods an alarm must exceed the threshold before moving to the ALARM state.
+|-
+| evaluation_periods || integer || The number of consecutive periods an alarm must exceed the threshold before moving to the ALARM state.
+|-
+| insufficient_data_action_1 || text || ARN of the first action to be taken when the alarm goes into the INSUFFICIENT_DATA state.
+|-
+| insufficient_data_action_2 || text || ARN of the second action to be taken when the alarm goes into the INSUFFICIENT_DATA state.
+|-
+| insufficient_data_action_3 || text || ARN of the third action to be taken when the alarm goes into the INSUFFICIENT_DATA state.
+|-
+| insufficient_data_action_4 || text || ARN of the fourth action to be taken when the alarm goes into the INSUFFICIENT_DATA state.
+|-
+| insufficient_data_action_5 || text || ARN of the fifth action to be taken when the alarm goes into the INSUFFICIENT_DATA state.
+|-
+| last_actions_executed_timestamp || timestamp without time zone || The last time an action was executed (used to determine if more than one period has passed)
+|-
+| metric_name || character varying(255) || Name of the metric
+|-
+| metric_type || character varying(255) || Enumeration of SYSTEM or CUSTOM metric
+|-
+| namespace || character varying(255) || Namespace for the metric
+|-
+| ok_action_1 || text || ARN of the first action to be taken when the alarm goes into the OK state.
+|-
+| ok_action_2 || text || ARN of the second action to be taken when the alarm goes into the OK state.
+|-
+| ok_action_3 || text || ARN of the third action to be taken when the alarm goes into the OK state.
+|-
+| ok_action_4 || text || ARN of the fourth action to be taken when the alarm goes into the OK state.
+|-
+| ok_action_5 || text || ARN of the fifth action to be taken when the alarm goes into the OK state.
+|-
+| period || integer || The number of seconds of one evaluation period
+|-
+| state_reason || character varying(1023) || The reason the alarm is in the current state
+|-
+| state_reason_data || character varying(1023) || A JSON string representing the reason the alarm is in the current state.
+|-
+| state_updated_timestamp || timestamp without time zone || Time the alarm state was last updated
+|-
+| state_value || character varying(255) || Enumeration of current alarm state (ALARM, OK, INSUFFICIENT_DATA)
+|-
+| statistic || character varying(255) || Enumeration of possible statistics (Average, Maximum, Minimum, Sample Count, Sum) used for alarm state evaluation
+|-
+| threshold || double precision || The threshold value used for alarm state evaluation
+|-
+| unit || character varying(255) || Enumeration of valid unit values
+|}
+Most of the fields in this table map to the equivalent fields in the AWS CLoudwatch Alarm API definition.  The only item of note is that the AWS CloudWatch Alarms consist of a collection of
+''okActions'', ''alarmActions'', and ''insufficientDataActions''.  These fields are handled the same way in this table as dimensions are handled in the '''AbstractPersistentWithDimensions''' class.  It is a single table, limited to a collection of size 5 for each collection.  There are getters and setters for each individual field, but the getters and setters are usually done on the collections.
 
-Read: Searches can be based on metric name, namespace, or a dimension list (dimension subset match is allowed).  
-Result will include the entire dimension list entered with the metric
+Table Operations
+*Create : A row is created when a ''putMetricAlarm()'' request is made on an alarm that does not exist yet.
+*Read: Searches can be done via the ''describeAlarms()'' or ''describeAlarmsForMetric()'' requests.  Alarms can be searched by alarm name, alarm name prefix, action prefix (ARN of one of the ok, alarm, or insufficient data actions), or state value.  Alarms for a certain metric can be searched by metric name, namespace, period, units, or statistic.
+*Update: The table is updated by many factors, alarm state evaluation, ''putMetricAlarm()'' on an existing alarm, or any of the ''disableAlarmActions()'', ''enableAlarmActions()'' or ''setAlarmState()'' requests.
+*Delete : A row is deleted when a ''deleteMetricAlarms()'' request is made on that alarm.  Alarm history (shown below) is not deleted.
+*Uniqueness Constraints: Only the combination of account_id, and alarm_name need to be unique.
 
-Update: Only the update timestamp of the list_metrics row will be updated
+=== Alarm History ===
+The Alarm History Entity represents the history of alarm operations in the system.  This includes things like alarm creation, deletion, and state update.  Alarm history is stored in the ''alarm_history'' table, which has the following fields.
+{|
+|-
+| account_id || character varying(255) || Id associated with the account
+|-
+| alarm_name || character varying(255) || name for the alarm
+|-
+| history_data || character varying(4095) || A JSON string representing this history data item
+|-
+| history_item_type || character varying(255) || Enumeration of valid history item types (Configuration Update, State Change, Action)
+|-
+| history_summary || character varying(255) || A summary of the history item.
+|-
+| timestamp || timestamp without time zone || Timestamp of the alarm history item.
+|}
+Most of the fields in this table map to the equivalent fields in the AWS CLoudwatch Alarm API definition.  
 
-Delete - remove rows that have an update time stamp that is equals (current system time - (current time + two weeks)).
+Table Operations
+*Create : A row is created when an alarm action is executed, alarm configuration is updated, an alarm is created or deleted, or the alarm state is updated.
+*Read: Searches can be done via the ''describeAlarmHistory()'' request.  Alarm History can be searched by timestamp (start and end time), alarm name, or history item type.
+*Update: Not required.
+*Delete : removes rows in which have a time stamp that is more than two weeks old.  Rows are not deleted just because an alarm is deleted.
+*Uniqueness Constraints: None
 
-Uniqueness_Constraints: Only the combination of account_id, metric_name, namespace, and dimension key/values (in order) need to be unique.
+=== Absolute Metric History ===
+Some system metrics that come in are cumulative metrics.  For example ''DiskReadOps'' return the total number of disk reads since the instance started, not the number of reads since the last metric was recorded.  To put the non-cumulative value in the metric data, a delta against the last cumulative (absolute) value of the metric is computed.  The previous cumulative value of a given metric is stored in the ''absolute_metric_history'' table.  The fields are shown below.
+{|
+|-
+| dimension_name || character varying(255) || The (primary) name of the dimension associated with the metric
+|-
+| dimension_value || character varying(255) || The (primary) value of the dimension associated with the metric
+|-
+| last_metric_value || character varying(4095) || The last (cumulative) metric value associated with the metirc
+|-
+| metric_name || character varying(255) || Name of the metric
+|-
+| namespace || character varying(255) || Namespace of the metric
+|-
+| timestamp || timestamp without time zone || Timestamp of the last recorded data point for the metric
+|}
 
-=== Service Impact ===
+Most of the cumulative system metrics that come in have one primary dimenison associated with this metric.  Items stored in this table are of this type.  
 
-CLC -> Consume general jvm resource the cloud controller
+Table Operations
+*Create : Every time a new system metric comes in that is cumulative, the table is checked for a previous data point.  If none is in the table, a new row is created.
+*Read: A read is done to compute the delta when the a new cumulative system metric is put in.
+*Update: Row is updated when a new cumulative system metric is put in.
+*Delete : Right now rows are never deleted, but should be deleted every two weeks.
+*Uniqueness Constraints: dimension_name, dimension_value, metric_name, and namespace must be unique together.
 
-DB -> additional jdbc connections 
+== Workflows ==
+=== Put Metric Data Workflow ===
 
-Alarms -> additional duty cycle in which will spawn more threads
+[[File:put-metric-data-workflow.png]] 
 
-Must be HA compliant 
-
-=== Put Metric Workflow ===
-
-[[put-metric-data-workflow.png]] 
-
-=== Put Metric Workflow Diagram Definitions === 
+=== Put Metric Data Workflow Diagram Definitions === 
 
 * PutMetricData -> user created request 
 
@@ -92,7 +370,7 @@ Must be HA compliant
 
 === List Metrics Workflow ===
 
-[[list-metrics-workflow.png]] 
+[[File:list-metrics-workflow.png]] 
 
 === List Metrics Workflow Diagram Definitions === 
 
@@ -108,7 +386,7 @@ Must be HA compliant
 
 === Get Metric Workflow ===
 
-[[get-metric-statistics-workflow.png]] 
+[[File:get-metric-statistics-workflow.png]] 
 
 === Get Metric Workflow Diagram Definitions === 
 
@@ -120,9 +398,132 @@ Must be HA compliant
 
 * Data Points Rows / Metric Data Table -> A table is selected based on dimension hash and metric type, processed information.
 
+=== Put Metric Alarm Workflow ===
+
+[[File:put-metric-alarm-workflow.png]] 
+
+=== Put Metric Alarm Workflow Diagram Definitions === 
+
+* PutMetricAlarm -> user created request 
+
+* Cloud Watch Service -> Eucalyptus implementation of the Cloud Watch Service
+
+* Alarms -> database table used to store alarms
+
+=== Describe Alarms Workflow ===
+
+[[File:describe-alarms-workflow.png]] 
+
+=== Describe Alarms Workflow Diagram Definitions === 
+
+* DescribeAlarms -> user created request 
+
+* Cloud Watch Service -> Eucalyptus implementation of the Cloud Watch Service
+
+* Alarms -> database table used to store alarms
+
+=== Describe Alarms FOr Metric Workflow ===
+
+[[File:describe-alarms-for-metric-workflow.png]] 
+
+=== Describe Alarms For Metric Workflow Diagram Definitions === 
+
+* DescribeAlarmsForMetric -> user created request 
+
+* Cloud Watch Service -> Eucalyptus implementation of the Cloud Watch Service
+
+* Alarms -> database table used to store alarms
+
+=== Enable Alarm Actions Workflow ===
+
+[[File:enable-alarm-actions-workflow.png]] 
+
+=== Enable Alarm Actions For Metric Workflow Diagram Definitions === 
+
+* EnableAlarmActions -> user created request 
+
+* Cloud Watch Service -> Eucalyptus implementation of the Cloud Watch Service
+
+* Alarms -> database table used to store alarms
+
+=== Disable Alarm Actions Workflow ===
+
+[[File:disable-alarm-actions-workflow.png]] 
+
+=== Disable Alarm Actions For Metric Workflow Diagram Definitions === 
+
+* DisableAlarmActions -> user created request 
+
+* Cloud Watch Service -> Eucalyptus implementation of the Cloud Watch Service
+
+* Alarms -> database table used to store alarms
+
+=== Set Alarm State Workflow ===
+
+[[File:set-alarm-state-workflow.png]] 
+
+=== Set Alarm State For Metric Workflow Diagram Definitions === 
+
+* DisableAlarmActions -> user created request 
+
+* Cloud Watch Service -> Eucalyptus implementation of the Cloud Watch Service
+
+* Alarms -> database table used to store alarms
+
+=== Describe Alarm History Workflow ===
+
+[[File:describe-alarm-history-workflow.png]] 
+
+=== Describe Alarm History Workflow Diagram Definitions === 
+
+* DescribeAlarmHistory -> user created request 
+
+* Cloud Watch Service -> Eucalyptus implementation of the Cloud Watch Service
+
+* Alarm History -> database table used to store alarm history
+
+* Cleaner -> House keeping process to delete metric data from the database with a 2 week window  
+
+* Alarm CRUD Operation -> A change in state to an alarm, alarm creation, alarm deletion, or executed action.
+
+
 === Database Purge ===
 
 Global period data deletion after 2 weeks.
+
+=== Alarm State Evaluation ===
+Once a minute, every alarm is read out of the database and put into a queue for evaluation.  There are currently 5 queue workers.  Each queue worker evaluates the state of it's alarm, according to the alarm rules.  (See [[alarm-rules.wiki]]).  If alarm actions need to be executed, the queue workers do that as well.
+
+=== System Metric Folding ===
+Because AWS allows some metrics to be aggregated or "folded", system metrics are inserted into the database with every possible parameter combination.  For example, a system metric of "CPUUtilization", with dimensions "{ImageId=emi-12345, InstanceId=i-1234567, InstanceType=m1.small} and value 20.0 is actually inserted into the database 8 times, with all possible dimension parameters (i.e.
+*{}
+*{ImageId=emi-12345}
+*{InstanceId=i-1234567}
+*{InstanceType=m1.small} 
+*{ImageId=emi-12345, InstanceId=i-1234567}
+*{ImageId=emi-12345, InstanceType=m1.small}
+*{InstanceId=i-1234567, InstanceType=m1.small}
+*{ImageId=emi-12345, InstanceId=i-1234567, InstanceType=m1.small} 
+
+This is 2^n metrics for a metric with n dimensions.  At present there are no more than 4 dimensions for any system metrics, so at most 16 points are entered.  Metrics are also put into the list_metrics table in this fashion.
+One caveat with the folding approach is that while it is true that all combinations of dimenisons are entered into the metric data tables, the dimension hash is based on the dimension permutation, but the list of dimensions in the table is the complete list of dimensions.  This distinguishes metrics entered directly from folded dimensions.
+
+
+'''Update:''' It appears AWS does not aggregate all combinations of system metrics.  Using the approach above caused EucaLobo to not function properly.  For EBS and EC2 metrics, while data is still folded in the metric data tables, the list_metrics table only shows metrics with zero or one dimension for EBS and EC2 metrics.  We may wish to reconsider folding metrics in the future and make the metric provider responsible for adding whatever aggregated metrics they want to allow.
+
+
+== Service Impact ==
+New SOAP / Query API user facing services are added.
+
+=== Service Impact ===
+
+CLC -> Consume general jvm resource the cloud controller
+
+DB -> additional jdbc connections 
+
+Alarms -> additional duty cycle in which will spawn more threads
+
+Must be HA compliant 
 
 === Discovery ===
 Filters should be discovered, whether individually, per type or per API.
