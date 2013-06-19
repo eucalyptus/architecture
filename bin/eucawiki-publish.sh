@@ -25,3 +25,4 @@ git fetch -k ${UUID}
   done    
 )
 git remote -v rm ${UUID}
+rm -fv ${BASEDIR}/.git/shallow
