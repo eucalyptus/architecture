@@ -1,0 +1,70 @@
+= New User Model =
+* Eucalyptus should clearly differentiate between different privileged cloud personas (currently all accommodated by the ''eucalyptus'' account) and provide ways to compartmentalize their privileges
+* Eucalyptus should be able to accommodate simple deployments where most of the below roles are played by 1 or 2 individuals
+* Eucalyptus should provide the ability to define which roles are needed for a particular deployment AND what each of these roles are going to be able to do 
+
+The eucalyptus account is currently used to perform a variety of privileged operations ranging from cloud setup to cross-account resource management. In the new user model, there is going to a single super privileged user that can do all functionality currently available to the ''eucalyptus'' account but be limited by local-host access only. This user can be used to perform privileged operations when needed using local-host access and can bootstrap other privileged accounts/users/roles that can be used remotely and delegate a customizable set of privileges (defined by policies) to them. 
+
+== Privileged Personas ==
+* the ''Cloud Super Admin'' (CSA)
+** the super powerful user, which can perform any privileged operation in Eucalyptus and delegate these privileges
+** should have limited access (local root only?)
+** the only user who can create, modify and delete privileged policies and assign these policies to users
+* the ''Cloud Resource Manager'' (CRM) 
+** can manage AWS-defined resources (such as S3 objects, instances, users, etc) across accounts
+** from PRD-37, typical responsibilities 
+*** Management (accounts, cloud resources, policies, quotas, users, groups)
+*** Monitoring (capacity, usage)
+*** Reporting (usage reporting, account activity, audit trail)
+*** Backup and Restore
+* the ''Infrastructure Admin'' (IA)
+** can perform operations related to system setup and management
+** from PRD-37, typical responsibilities
+*** installation and configuration
+**** prepare environment
+**** install Eucalyptus
+**** configure Eucalyptus
+*** Monitoring and Maintenance
+**** Infrastructure supporting the cloud
+**** Cloud management layer
+**** Upgrades, security patches
+**** Diagnostics and troubleshooting
+*** Backup and Restore 
+
+== Privileged Users and Roles ==
+* Users
+** CSA
+* Roles
+** CRM
+*** a policy should allow for any supported AWS action (e.g., actions: "ec2:*", "s3:*", "iam:*", "elb:*", "as:*", "cw:*") + reporting
+*** need a way to specify in a policy that cross-account access is allowed (e.g., by prepending a special namespace to all actions "euca:ec2:*" or by employing ARNs "arn:aws:service:region:*:resource") 
+** IA
+*** a policy should allow for the actions supported by Empyrean, Configuration, and Properties services)
+
+== Requirements ==
+* a user can assume more than one role (is there a limit?) 
+* provide canned policies for privileged roles
+* policy language should allow for specifying cross-account access
+
+== Security Restrictions ==
+* limited access to CSA functionality (local root only?)
+* only CSA can
+** define privileged policies
+** define privileged policies to users and roles
+** grant/revoke access to privileged roles
+* accounts with privileged access should not have preset default password
+
+== UX Requirements ==
+* TBD
+
+== Notes ==
+* euca-modify-property should be separated into 2 operation: to modify properties (for IA) and to modify runtime (by default, for CSA only)
+* how to distinguish between expired and invalid credentials?! (if valid, but expired, the error message can say that they are expired)
+* lifetime of STS credentials for privileged roles
+** should be short, allow for one operation only?
+* role discovery by client tools and UI
+** should only work for the privileged roles, but not any roles that an account is allowed to assume
+* some operations typically performed by IA, also need to be available to other users and account admins should be able to delegate these privileges
+** DescribeServices
+** any others?
+
