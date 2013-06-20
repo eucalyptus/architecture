@@ -1,0 +1,4 @@
+= Configuration =
+* Automate as many steps as possible in populating eucalyptus.conf
+----
+[[tag:rls-3.4]]

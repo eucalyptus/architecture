@@ -1,0 +1,5 @@
+- volume attachments do not go where requested https://eucalyptus.atlassian.net/browse/EUCA-2394
+- Meta-data service behavior should be same from within Eucalyptus instance as in AWS
+
+----
+[[tag:rls-3.4]]

@@ -4,7 +4,7 @@ DESTDIR=${BASEDIR}/wiki
 EXCLUDE="TODO|README.wiki|.wiki.log|EUCA-...."
 EXCLUDE_SUFFIX="pdf|zip|wsdl|git|puml|keep|eucawiki"
 EXCLUDE_DIRS="/bin/|/releases/|/lib/|/wiki/|/.git"
-TAGS="rls-2.0 rls-3.2 rls-3.3 index"
+TAGS="rls-2.0 rls-3.2 rls-3.3 rls-3.4 index"
 ${BASEDIR}/bin/eucawiki-publish.sh
 echo > ${BASEDIR}/.wiki.log
 FILELIST=$(cd ${BASEDIR}; 

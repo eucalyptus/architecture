@@ -7,4 +7,6 @@
 3  Networking  No  A Do away with VLAN while preserving isolation  Traffic_CC  --    OVS?                                  
 3  Networking  Yes (AWS)  A IP address allocation to use existing arrangements and provide flexibility to choose private and public IPs for instances (well understood)  Traffic_CC  --    this is really vpc, which depends on edge                                  
 3  Networking  Yes (AWS)  A Ability to define private IP subnets (example a subnet for logical grouping of instances; initial assignment and retention after 1st assignment) (well understood)  Traffic_CC  --    this is really vpc, which depends on edge                                  
+
+----
 [[tag:rls-3.4]]

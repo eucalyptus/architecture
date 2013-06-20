@@ -17,5 +17,5 @@ The way machine images are handled will receive attention in following areas:
 - test cases for canonical image format change
 -- boot {disk,partition,disk w/ kernel & ramdisk} {linux, windows} {ebs, instance-store}
 
-
+----
 [[tag:rls-3.4]]
