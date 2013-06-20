@@ -1,0 +1,10 @@
+1  Networking  Yes  A Avoid routing traffic through the CC   Traffic_CC  L    edge networking  could be XL                                
+1  Networking  Yes  A future plugins for SDNs, Cisco, Juniper, F5, etc.  Traffic_CC  --    all about design consideration                                  
+1  Networking  Yes (AWS+)  A Being able to specify the default gateway (primarily for the infra admin. well understood. needs investigation)  Traffic_CC  MoreInfo    this is definition of edge                                  
+1  Networking  Yes (AWS+)  A Provide simple, flexible choice based on customer's ability to control routing, addressing  Traffic_CC  MoreInfo    this is definition of edge                                  
+1  Networking  Yes (AWS)  A Instances should be able to be part of multiple security groups (well understood. need investigation)  Traffic_CC  M    this should occur for only edge networking, and happen after                                  
+3  networking  Yes (AWS)  A Ability to specify static IP assignment to instances (private IP stickiness) (Chris understands it. Difficult one. Chris needs to schedule somebody's time to look into the details involved in delivering feature before Engineering can provide more feedback)  AWS/Networking enhancements  unknown  edge networking  depends on edge networking                                  
+3  Networking  No  A Do away with VLAN while preserving isolation  Traffic_CC  --    OVS?                                  
+3  Networking  Yes (AWS)  A IP address allocation to use existing arrangements and provide flexibility to choose private and public IPs for instances (well understood)  Traffic_CC  --    this is really vpc, which depends on edge                                  
+3  Networking  Yes (AWS)  A Ability to define private IP subnets (example a subnet for logical grouping of instances; initial assignment and retention after 1st assignment) (well understood)  Traffic_CC  --    this is really vpc, which depends on edge                                  
+[[tag:rls-3.4]]

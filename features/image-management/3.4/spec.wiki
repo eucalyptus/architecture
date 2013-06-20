@@ -1,0 +1,21 @@
+= Image Management =
+The way machine images are handled will receive attention in following areas:
+# **Disk-images**:  Support for direct boot of disk based machine images (i.e., kernel and ramdisk are embedded)
+# **CreateImage/BundleInstance**:  Creation of images from currently running instances; both linux & windows and instance-store & ebs.
+# **Image Toolkit**:  Library of tools implementing image validation, conversion, and test.
+# **Instance Import**:  Enabling services which validate, convert, and test images using the image toolkit.
+# **Image Import CLIs**:  Client tools which orchestrate the validation, conversion, and test just like the above service, but usable from the command line.
+# **Instance Import Tools**:  Client tools which, using the above, enable the import of instances from AWS and VMware.
+# **NOTE**: The converse ''export'' functionality is not within scope as the AWS import services are limited to windows.
+
+- VM image import: 
+-- is it using S3?
+-- validation: metadata (e.g., vsphere) and raw disk validations
+-- ability to pass parameters across the import interfaces
+-- component, activity, and information breakdown
+-- client, service, image toolkit, validations, verifications, and conversions diagrams
+- test cases for canonical image format change
+-- boot {disk,partition,disk w/ kernel & ramdisk} {linux, windows} {ebs, instance-store}
+
+
+[[tag:rls-3.4]]
