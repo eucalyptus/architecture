@@ -9,11 +9,14 @@ The way machine images are handled will receive attention in following areas:
 # '''Canonical Image Format''':  The way the system stores images internally will converge on a single format (rather than doing on-the-fly conversion).
 # '''NOTE''': The converse ''export'' functionality is not within scope as the AWS import services are limited to windows.
 
+
 == Ingress Vectors ==
-* AWS -> Eucalyptus:  This is required.
+* Raw disk -> Eucalyptus: This is required.
+* AWS -> Eucalyptus:  This is desired.
 * VMware -> Eucalyptus:  This is desired.
 * Eucalyptus -> AWS:  This is not within scope.
 * Eucalyptus -> VMware:  This is not within scope.
+
 
 == Instance Import/Export Service ==
 The Instance Import/Export Service <ref name="import">[http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instances_of_your_vm.html EC2 Importing and Exporting Instances]</ref> allows a user to extract an instance from VMware.  The process works like this:
@@ -22,40 +25,224 @@ The Instance Import/Export Service <ref name="import">[http://docs.aws.amazon.co
 # Invoke the ImportInstance (from EC2) with a reference to the S3 bucket.
 The service then fetches the VMDK, validates its, spins up an instance, confirms the instance is setup correctly (by logging into it), and, eventually, provides the instance id to the user.
 
+
 == Basic Service Design ==
 * User facing Instance Import service:  This service accepts user requests, validates the parameters, creates the import task state in the system, sends the request to the '''backend image import''' service, and then responds to the user.  Subsequently, the user can poll the state of the import task.  This state is read from the persistence subsystem (DB) and means the backend service will have to be polled to update that state based on progress.
-* Backend Image Service:  This service has several parts:
-** Image Workflow Primitive Operations:  There are a number of different image ingress workflows which are really composed of a collection of fundamental ''factors'' -- these are used by system-facing operations below composed into some process for handling images (e.g., import instance, bundle instance, and create image).
-*** Convert Image:  converts an image from input type to the canonical output type using the '''image toolkit'''
-*** Validate Image:  runs a collection of static image validation checks using the '''image toolkit''' against the image without running an instance (i.e., just mounted).
-*** Validate Image Runtime:  runs a collection of image validation checks which are performed on a ''running instance'', again, using the '''image toolkit'''.
-** GetDecryptedImage:  This service will be split out of walrus as part of the Riak effort.  This service fetches image bundles using the S3 interface from walrus, performs decryption and publication of the decrypted image to the NCs in support of run instances.
+* '''Backend Image Service''':  This service has several parts:
+** '''Image Workflow Primitive Operations''':  There are a number of different image ingress workflows which are really composed of a collection of fundamental ''factors'' -- these are used by system-facing operations below composed into some process for handling images (e.g., import instance, bundle instance, and create image).
+*** '''Convert Image''':  converts an image from input type to the canonical output type using the '''image toolkit'''
+*** '''Validate Image''':  runs a collection of static image validation checks using the '''image toolkit''' against the image without running an instance (i.e., just mounted).
+*** '''Validate Image Runtime''':  runs a collection of image validation checks which are performed on a ''running instance'', again, using the '''image toolkit'''.
+*** '''GetDecryptedImage''':  This was previosly an operation in walrus and will be split out of walrus as part of the Riak effort.  This service fetches image bundles using the S3 interface from walrus, performs decryption and publication of the decrypted image to the NCs in support of run instances.
+*** '''PutEncryptedImage''':  This operation is for putting an image back using the S3 interface into some bucket.
+** '''Import Instance''':  This is the new operation corresponding to the user-facing EC2 ImportInstance operation.  The important distinction here is that the runtime validations are performed and the instance is subsequently made available to the user.  This operation is a composition of all of the above 
+** '''Import Image''':  This is the new operation corresponding to the user-facing EC2 ImportInstance operation.  The important distinction here is that the runtime validations are performed and the instance is subsequently made available to the user.
+** '''Describe Import Tasks''':  This operation lists the status of currently ongoing import tasks (any of the above kinds need to be queryable in this fashion)
 
-== Image Toolkit ==
-* Orchestrator of image management processes
-* Extensible: have to be able to add
+
+
+= Image Toolkit =
+A collection of utilities in several classes (detailed below) that, when composed in a process, handle the micro-steps of various image management processes.  The classes are Mounters, Validators, Converters, and Runtime Validators.
+* Collection of utilities which are composed to define the various image management processes.
+* Extensible: each of the below classes has to be extensible so that a particular mounter, 
 * Partial execution
 * State feedback
 * Sub-task resource management
-=== Mounters ===
-These which are able to mount a particular
-=== Validators ===
-=== Converters ===
-=== Runtime Validators ===
-=== Ansible ===
+
+
+== Mounters ==
+These which are able to mount a particular disk image type.
+# Raw disk:  this is the most important one.
+# Disk partition:  this is the ami/ari/aki case.
+# VMDK:  this is the AWS defined instance import case.
+# Others:  any others are out of scope.
+
+=== API ===
+{|
+! Function || Arguments || Return Value
+|-
+! '''accepts''' || diskType || boolean
+|-
+| &nbsp; || Checks if this mounter is able to mount the argument disk type || &nbsp;
+|-
+| &nbsp; || '''diskType''' || String: describing the image type
+|-
+! '''mount''' || diskType, filePath, mountPoint || void
+|-
+| &nbsp; || Mounts the disk image at filePath onto mountPoint using the mounter for diskType || &nbsp;
+|-
+| &nbsp; || '''diskType''' || String: describing the image type
+|-
+| &nbsp; || '''filePath''' || String: the path to the disk image
+|-
+| &nbsp; || '''mountPoint''' || String: the path to the directory which serves as the mount point
+|-
+| &nbsp; || '''errors''' || Exceptions occur when the tool fails (and the exception clarifies the reason) or when a failure occurs for any other reason (in which case ''at least'' the context of the failure is reported if no further information is available).
+|}
+
+
+== Validators ==
+These are scripts which are executed against a mounted image, under certain conditions, and tests one assertion that must be true.  A validator can be '''optional''' which means that its failure is recorded and reported but does not result in aborting the calling image management process. 
+
+=== API ===
+{|
+! Function || Arguments || Return Value
+|-
+! '''accepts''' || platform || boolean
+|-
+| &nbsp; || Checks if this validator applies to the given platform and os pair || &nbsp;
+|-
+| &nbsp; || '''platform''' || Enum: describing the operating system, either '''linux''', '''windows''', '''unknown'''
+|-
+! '''validate''' || none || String
+|-
+| &nbsp; || Performs a single test and fails with a descriptive exception when there is an error.  Returns a String describing the check which was performed when it succeeds. || &nbsp;
+|-
+| &nbsp; || '''errors''' || Exceptions occur when the tool fails (and the exception clarifies the reason) or when a failure occurs for any other reason (in which case ''at least'' the context of the failure is reported if no further information is available).
+|-
+! '''optional''' || none || boolean
+|-
+| &nbsp; || Returns true if the validator is optional.  If it is optional, errors which occur when invoking '''validate''' are treated as warnings:  They are recorded and reported to the user, but the image management process continues || &nbsp;
+|}
+
+
+== Converters ==
+These change an input disk image from one type to another.  Conversion has several wrinkles which need to be kept in mind.  It can be a multi step process and intermediate state information is needed to understand what is happening.  It can be a long running process so progress information is similarly important.  Last, conversion can demand a 
+# Raw disk -> Raw disk:  The trivial case.
+# AMI -> Raw disk:  This has two parts: partition based and disk based images.
+# VMDK -> Raw disk:  This is much like euca_imager
+Note that converters are defined here in a manner that supports eventual implementation of round-trip conversion.  That is, from VMDK to Raw disk and also back from Raw disk to VMDK.
+
+=== API ===
+{|
+! Function || Arguments || Return Value
+|-
+! '''accepts''' || sourceImageType, destImageType || boolean
+|-
+| &nbsp; || Checks if this converter applies to the given sourceType and destType || &nbsp;
+|-
+| &nbsp; || '''sourceImageType''' || String describing the source image type
+|-
+| &nbsp; || '''destImageType''' || String describing the destination image type
+|-
+| &nbsp; || '''errors''' || Exceptions must only occur when the tool determines that it ''should'' be performing the but knows apriori that the resources required are not available (e.g., disk space).  A failure of assumptions in the '''accepts''' method (e.g., missing dependencies) must never result in throwing an exception; it should return false.
+|-
+! '''convert''' || sourceImageType, destImageType, sourceFilePath, destFilePath || String
+|-
+| &nbsp; || Performs the conversion of sourceFilePath stored in sourceImageType and converts it to destImageType in the file destFilePath.  Returns a String describing the check which was performed when it succeeds. || &nbsp;
+|-
+| &nbsp; || '''sourceImageType''' || String describing the source image type
+|-
+| &nbsp; || '''destImageType''' || String describing the destination image type
+|-
+| &nbsp; || '''sourceFilePath''' || String indicating the source image path
+|-
+| &nbsp; || '''destFilePath''' || String indicating the destination image path
+|-
+| &nbsp; || '''errors''' || Exceptions occur when the tool fails (and the exception clarifies the reason) or when a failure occurs for any other reason (in which case ''at least'' the context of the failure is reported if no further information is available).
+|-
+! '''optional''' || none || boolean
+|-
+| &nbsp; || Returns true if the validator is optional.  If it is optional, errors which occur when invoking '''validate''' are treated as warnings:  They are recorded and reported to the user, but the image management process continues || &nbsp;
+|}
+
+
+== Runtime Validators ==
+These are scripts which execute within a running instance and perform sanity checks before an imported instance is returned to the user.
+
+=== API ===
+{|
+! Function || Arguments || Return Value
+|-
+! '''accepts''' || platform || boolean
+|-
+| &nbsp; || Checks if this validator applies to the given platform and os pair || &nbsp;
+|-
+| &nbsp; || '''platform''' || Enum: describing the operating system, either '''linux''', '''windows''', '''unknown'''
+|-
+! '''validate''' || none || String
+|-
+| &nbsp; || Performs a single test and fails with a descriptive exception when there is an error.  Returns a String describing the check which was performed when it succeeds. Note: it is '''not''' an error for a validator to be run against an unsupported flavor of the platform type:  This case should be indicated by a human readable message stating the mismatch of expectations (e.g., "Expected RHEL/CentOS or 5.x/6.x, but failed to find /etc/redhat-version") || &nbsp;
+|-
+| &nbsp; || '''errors''' || Exceptions occur when the tool fails (and the exception clarifies the reason) or when a failure occurs for any other reason (in which case ''at least'' the context of the failure is reported if no further information is available).
+|-
+! '''optional''' || none || boolean
+|-
+| &nbsp; || Returns true if the validator is optional.  If it is optional, errors which occur when invoking '''validate''' are treated as warnings:  They are recorded and reported to the user, but the image management process continues || &nbsp;
+|}
+
+== Encrypt/Decrypt ==
+This is the mechanism used for encrypting and decrypting images.  Today the implementation is singular, but will be handled here as if multiplicity existed.  This should be understood as meaning the same mechanism be used to orchestrate the encrypt/decrypt actions and they are not embedded in the service or image toolkit implementation.
+
+=== API ===
+{|
+! Function || Arguments || Return Value
+|-
+! '''accepts''' || sourceCryptType, destCryptType || boolean
+|-
+| &nbsp; || Checks if this encrypt/decrypt script applies to the given sourceCryptType and destCryptType encryption types.  One of sourceCryptType and destCryptType is necessarily "none" -- that is, not encrypted. || &nbsp;
+|-
+| &nbsp; || '''sourceCryptType''' || String describing the source encryption type; possible "none"
+|-
+| &nbsp; || '''destCryptType''' || String describing the destination encryption type; possible "none"
+|-
+| &nbsp; || '''errors''' || Exceptions must only occur when the tool determines that it ''should'' be performing the but knows apriori that the resources required are not available (e.g., disk space).  A failure of assumptions in the '''accepts''' method (e.g., missing dependencies) must never result in throwing an exception; it should return false.
+|-
+! '''crypt''' || sourceCryptType, destCryptType, sourceFilePath, destFilePath || String
+|-
+| &nbsp; || Performs the conversion of sourceFilePath, encrypted as sourceCryptType, and de/encrypts it to destFilePath as appropriate for destCryptType || &nbsp;
+|-
+| &nbsp; || '''sourceCryptType''' || String describing the source image encryption type
+|-
+| &nbsp; || '''destCryptType''' || String describing the destination image encryption type
+|-
+| &nbsp; || '''errors''' || Exceptions occur when the tool fails (and the exception clarifies the reason) or when a failure occurs for any other reason (in which case ''at least'' the context of the failure is reported if no further information is available).
+|}
+
 
 == Public Service Operations ==
 There are # essential operations which are user 
 === Import Instance ===
-
+{|
+! Operation || Arguments || Return Value
+|}
 === Describe Import Tasks ===
+{|
+! Operation || Arguments || Return Value
+|}
 
 == Internal Service Operations ==
 === Import Instance ===
+{|
+! Operation || Arguments || Return Value
+|}
+=== Import Image ===
+{|
+! Operation || Arguments || Return Value
+|}
 === Describe Import Tasks ===
+{|
+! Operation || Arguments || Return Value
+|}
 === Validate Image ===
+{|
+! Operation || Arguments || Return Value
+|}
 === Convert Image ===
+{|
+! Operation || Arguments || Return Value
+|}
 === Validate Runtime Image ===
+{|
+! Operation || Arguments || Return Value
+|}
+
+= Ansible =
+A quick investigation indicates that it may be possible to express the orchestration of the image toolkit operations as an ansible playbook.  That is, it has the following attributes:
+# Small and sensible set of dependencies (yaml and jinja2)
+# Support for nested playbooks:  this is necessary so that the service implementation may execute the leaves of the validation/conversion/runtime-validation/crypt stages piecemeal.
+# Support for operating on a chroot'd image <ref name="ansiblechroot">https://github.com/mmoya/ansible/commit/9a493ef3881ba1153a1894c6fb19a5a54da24183</ref> (verified present in the 1.2 release; which is current)
+# Supports instrumentation of playbook execution to through callbacks to allow externalizing execution state <ref name="ansiblecallback">https://github.com/ansible/ansible/blob/devel/lib/ansible/callback_plugins/noop.py</ref>
 
 
 = Notes =
