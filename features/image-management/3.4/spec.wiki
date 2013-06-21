@@ -200,39 +200,39 @@ This is the mechanism used for encrypting and decrypting images.  Today the impl
 |}
 
 
-== Public Service Operations ==
+= Public Service Operations =
 There are # essential operations which are user 
-=== Import Instance ===
+== Import Instance ==
 {|
 ! Operation || Arguments || Return Value
 |}
-=== Describe Import Tasks ===
+== Describe Import Tasks ==
 {|
 ! Operation || Arguments || Return Value
 |}
 
-== Internal Service Operations ==
-=== Import Instance ===
+= Internal Service Operations =
+== Import Instance ==
 {|
 ! Operation || Arguments || Return Value
 |}
-=== Import Image ===
+== Import Image ==
 {|
 ! Operation || Arguments || Return Value
 |}
-=== Describe Import Tasks ===
+== Describe Import Tasks ==
 {|
 ! Operation || Arguments || Return Value
 |}
-=== Validate Image ===
+== Validate Image ==
 {|
 ! Operation || Arguments || Return Value
 |}
-=== Convert Image ===
+== Convert Image ==
 {|
 ! Operation || Arguments || Return Value
 |}
-=== Validate Runtime Image ===
+== Validate Runtime Image ==
 {|
 ! Operation || Arguments || Return Value
 |}
