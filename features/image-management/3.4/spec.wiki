@@ -17,5 +17,24 @@ The way machine images are handled will receive attention in following areas:
 - test cases for canonical image format change
 -- boot {disk,partition,disk w/ kernel & ramdisk} {linux, windows} {ebs, instance-store}
 
+== Public Service Operations ==
+=== Import Instance ===
+=== Describe Import Tasks ===
+
+== Internal Service Operations ==
+=== Import Instance ===
+=== Describe Import Tasks ===
+=== Validate Image ===
+=== Convert Image ===
+=== Validate Runtime Image ===
+
+== Image Toolkit ==
+=== Mounters ===
+=== Validators ===
+=== Converters ===
+=== Runtime Validators ===
+=== Ansible ===
+
+
 ----
 [[tag:rls-3.4]]
