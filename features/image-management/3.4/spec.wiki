@@ -1,13 +1,13 @@
 = Image Management =
 The way machine images are handled will receive attention in following areas:
-# **Disk-images**:  Support for direct boot of disk based machine images (i.e., kernel and ramdisk are embedded)
-# **CreateImage/BundleInstance**:  Creation of images from currently running instances; both linux & windows and instance-store & ebs.
-# **Image Toolkit**:  Library of tools implementing image validation, conversion, and test.
-# **Instance Import**:  Enabling services which validate, convert, and test images using the image toolkit.
-# **Image Import CLIs**:  Client tools which orchestrate the validation, conversion, and test just like the above service, but usable from the command line.
-# **Instance Import Tools**:  Client tools which, using the above, enable the import of instances from AWS and VMware.
-# **Canonical Image Format**:  The way the system stores images internally will converge on a single format (rather than doing on-the-fly conversion).
-# **NOTE**: The converse ''export'' functionality is not within scope as the AWS import services are limited to windows.
+# '''Disk-images''':  Support for direct boot of disk based machine images (i.e., kernel and ramdisk are embedded)
+# '''CreateImage/BundleInstance''':  Creation of images from currently running instances; both linux & windows and instance-store & ebs.
+# '''Image Toolkit''':  Library of tools implementing image validation, conversion, and test.
+# '''Instance Import''':  Enabling services which validate, convert, and test images using the image toolkit.
+# '''Image Import CLIs''':  Client tools which orchestrate the validation, conversion, and test just like the above service, but usable from the command line.
+# '''Instance Import Tools''':  Client tools which, using the above, enable the import of instances from AWS and VMware.
+# '''Canonical Image Format''':  The way the system stores images internally will converge on a single format (rather than doing on-the-fly conversion).
+# '''NOTE''': The converse ''export'' functionality is not within scope as the AWS import services are limited to windows.
 
 == Ingress Vectors ==
 * AWS -> Eucalyptus:  This is required.
@@ -23,12 +23,12 @@ The Instance Import/Export Service <ref name="import">[http://docs.aws.amazon.co
 The service then fetches the VMDK, validates its, spins up an instance, confirms the instance is setup correctly (by logging into it), and, eventually, provides the instance id to the user.
 
 == Basic Service Design ==
-* User facing Instance Import service:  This service accepts user requests, validates the parameters, creates the import task state in the system, sends the request to the **backend image import** service, and then responds to the user.  Subsequently, the user can poll the state of the import task.  This state is read from the persistence subsystem (DB) and means the backend service will have to be polled to update that state based on progress.
+* User facing Instance Import service:  This service accepts user requests, validates the parameters, creates the import task state in the system, sends the request to the '''backend image import''' service, and then responds to the user.  Subsequently, the user can poll the state of the import task.  This state is read from the persistence subsystem (DB) and means the backend service will have to be polled to update that state based on progress.
 * Backend Image Service:  This service has several parts:
 ** Image Workflow Primitive Operations:  There are a number of different image ingress workflows which are really composed of a collection of fundamental ''factors'' -- these are used by system-facing operations below composed into some process for handling images (e.g., import instance, bundle instance, and create image).
-*** Convert Image:  converts an image from input type to the canonical output type using the **image toolkit**
-*** Validate Image:  runs a collection of static image validation checks using the **image toolkit** against the image without running an instance (i.e., just mounted).
-*** Validate Image Runtime:  runs a collection of image validation checks which are performed on a ''running instance'', again, using the **image toolkit**.
+*** Convert Image:  converts an image from input type to the canonical output type using the '''image toolkit'''
+*** Validate Image:  runs a collection of static image validation checks using the '''image toolkit''' against the image without running an instance (i.e., just mounted).
+*** Validate Image Runtime:  runs a collection of image validation checks which are performed on a ''running instance'', again, using the '''image toolkit'''.
 ** GetDecryptedImage:  This service will be split out of walrus as part of the Riak effort.  This service fetches image bundles using the S3 interface from walrus, performs decryption and publication of the decrypted image to the NCs in support of run instances.
 
 == Image Toolkit ==
