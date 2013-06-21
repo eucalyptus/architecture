@@ -6,19 +6,48 @@ The way machine images are handled will receive attention in following areas:
 # **Instance Import**:  Enabling services which validate, convert, and test images using the image toolkit.
 # **Image Import CLIs**:  Client tools which orchestrate the validation, conversion, and test just like the above service, but usable from the command line.
 # **Instance Import Tools**:  Client tools which, using the above, enable the import of instances from AWS and VMware.
+# **Canonical Image Format**:  The way the system stores images internally will converge on a single format (rather than doing on-the-fly conversion).
 # **NOTE**: The converse ''export'' functionality is not within scope as the AWS import services are limited to windows.
 
-- VM image import: 
--- is it using S3?
--- validation: metadata (e.g., vsphere) and raw disk validations
--- ability to pass parameters across the import interfaces
--- component, activity, and information breakdown
--- client, service, image toolkit, validations, verifications, and conversions diagrams
-- test cases for canonical image format change
--- boot {disk,partition,disk w/ kernel & ramdisk} {linux, windows} {ebs, instance-store}
+== Ingress Vectors ==
+* AWS -> Eucalyptus:  This is required.
+* VMware -> Eucalyptus:  This is desired.
+* Eucalyptus -> AWS:  This is not within scope.
+* Eucalyptus -> VMware:  This is not within scope.
+
+== Instance Import/Export Service ==
+The Instance Import/Export Service <ref name="import">[http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instances_of_your_vm.html EC2 Importing and Exporting Instances]</ref> allows a user to extract an instance from VMware.  The process works like this:
+# Extract the VMDK from VMware.
+# Bundle and upload the VMDK to S3.
+# Invoke the ImportInstance (from EC2) with a reference to the S3 bucket.
+The service then fetches the VMDK, validates its, spins up an instance, confirms the instance is setup correctly (by logging into it), and, eventually, provides the instance id to the user.
+
+== Basic Service Design ==
+* User facing Instance Import service:  This service accepts user requests, validates the parameters, creates the import task state in the system, sends the request to the **backend image import** service, and then responds to the user.  Subsequently, the user can poll the state of the import task.  This state is read from the persistence subsystem (DB) and means the backend service will have to be polled to update that state based on progress.
+* Backend Image Service:  This service has several parts:
+** Image Workflow Primitive Operations:  There are a number of different image ingress workflows which are really composed of a collection of fundamental ''factors'' -- these are used by system-facing operations below composed into some process for handling images (e.g., import instance, bundle instance, and create image).
+*** Convert Image:  converts an image from input type to the canonical output type using the **image toolkit**
+*** Validate Image:  runs a collection of static image validation checks using the **image toolkit** against the image without running an instance (i.e., just mounted).
+*** Validate Image Runtime:  runs a collection of image validation checks which are performed on a ''running instance'', again, using the **image toolkit**.
+** GetDecryptedImage:  This service will be split out of walrus as part of the Riak effort.  This service fetches image bundles using the S3 interface from walrus, performs decryption and publication of the decrypted image to the NCs in support of run instances.
+
+== Image Toolkit ==
+* Orchestrator of image management processes
+* Extensible: have to be able to add
+* Partial execution
+* State feedback
+* Sub-task resource management
+=== Mounters ===
+These which are able to mount a particular
+=== Validators ===
+=== Converters ===
+=== Runtime Validators ===
+=== Ansible ===
 
 == Public Service Operations ==
+There are # essential operations which are user 
 === Import Instance ===
+
 === Describe Import Tasks ===
 
 == Internal Service Operations ==
@@ -28,13 +57,20 @@ The way machine images are handled will receive attention in following areas:
 === Convert Image ===
 === Validate Runtime Image ===
 
-== Image Toolkit ==
-=== Mounters ===
-=== Validators ===
-=== Converters ===
-=== Runtime Validators ===
-=== Ansible ===
 
+= Notes =
+- VM image import: 
+-- is it using S3?
+-- validation: metadata (e.g., vsphere) and raw disk validations
+-- ability to pass parameters across the import interfaces
+-- component, activity, and information breakdown
+-- client, service, image toolkit, validations, verifications, and conversions diagrams
+- test cases for canonical image format change
+-- boot {disk,partition,disk w/ kernel & ramdisk} {linux, windows} {ebs, instance-store}
+
+
+= References =
+<references />
 
 ----
 [[tag:rls-3.4]]
