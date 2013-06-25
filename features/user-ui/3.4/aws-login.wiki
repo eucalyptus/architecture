@@ -1,0 +1,14 @@
+= AWS Support =
+
+* http://docs.aws.amazon.com/STS/latest/UsingSTS/STSUseCases.html#MobileApplication-KnownProvider
+* http://docs.aws.amazon.com/STS/latest/UsingSTS/CreatingWIF.html
+
+== Steps Involved ==
+Assuming we had support, the workflow a user would have to follow in order to enable the Eucalyptus User Console to interact with AWS is:
+* FILL IN
+
+== Console Changes Needed ==
+* FILL IN
+
+----
+[[tag:rls-3.4]]
