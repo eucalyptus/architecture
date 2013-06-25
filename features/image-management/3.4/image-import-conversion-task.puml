@@ -1,0 +1,61 @@
+@startuml
+!include ../../../lib/component.skin
+  skinparam ranksep 50
+  skinparam nodesep 10
+'  scale 1000 height 
+'  left to right direction
+class ConversionTaskType  {
+  String conversionTaskId
+  String expirationTime
+  ImportVolumeTaskDetailsType importVolume
+  ImportInstanceTaskDetailsType importInstance
+  String state
+  String statusMessage
+  Set<ResourceTagSetItemType> tagSet
+}
+class ImportVolumeTaskDetailsType  {
+  Long bytesConverted
+  String availabilityZone
+  String description
+  DiskImageDescriptionType image
+  DiskImageVolumeDescriptionType volume
+}
+class DiskImageDescriptionType  {
+  String format
+  Long size
+  String importManifestUrl
+  String checksum
+}
+class DiskImageVolumeDescriptionType  {
+  BigInteger size
+  String id
+}
+class ImportInstanceTaskDetailsType  {
+  Set<ImportInstanceVolumeDetailItemType> volumes
+  String instanceId
+  String platform
+  String description
+}
+class ImportInstanceVolumeDetailItemType  {
+  Long bytesConverted
+  String availabilityZone
+  DiskImageDescriptionType image
+  String description
+  DiskImageVolumeDescriptionType volume
+  String status
+  String statusMessage
+}
+class ResourceTagSetItemType  {
+  String key
+  String value
+}
+
+ConversionTaskType "1..1" -- "1..1" ImportVolumeTaskDetailsType
+ImportVolumeTaskDetailsType "1..1" -- "1..1" DiskImageDescriptionType
+ImportVolumeTaskDetailsType "1..1" -- "1..1" DiskImageVolumeDescriptionType
+ConversionTaskType "1..1" -- "1..1" ImportInstanceTaskDetailsType
+ImportInstanceTaskDetailsType "1..n" -- "1..n" ImportInstanceVolumeDetailItemType
+ImportInstanceVolumeDetailItemType "1..1" -- "1..1" DiskImageDescriptionType
+ImportInstanceVolumeDetailItemType "1..1" -- "1..1" DiskImageVolumeDescriptionType
+ConversionTaskType "1..n" -- "1..n" ResourceTagSetItemType
+@enduml

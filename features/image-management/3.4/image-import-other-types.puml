@@ -1,0 +1,29 @@
+@startuml
+!include ../../../lib/component.skin
+  skinparam ranksep 50
+  skinparam nodesep 10
+'  scale 1000 height 
+'  left to right direction
+class ImportVolumeResponseType extends ImageMessage {
+  String requestId
+  ConversionTaskType conversionTask
+}
+class ImportVolumeType extends ImageMessage {
+  String availabilityZone
+  DiskImageDetailType image
+  String description
+  DiskImageVolumeType volume
+}
+ImportVolumeType "1..1" -- "1..1" DiskImageDetailType
+ImportVolumeType "1..1" -- "1..1" DiskImageVolumeType
+
+class CancelConversionTaskType extends ImageMessage {
+  String conversionTaskId
+}
+
+class CancelConversionTaskResponseType extends ImageMessage {
+  String requestId
+  Boolean _return
+}
+
+@enduml

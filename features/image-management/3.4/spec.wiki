@@ -31,6 +31,7 @@ The service then fetches the VMDK, validates its, spins up an instance, confirms
 [[image-management-3.4-image-service.png|float|width=2000px|align=right|frame]]
 * '''EC2 Instance Import/Export service''': User facing service implementing AWS/EC2 specified operations.
 * '''Imaging service''': Internal-only service which manages all conversion tasks (not only the import/export requests).
+
 === EC2 Instance Import/Export Service ===
 This service is part of the EC2 API implementation and performs a portion of the work of processing requests:
 * Accepts user requests
@@ -38,28 +39,60 @@ This service is part of the EC2 API implementation and performs a portion of the
 * Sends the request to the '''imaging''' service
 * Responds to the user.  
 * Subsequently, the user can poll the state of the import task.
-Import/Conversion task state is stored in the persistence subsystem (DB) and is managed by the '''Imaging''' service.=== Imaging Service === 
+Import/Conversion task state is stored in the persistence subsystem (DB) and is managed by the '''Imaging''' service.
+
+=== Imaging Service === 
 The '''Imaging''' service is:
 * The engine for driving image conversion/import tasks.  
 * Is the ground-truth for conversion task state
 * Will have to be queried for information needed to fulfill '''EC2 Instance Import/Export Service''' requests.
 This service has several parts:
+
 ==== Import/Export Operations ====
-These operations are to serve as the internal complement for the user-facing operations defined above for the '''EC2 Instance Import/Export service'''.
-* '''ImportInstance''':  This is the new operation corresponding to the user-facing EC2 ImportInstance operation.  The important distinction here is that the runtime validations are performed and the instance is subsequently made available to the user.  This operation is a composition of the below primitives.
-* '''ImportVolume''':  This is the new operation corresponding to the user-facing EC2 ImportVolume operation.  The important distinction here is that the runtime validations are performed and the volume is subsequently made available to the user.  This operation is a composition of the below primitives.
-* '''DescribeConversionTasks''':  This operation lists the status of currently ongoing import tasks (any of the above kinds need to be queryable in this fashion)
-* '''CancelConversionTask''':  This operation cancels an extent conversion task
+These are the user-facing service operations defined by AWS as part of the Instance Import/Export services:
+{|
+! Name !! Description
+|-
+! '[[#ImportInstance|ImportInstance]] || [[EC2 ImportInstance|http://docs.aws.amazon.com/AWSEC2/latest/APIReference/ApiReference-query-ImportInstance.html]] This is the new operation corresponding to the user-facing EC2 ImportInstance operation.  The important distinction here is that the runtime validations are performed and the instance is subsequently made available to the user.  This operation is a composition of the below primitives.
+|-
+! '[[#ImportVolume|ImportVolume]] || [[EC2 ImportVolume|http://docs.aws.amazon.com/AWSEC2/latest/APIReference/ApiReference-query-ImportVolume.html]] This is the new operation corresponding to the user-facing EC2 ImportVolume operation.  The important distinction here is that the runtime validations are performed and the volume is subsequently made available to the user.  This operation is a composition of the below primitives.
+|-
+! '[[#DescribeConversionTasks|DescribeConversionTasks]] || [[EC2 DescribeConversionTasks|http://docs.aws.amazon.com/AWSEC2/latest/APIReference/ApiReference-query-DescribeConversionTasks.html]] This operation lists the status of currently ongoing import tasks (any of the above kinds need to be queryable in this fashion)
+|-
+! '[[#CancelConversionTask|CancelConversionTask]] || [[EC2 CancelConversionTask|http://docs.aws.amazon.com/AWSEC2/latest/APIReference/ApiReference-query-CancelConversionTask.html]] This operation cancels an extent conversion task
+|-
+| ''CreateInstanceExportTask'' || [[EC2 CreateInstanceExportTask|http://docs.aws.amazon.com/AWSEC2/latest/APIReference/ApiReference-query-CreateInstanceExportTask.html]]
+|-
+| ''CancelExportTask'' || [[EC2 CancelExportTask|http://docs.aws.amazon.com/AWSEC2/latest/APIReference/ApiReference-query-CancelExportTask.html]]
+|-
+| ''DescribeExportTasks'' || [[DescribeExportTasks|http://docs.aws.amazon.com/AWSEC2/latest/APIReference/ApiReference-query-DescribeExportTasks.html]]
+|}
+The backend implementation for the '''bolded''' operations are required for 3.4 while those that are ''italicized'' are out of scope for 3.4.  
+
 ==== Internal Import/Export Operations ====
-These operations are endpoints different image conversion workflows which are used internally w/in the system.
-* '''ImportImage''':  This is an internal service operation which corresponds with the internal import image workflow supporting bundling of instances.  This operation is a composition of the below primitives.
+These operations are to serve as the internal complement for the user-facing operations defined above for the '''EC2 Instance Import/Export service'''.
+{|
+! Name !! Description
+|-
+! '[[#ImportImage|ImportImage]] || This is an internal service operation which corresponds with the internal import image workflow supporting bundling of instances.  This operation is a composition of the below primitives.
+|}
+
 ==== Service-Local Primitive Operations ====
-There are a number of different image ingress workflows which are really composed of a collection of fundamental ''factors'' -- these are used by system-facing operations below composed into some process for handling images (e.g., import instance, bundle instance, and create image).
-** '''ConvertImage''':  converts an image from input type to the canonical output type using the '''image toolkit'''
-** '''ValidateImage''':  runs a collection of static image validation checks using the '''image toolkit''' against the image without running an instance (i.e., just mounted).
-** '''ValidateInstance''':  runs a collection of image validation checks which are performed on a ''running instance'', again, using the '''image toolkit'''.
-** '''GetDecryptedImage''':  This was previosly an operation in walrus and will be split out of walrus as part of the Riak effort.  This service fetches image bundles using the S3 interface from walrus, performs decryption and publication of the decrypted image to the NCs in support of run instances.
-** '''PutEncryptedImage''':  This operation is for putting an image back using the S3 interface into some bucket.
+These operations are endpoints different image conversion workflows which are used internally w/in the system.  There are a number of different image ingress workflows which are really composed of a collection of fundamental ''factors'' -- these are used by system-facing operations below composed into some process for handling images (e.g., import instance, bundle instance, and create image).
+{|
+! Name !! Description
+|-
+! '[[#ConvertImage|ConvertImage]] || converts an image from input type to the canonical output type using the '''image toolkit'''
+|-
+! '[[#ValidateImage|ValidateImage]] || runs a collection of static image validation checks using the '''image toolkit''' against the image without running an instance (i.e., just mounted).
+|-
+! '[[#ValidateInstance|ValidateInstance]] || runs a collection of image validation checks which are performed on a ''running instance'', again, using the '''image toolkit'''.
+|-
+! '[[#GetDecryptedImage|GetDecryptedImage]] || This was previosly an operation in walrus and will be split out of walrus as part of the Riak effort.  This service fetches image bundles using the S3 interface from walrus, performs decryption and publication of the decrypted image to the NCs in support of run instances.
+|-
+! '[[#PutEncryptedImage|PutEncryptedImage]] || This operation is for putting an image back using the S3 interface into some bucket.
+|}
+
 
 
 == Image Toolkit ==
@@ -85,28 +118,6 @@ A collection of utilities in several classes (detailed below) that, when compose
 |-
 ! '[[#Bundlers|Bundlers]] || This is the mechanism used for bundling/unbundling images which are stored in the object store.
 |}
-
-
-== Public Service Operations ==
-These are the user-facing service operations defined by AWS as part of the VM Import/Export services:
-{|
-! Name !! Description
-|-
-! '[[#ImportInstance|ImportInstance]] || [[EC2 ImportInstance|http://docs.aws.amazon.com/AWSEC2/latest/APIReference/ApiReference-query-ImportInstance.html]]
-|-
-! '[[#ImportVolume|ImportVolume]] || [[EC2 ImportVolume|http://docs.aws.amazon.com/AWSEC2/latest/APIReference/ApiReference-query-ImportVolume.html]]
-|-
-! '[[#DescribeConversionTasks|DescribeConversionTasks]] || [[EC2 DescribeConversionTasks|http://docs.aws.amazon.com/AWSEC2/latest/APIReference/ApiReference-query-DescribeConversionTasks.html]]
-|-
-! '[[#CancelConversionTask|CancelConversionTask]] || [[EC2 CancelConversionTask|http://docs.aws.amazon.com/AWSEC2/latest/APIReference/ApiReference-query-CancelConversionTask.html]]
-|-
-| ''CreateInstanceExportTask'' || [[EC2 CreateInstanceExportTask|http://docs.aws.amazon.com/AWSEC2/latest/APIReference/ApiReference-query-CreateInstanceExportTask.html]]
-|-
-| ''CancelExportTask'' || [[EC2 CancelExportTask|http://docs.aws.amazon.com/AWSEC2/latest/APIReference/ApiReference-query-CancelExportTask.html]]
-|-
-| ''DescribeExportTasks'' || [[DescribeExportTasks|http://docs.aws.amazon.com/AWSEC2/latest/APIReference/ApiReference-query-DescribeExportTasks.html]]
-|}
-The backend implementation for the '''bolded''' operations are required for 3.4 while those that are ''italicized'' are out of scope for 3.4.  
 
 
 == Ansible ==
@@ -277,19 +288,109 @@ This is the mechanism used for bundling and unbundling of images.  Today the imp
 == Instance Import/Export API ==
 === ImportInstance ===
 {|
-! Request Type 
 !colspan="5"| Description 
 |-
-! ImportInstance
 |colspan="5"| [http://docs.aws.amazon.com/AWSEC2/latest/APIReference/ApiReference-query-ImportInstance.html (AWS)] Creates a new import instance task using metadata from the specified disk image.
 |-
-! &nbsp; !! Parameter !! Type !! Default !! Required !! Notes
+! Parameter 
+!colspan="4"| Description
+|- 
+! &nbsp; !! Type !! Default !! Valid Values !! Required
 |-
-| &nbsp; || &nbsp; || &nbsp; || &nbsp; || &nbsp; || &nbsp;
+! Description 
+|colspan="4"| A description of the instance being imported.
 |-
-! &nbsp; !! Parameter !! Type !! Default !! Required !! Notes
+| &nbsp; || Type: String || Default: None || &nbsp; || Required: No
+
 |-
-| &nbsp; || &nbsp; || &nbsp; || &nbsp; || &nbsp; || &nbsp;
+! LaunchSpecification.<br/>Architecture 
+|colspan="4"| The architecture of the instance.
+|-
+| &nbsp; || Type: String || Default: None || Valid values: i386 ''or'' x86_64 || Required: Yes
+
+|-
+! LaunchSpecification.<br/>GroupName.n 
+|colspan="4"| One or more security group names.
+|-
+| &nbsp; || Type: String || Default: None || &nbsp; || Required: No
+
+|-
+! LaunchSpecification.<br/>UserData 
+|colspan="4"| User data to be made available to the instance.
+|-
+| &nbsp; || Type: String || Default: None || &nbsp; || Required: No
+
+|-
+! LaunchSpecification.<br/>InstanceType 
+|colspan="4"| The instance type. See Available Instance Types for more information.
+|-
+| &nbsp; || Type: String || Default: None || &nbsp; || Required: Yes
+
+|-
+! LaunchSpecification.<br/>Placement.AvailabilityZone 
+|colspan="4"| The Availability Zone to launch the instance into.
+|-
+| &nbsp; || Type: String || Default: We choose a zone for you || &nbsp; || Required: No
+
+|-
+! LaunchSpecification.<br/>Monitoring.Enabled 
+|colspan="4"| Specifies whether to enable detailed monitoring for the instance.
+|-
+| &nbsp; || Type: Boolean || Default: false || &nbsp; || Required: No
+
+
+|-
+! LaunchSpecification.<br/>InstanceInitiatedShutdownBehavior 
+|colspan="4"| Specifies whether the instance stops or terminates on instance-initiated shutdown.
+|-
+| &nbsp; || Type: String || Default: stop || Valid values: stop ''or'' terminate || Required: No
+
+|-
+! DiskImage.n.<br/>Image.Format 
+|colspan="4"| The file format of the disk image.
+|-
+| &nbsp; || Type: String || Default: None || Valid values: VMDK ''or'' RAW ''or'' VHD || Required: Yes
+
+|-
+! DiskImage.n.<br/>Image.Bytes 
+|colspan="4"| The number of bytes in the disk image.
+|-
+| &nbsp; || Type: Long || Default: None || &nbsp; || Required: Yes
+
+|-
+! DiskImage.n.<br/>Image.ImportManifestUrl 
+|colspan="4"| The manifest for the disk image, stored in Amazon S3 and presented here as an Amazon S3 presigned URL. 
+|-
+| &nbsp; || Type: String || Default: None || &nbsp; || Required: Yes
+
+|-
+! DiskImage.n.<br/>Image.Description 
+|colspan="4"| An optional description of the disk image.
+|-
+| &nbsp; || Type: String || Default: None || &nbsp; || Required: No
+
+|-
+! DiskImage.n.<br/>Volume.Size 
+|colspan="4"| The size, in GB (2^30 bytes), of the Amazon EBS volume that will hold the converted image. 
+|-
+|| &nbsp; || &nbsp; || &nbsp; || &nbsp; || Required: Yes
+
+|-
+! Platform 
+|colspan="4"| The instance operating system.
+|-
+| &nbsp; || Type: String || Default: None || Valid value: Windows | Linux | Other || Required: No
+
+|-
+| ''LaunchSpecification.SubnetId'' 
+|colspan="4"| [''unsupported''] The ID of the subnet to launch the instance into.
+|-
+| &nbsp; || Type: String || Default: None || &nbsp; || Required: No
+|-
+| ''LaunchSpecification.PrivateIpAddress'' 
+|colspan="4"| [''unsupported''] You can optionally use this parameter to assign the instance a specific available IP address from the IP address range of the subnet.
+|-
+| &nbsp; || Type: String || Default: We selects an IP address from the IP address range of subnet for the instance || &nbsp; || Required: No
 |}
 
 === ImportVolume ===

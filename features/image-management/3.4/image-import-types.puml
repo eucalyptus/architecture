@@ -1,0 +1,15 @@
+@startuml
+!include ../../../lib/component.skin
+  skinparam ranksep 10
+  skinparam nodesep 10
+'  scale 1000 height 
+''  left to right direction
+!include image-import-instance-types.puml
+
+class ImageMessage {
+}
+
+
+'!include image-import-other-types.puml
+@enduml
+

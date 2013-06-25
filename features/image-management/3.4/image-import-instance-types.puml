@@ -1,0 +1,66 @@
+@startuml
+!include ../../../lib/component.skin
+  skinparam ranksep 50
+  skinparam nodesep 10
+'  scale 1000 height 
+  'left to right direction
+class ImportInstanceLaunchSpecificationType  {
+  String architecture
+  Set<ImportInstanceGroup> groupSet
+  UserDataType userData
+  String instanceType
+  InstancePlacementType placement
+  Boolean monitoring
+  String instanceInitiatedShutdownBehavior
+  __unsupported__
+  String subnetId
+  String privateIpAddress
+}
+class ImportInstanceType  extends ImageMessage {
+  String description
+  ImportInstanceLaunchSpecificationType launchSpecification
+  Set<DiskImageType> diskImageSet
+  Boolean keepPartialImports
+  String platform
+}
+class ImportInstanceGroup  {
+  String groupId
+  String groupName
+}
+class InstancePlacementType  {
+  String availabilityZone
+  String groupName
+}
+class DiskImageType  {
+  DiskImageDetailType image
+  String description
+  DiskImageVolumeType volume
+}
+class DiskImageDetailType  {
+  String format
+  Long bytes
+  String importManifestUrl
+}
+class DiskImageVolumeType  {
+  BigInteger size
+}
+class UserDataType  {
+  String data
+  String version
+  String encoding
+}
+class ImportInstanceResponseType extends ImageMessage {
+  String requestId
+  ConversionTaskType conversionTask
+}
+!include image-import-conversion-task.puml
+DiskImageType "1..1" -- "1..1" DiskImageDetailType
+DiskImageType "1..1" -- "1..1" DiskImageVolumeType
+ImportInstanceType "1..1" -- "1..1" ImportInstanceLaunchSpecificationType
+ImportInstanceType "1..n" -- "1..n" DiskImageType
+ImportInstanceLaunchSpecificationType "1..n" -- "1..n" ImportInstanceGroup
+ImportInstanceLaunchSpecificationType "1..n" -- "1..n" InstancePlacementType
+ImportInstanceLaunchSpecificationType "1..1" -- "1..1" UserDataType
+ImportInstanceResponseType "1..1" -- "1..1" ConversionTaskType
+
+@enduml

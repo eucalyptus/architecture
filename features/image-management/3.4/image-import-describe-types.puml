@@ -1,0 +1,17 @@
+@startuml
+!include ../../../lib/component.skin
+  skinparam ranksep 50
+  skinparam nodesep 10
+'  scale 1000 height 
+'  left to right direction
+class DescribeConversionTasksType extends ImageMessage {
+  Set<String> conversionTaskIdSet
+}
+class DescribeConversionTasksResponseType extends ImageMessage {
+  String requestId
+  Set<ConversionTaskType> conversionTasks
+}
+!include image-import-conversion-task.puml
+DescribeConversionTasksResponseType "1..n" -- "1..n" ConversionTaskType
+
+@enduml

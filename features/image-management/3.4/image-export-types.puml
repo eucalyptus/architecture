@@ -1,0 +1,60 @@
+@startuml
+class DescribeExportTasksResponseType  {
+  String requestId
+  ExportTaskSetResponseType exportTaskSet
+}
+class ExportTaskIdType  {
+  String exportTaskId
+}
+class ExportTaskSetResponseType  {
+  ArrayList<ExportTaskResponseType> item 
+}
+class CancelExportTaskType  {
+  String exportTaskId
+}
+class ExportTaskIdSetType  {
+  ArrayList<ExportTaskIdType> item 
+}
+class ExportToS3TaskType  {
+  String diskImageFormat
+  String containerFormat
+  String s3Bucket
+  String s3Prefix
+}
+class CreateInstanceExportTaskResponseType  {
+  String requestId
+  ExportTaskResponseType exportTask
+}
+class ExportToS3TaskResponseType  {
+  String diskImageFormat
+  String containerFormat
+  String s3Bucket
+  String s3Key
+}
+class ExportTaskResponseType  {
+  String exportTaskId
+  String description
+  String state
+  String statusMessage
+  InstanceExportTaskResponseType instanceExport
+  ExportToS3TaskResponseType exportToS3
+}
+class InstanceExportTaskResponseType  {
+  String instanceId
+  String targetEnvironment
+}
+class DescribeExportTasksType  {
+  ExportTaskIdSetType exportTaskIdSet
+}
+class CancelExportTaskResponseType  {
+  String requestId
+  Boolean _return
+}
+class CreateInstanceExportTaskType  {
+  String description
+  String instanceId
+  String targetEnvironment
+  ExportToS3TaskType exportToS3
+}
+
+@enduml
