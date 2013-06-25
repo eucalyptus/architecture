@@ -27,13 +27,25 @@ skinparam component {
     InterfaceBorderColor<<Maybe>> LightGray
     BackgroundColor<<Maybe>> White
 
-    BorderColor<<TODO>> Yellow
+    BorderColor<<ServiceInternalOperation>> LightGray
+    InterfaceBorderColor<<ServiceInternalOperation>> LightGray
+    BackgroundColor<<ServiceInternalOperation>> White
+
+    BorderColor<<InternalOperation>> Yellow
+    InterfaceBorderColor<<InternalOperation>> Yellow
+    BackgroundColor<<InternalOperation>> #ffffee
+
+    BorderColor<<Internal>> Yellow
     InterfaceBorderColor<<TODO>> Yellow
     BackgroundColor<<TODO>> #ffffee
 
     BorderColor<<App>> Red
     InterfaceBorderColor<<App>> Red
     BackgroundColor<<App>> #ffeeee    
+
+    BorderColor<<Future>> Red
+    InterfaceBorderColor<<Future>> Red
+    BackgroundColor<<Future>> #ffeeee    
 
     BorderColor<<NIC>> Brown
     InterfaceBorderColor<<NIC>> Brown
