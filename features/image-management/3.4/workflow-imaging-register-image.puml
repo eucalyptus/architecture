@@ -1,0 +1,117 @@
+@startuml
+title RegisterImage (Imaging Service)
+
+start
+:#ddffdd:RegisterImage invoked;
+note right: Green indicates Imaging Service
+if (NOT imageLocation is valid) then (exists & accessible)
+  :#ddffdd:store state <b>failed</b> (invalid bucket: error info);
+  end
+endif
+
+''
+'' DOWNLOADING
+''
+fork
+  :#ffff00:download bundle;
+  note right: Yellow indicates Imaging Toolkit
+fork again
+  :#ddffdd:store state <b>active</b> (downloading: % done);
+end fork
+note right: store state <b>active</b> (downloaded);
+if (NOT downloaded) then (failed)
+  :#ddffdd:store state <b>failed</b> (downloading: error info);
+  end
+endif
+
+''
+'' UNBUNDLING
+''
+fork
+  :#ffff00:decrypt => decompress => untar;
+''  :#ffff00:decompress;
+''  :#ffff00:untar;
+fork again
+  :#ddffdd:store state <b>active</b> (unbundling: % done);
+endfork
+note right: store state <b>active</b> (unbundled);
+if (NOT unbundled) then (failed)
+  :#ddffdd:store state <b>failed</b> (unbundling: error info);
+  end
+endif
+
+''
+'' MOUNTING
+''
+:#ffff00:mount image;
+note right: store state <b>active</b> (mounted);
+if (NOT mounted) then (failed)
+  :#ddffdd:store state <b>failed</b> (mounting: error info);
+  end
+endif
+
+''
+'' VALIDATING
+''
+fork
+  :#ffff00:validate image (possibly);
+fork again
+  :#ddffdd:store state <b>active</b> (validating: task name);
+end fork
+note right: store state <b>active</b> (validated);
+if (NOT validated) then (failed)
+  :#ddffdd:store state <b>failed</b> (validating: error info);
+  end
+endif
+
+''
+'' CONVERTING
+''
+fork
+  :#ffff00:convert image (to disk);
+fork again
+  :#ddffdd:store state <b>active</b> (converting: % done);
+end fork
+note right: store state <b>active</b> (converted);
+'    - convert to disk 
+'    - extend disk (add partitions to disk / rearrange disk geometry)
+if (NOT converted) then (failed)
+  :#ddffdd:store state <b>failed</b> (converting: error info);
+  end
+endif
+
+''
+'' BUNDLING
+''
+fork
+  :#ffff00:tar => compress => encrypt;
+''  :#ffff00:compress;
+''  :#ffff00:encrypt;
+  note right: bundling
+fork again
+  :#ddffdd:store state <b>active</b> (bundling: % done/stage);
+end fork
+note right: store state <b>active</b> (bundled);
+if (NOT bundled) then (failed)
+  :#ddffdd:store state <b>failed</b> (bundling: error info);
+  end
+endif
+
+''
+'' UPLOADING
+''
+fork
+  :upload bundle;
+fork again
+  :#ddffdd:store state <b>active</b> (uploading: % done);
+end fork
+note right: store state <b>completed</b>;
+if (NOT uploaded) then (failed)
+  :#ddffdd:store state <b>failed</b> (uploading: error info);
+  end
+endif
+
+end
+
+
+@enduml

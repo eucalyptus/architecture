@@ -1,0 +1,4 @@
+#!/bin/bash
+CMD=$(readlink -f ${0})
+LIB=$(dirname $(dirname ${CMD}))
+java -server -Xmx1g -Djava.awt.headless=true -jar ${LIB}/lib/plantuml-r7969.jar ${@} 

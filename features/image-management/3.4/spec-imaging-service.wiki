@@ -1,0 +1,65 @@
+= Instance Import/Export API =
+The '''Imaging''' service is:
+* The engine for driving image conversion/import tasks.  
+* Is the ground-truth for conversion task state
+* Will have to be queried for information needed to fulfill '''EC2 Instance Import/Export Service''' requests.
+This service has several parts:
+
+== Service Design ==
+[[image-management-3.4-image-service.png|float|width=2000px|align=right|frame]]
+* '''EC2 Instance Import/Export service''': User facing service implementing AWS/EC2 specified operations.
+* '''Imaging service''': Internal-only service which manages all conversion tasks (not only the import/export requests).
+
+== EC2 Instance Import/Export Service ==
+This service is part of the EC2 API implementation and performs a portion of the work of processing requests:
+* Accepts user requests
+* Validates the parameters
+* Sends the request to the '''imaging''' service
+* Responds to the user.  
+* Subsequently, the user can poll the state of the import task.
+Import/Conversion task state is stored in the persistence subsystem (DB) and is managed by the '''Imaging''' service.
+
+== Import/Export Operations ==
+These are the user-facing service operations defined by AWS as part of the Instance Import/Export services:
+{|
+|+ See [[image-management-3.4-spec-import-service-api|Instance Import/Export Service API]] and [[image-management-3.4-spec-import-service-api|Imaging Service API]]
+|-
+! Name !! Description
+|-
+! '[[#ImportInstance|ImportInstance]] || [[EC2 ImportInstance|http://docs.aws.amazon.com/AWSEC2/latest/APIReference/ApiReference-query-ImportInstance.html]] This is the new operation corresponding to the user-facing EC2 ImportInstance operation.  The important distinction here is that the runtime validations are performed and the instance is subsequently made available to the user.  This operation is a composition of the below primitives.
+|-
+! '[[#ImportVolume|ImportVolume]] || [[EC2 ImportVolume|http://docs.aws.amazon.com/AWSEC2/latest/APIReference/ApiReference-query-ImportVolume.html]] This is the new operation corresponding to the user-facing EC2 ImportVolume operation.  The important distinction here is that the runtime validations are performed and the volume is subsequently made available to the user.  This operation is a composition of the below primitives.
+|-
+! '[[#DescribeConversionTasks|DescribeConversionTasks]] || [[EC2 DescribeConversionTasks|http://docs.aws.amazon.com/AWSEC2/latest/APIReference/ApiReference-query-DescribeConversionTasks.html]] This operation lists the status of currently ongoing import tasks (any of the above kinds need to be queryable in this fashion)
+|-
+! '[[#CancelConversionTask|CancelConversionTask]] || [[EC2 CancelConversionTask|http://docs.aws.amazon.com/AWSEC2/latest/APIReference/ApiReference-query-CancelConversionTask.html]] This operation cancels an extent conversion task
+|-
+| ''CreateInstanceExportTask'' || [[EC2 CreateInstanceExportTask|http://docs.aws.amazon.com/AWSEC2/latest/APIReference/ApiReference-query-CreateInstanceExportTask.html]]
+|-
+| ''CancelExportTask'' || [[EC2 CancelExportTask|http://docs.aws.amazon.com/AWSEC2/latest/APIReference/ApiReference-query-CancelExportTask.html]]
+|-
+| ''DescribeExportTasks'' || [[EC2 DescribeExportTasks|http://docs.aws.amazon.com/AWSEC2/latest/APIReference/ApiReference-query-DescribeExportTasks.html]]
+|}
+The backend implementation for the '''bolded''' operations are required for 3.4 while those that are ''italicized'' are out of scope for 3.4.  
+
+== Internal Import/Export Operations ==
+These operations are to serve as the internal complement for the user-facing operations defined above for the '''EC2 Instance Import/Export service'''.
+{|
+! Name !! Description
+|-
+! '[[#ImportImage|ImportImage]] || Internal service operation which takes a manifest URL reference and creates an internally bundled, converted, validated image in an (optionally provided) output bucket.
+|-
+! '[[#ImportImage|ImportVolume]] || Internal service operation which takes a manifest URL reference and creates an internally bundled, converted, validated image in a volume.
+|-
+! '[[#ValidateInstance|ValidateInstance]] || runs a collection of image validation checks which are performed on a ''running instance'', again, using the '''image toolkit'''.
+|-
+! '[[#DescribeImagingTasks|DescribeImagingTasks]] || This is an internal service operation which corresponds with the internal import image workflow supporting bundling of instances.
+|-
+! '[[#CancelImagingTask|CancelImagingTask]] || Cancels the imaging task indicated by the supplied identifier
+|}
+
+
+= Test Plan =
+
+----
+[[tag:rls-3.4]]

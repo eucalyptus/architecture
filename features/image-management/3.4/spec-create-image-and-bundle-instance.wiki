@@ -1,0 +1,36 @@
+= CreateImage and BundleInstance =
+This aspect of image management has the objective of simplifying the creation of registered images from instances which are already running in Eucalyptus.  Currently, BundleInstance only supports instances running from images which have the windows platform.  CreateImage, while present as an operation endpoint, is not currently supported.
+
+In 3.4 these two operations are to become the standard way of taking an already running instance and turning it into a registered image.  This goes beyond their scope as defined in AWS.  That is, CreateImage/BundleInstance are to work also for linux images (not ''just'' windows).
+
+== CreateImage ==
+* [http://docs.aws.amazon.com/AWSEC2/latest/APIReference/ApiReference-query-CreateImage.html AWS Reference]
+Currently implemented only as the operation endpoint.  Needs to:
+# Do usual request validation (IAM, check instance id is valid and allowed)
+# Terminates the instance if the '''NoReboot''' parameter is set to '''false'''
+# Create a snapshot of the root volume for the running instance referenced by '''InstanceId'''
+# Register a new image using:
+## The created snapshot 
+## The user provided '''Name''', '''Description''', and '''BlockDeviceMappings'''
+## Include as '''BlockDeviceMappings''' any volumes which were attached to the instance at the time it was snapshotted
+'''NOTE:''' Support for BlockDeviceMappings is important, but second priority to the basic case.
+
+== BundleInstance ==
+* [http://docs.aws.amazon.com/AWSEC2/latest/APIReference/ApiReference-query-BundleInstance.html AWS Reference]
+Currently implemented to only support the windows platform.  Needs to:
+# Remove precondition that checks the platform
+# Be tested with linux instance-store instances
+
+== BundleInstance from ''ebs'' Instances
+''Optionally'', as time allows, we would extend BundleInstance to also operate on ''ebs'' instances which would create a registered image which is backed by a bundled image.  It would:
+# Perform BundleInstance on the root volume of the ebs instance
+
+== CreateImage from ''instance-store'' Instances ==
+''Optionally'', as time allows, we would extend CreateImage to also operate on ''instance-store'' instances which would create a registered image which is backed by a snapshot.  It would:
+# Perform the steps of BundleInstance up to the point where a bundle is in an S3 bucket
+# Invoke the newly added '''ImportVolume''' operation from the Import/Export service to import the bundle from the S3 bucket.
+
+= Test Plan =
+
+----
+[[tag:rls-3.4]]

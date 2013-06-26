@@ -1,0 +1,161 @@
+= Import Service API (Public) =
+== ImportInstance ==
+{|
+!colspan="5"| Description 
+|-
+|colspan="5"| [http://docs.aws.amazon.com/AWSEC2/latest/APIReference/ApiReference-query-ImportInstance.html (AWS)] Creates a new import instance task using metadata from the specified disk image.
+|-
+! Parameter 
+!colspan="4"| Description
+|- 
+! &nbsp; !! Type !! Default !! Valid Values !! Required
+|-
+! Description 
+|colspan="4"| A description of the instance being imported.
+|-
+| &nbsp; || Type: String || Default: None || &nbsp; || Required: No
+
+|-
+! LaunchSpecification.<br/>Architecture 
+|colspan="4"| The architecture of the instance.
+|-
+| &nbsp; || Type: String || Default: None || Valid values: i386 ''or'' x86_64 || Required: Yes
+
+|-
+! LaunchSpecification.<br/>GroupName.n 
+|colspan="4"| One or more security group names.
+|-
+| &nbsp; || Type: String || Default: None || &nbsp; || Required: No
+
+|-
+! LaunchSpecification.<br/>UserData 
+|colspan="4"| User data to be made available to the instance.
+|-
+| &nbsp; || Type: String || Default: None || &nbsp; || Required: No
+
+|-
+! LaunchSpecification.<br/>InstanceType 
+|colspan="4"| The instance type. See Available Instance Types for more information.
+|-
+| &nbsp; || Type: String || Default: None || &nbsp; || Required: Yes
+
+|-
+! LaunchSpecification.<br/>Placement.AvailabilityZone 
+|colspan="4"| The Availability Zone to launch the instance into.
+|-
+| &nbsp; || Type: String || Default: We choose a zone for you || &nbsp; || Required: No
+
+|-
+! LaunchSpecification.<br/>Monitoring.Enabled 
+|colspan="4"| Specifies whether to enable detailed monitoring for the instance.
+|-
+| &nbsp; || Type: Boolean || Default: false || &nbsp; || Required: No
+
+
+|-
+! LaunchSpecification.<br/>InstanceInitiatedShutdownBehavior 
+|colspan="4"| Specifies whether the instance stops or terminates on instance-initiated shutdown.
+|-
+| &nbsp; || Type: String || Default: stop || Valid values: stop ''or'' terminate || Required: No
+
+|-
+! DiskImage.n.<br/>Image.Format 
+|colspan="4"| The file format of the disk image.
+|-
+| &nbsp; || Type: String || Default: None || Valid values: VMDK ''or'' RAW ''or'' VHD || Required: Yes
+
+|-
+! DiskImage.n.<br/>Image.Bytes 
+|colspan="4"| The number of bytes in the disk image.
+|-
+| &nbsp; || Type: Long || Default: None || &nbsp; || Required: Yes
+
+|-
+! DiskImage.n.<br/>Image.ImportManifestUrl 
+|colspan="4"| The manifest for the disk image, stored in Amazon S3 and presented here as an Amazon S3 presigned URL. 
+|-
+| &nbsp; || Type: String || Default: None || &nbsp; || Required: Yes
+
+|-
+! DiskImage.n.<br/>Image.Description 
+|colspan="4"| An optional description of the disk image.
+|-
+| &nbsp; || Type: String || Default: None || &nbsp; || Required: No
+
+|-
+! DiskImage.n.<br/>Volume.Size 
+|colspan="4"| The size, in GB (2^30 bytes), of the Amazon EBS volume that will hold the converted image. 
+|-
+|| &nbsp; || &nbsp; || &nbsp; || &nbsp; || Required: Yes
+
+|-
+! Platform 
+|colspan="4"| The instance operating system.
+|-
+| &nbsp; || Type: String || Default: None || Valid value: Windows | Linux | Other || Required: No
+
+|-
+| ''LaunchSpecification.SubnetId'' 
+|colspan="4"| [''unsupported''] The ID of the subnet to launch the instance into.
+|-
+| &nbsp; || Type: String || Default: None || &nbsp; || Required: No
+|-
+| ''LaunchSpecification.PrivateIpAddress'' 
+|colspan="4"| [''unsupported''] You can optionally use this parameter to assign the instance a specific available IP address from the IP address range of the subnet.
+|-
+| &nbsp; || Type: String || Default: We selects an IP address from the IP address range of subnet for the instance || &nbsp; || Required: No
+|}
+
+== ImportVolume ==
+{|
+! Request Type 
+!colspan="5"| Description 
+|-
+! ImportVolume
+|colspan="5"| [http://docs.aws.amazon.com/AWSEC2/latest/APIReference/ApiReference-query-ImportVolume.html (AWS)] Creates a new import volume task using metadata from the specified disk image.
+|-
+! &nbsp; !! Parameter !! Type !! Default !! Required !! Notes
+|-
+| &nbsp; || &nbsp; || &nbsp; || &nbsp; || &nbsp; || &nbsp;
+|-
+! &nbsp; !! Parameter !! Type !! Default !! Required !! Notes
+|-
+| &nbsp; || &nbsp; || &nbsp; || &nbsp; || &nbsp; || &nbsp;
+|}
+
+== DescribeConversionTasks ==
+{|
+! Request Type 
+!colspan="5"| Description 
+|-
+! DescribeConversionTasks
+|colspan="5"| [http://docs.aws.amazon.com/AWSEC2/latest/APIReference/ApiReference-query-DescribeConversionTasks.html (AWS)] Creates a new import instance task using metadata from the specified disk image.
+|-
+! &nbsp; !! Parameter !! Type !! Default !! Required !! Notes
+|-
+| &nbsp; || &nbsp; || &nbsp; || &nbsp; || &nbsp; || &nbsp;
+|-
+! &nbsp; !! Parameter !! Type !! Default !! Required !! Notes
+|-
+| &nbsp; || &nbsp; || &nbsp; || &nbsp; || &nbsp; || &nbsp;
+|}
+
+== CancelConversionTask ==
+{|
+! Request Type 
+!colspan="5"| Description 
+|-
+! CancelConversionTask
+|colspan="5"| [http://docs.aws.amazon.com/AWSEC2/latest/APIReference/ApiReference-query-CancelConversionTask.html (AWS)] Cancels an active conversion task. The task can be the import of an instance or volume. The action removes all artifacts of the conversion, including a partially uploaded volume or instance. If the conversion is complete or is in the process of transferring the final disk image, the command fails and returns an exception.
+|-
+! &nbsp; !! Parameter !! Type !! Default !! Required !! Notes
+|-
+| &nbsp; || &nbsp; || &nbsp; || &nbsp; || &nbsp; || &nbsp;
+|-
+! &nbsp; !! Parameter !! Type !! Default !! Required !! Notes
+|-
+| &nbsp; || &nbsp; || &nbsp; || &nbsp; || &nbsp; || &nbsp;
+|}
+
+----
+[[tag:rls-3.4]]

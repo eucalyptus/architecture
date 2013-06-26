@@ -1,72 +1,45 @@
 @startuml image-service.png
-!include ../../../lib/services.skin
+!include ../../../lib/component.skin
 skinparam ranksep 10
 skinparam nodesep 10
 scale 2000 width 
-left to right direction
-frame "EC2 Service" as EC2 {
-  component "Import/Export Service" <<Service>> as impexservice
-  interface ImportInstance
-  interface ImportVolume
-  interface DescribeConversionTasks
-  interface CancelConversionTask
-  interface CreateInstanceExportTask<<Future>>
-  interface CancelExportTask<<Future>>
-  interface DescribeExportTasks<<Future>>
-  ImportInstance -- impexservice
-  ImportVolume -- impexservice
-  DescribeConversionTasks -- impexservice
-  CancelConversionTask -- impexservice
-  CreateInstanceExportTask -- impexservice
-  CancelExportTask -- impexservice
-  DescribeExportTasks -- impexservice
+'left to right direction
+frame "Import/Export Service (EC2)" as impexservice {
+  interface "- ImportInstance\n- ImportVolume\n- DescribeConversionTasks\n- CancelConversionTask" as importops
+  interface "- CreateInstanceExportTask\n- CancelExportTask\n- DescribeExportTasks" <<Future>>
 }
-frame "Imaging Service" as imagingservice {
-  interface ImportInstance as imgimportinst
-  interface ImportVolume as imgimportvol 
-  interface DescribeConversionTasks as imgdescribe
-  interface CancelConversionTask as imgcancel
-  interface ImportImage <<InternalOperation>> as imgimportimg
-  interface ValidateImage <<ServiceInternalOperation>> as imgvalidateimg
-  interface ConvertImage <<ServiceInternalOperation>> as imgconvertimg
-  interface ValidateInstance <<ServiceInternalOperation>> as imgvalidateinst
-  interface EncryptImage <<ServiceInternalOperation>> as imgcryptimg
-  interface DecryptImage <<ServiceInternalOperation>> as imgdecryptimg
-  interface BundleImage <<ServiceInternalOperation>> as imgbundleimg
-  interface UnbundleImage <<ServiceInternalOperation>> as imgunbundleimg
-  component "Imaging Workflow Engine" as imgworkflow
-  imgimportinst -- imgworkflow
-  imgimportvol -- imgworkflow
-  imgdescribe -- imgworkflow
-  imgimportimg -- imgworkflow
-  imgvalidateimg -up- imgworkflow
-  imgvalidateinst -up- imgworkflow
-  imgconvertimg -up- imgworkflow
-  imgcryptimg -up- imgworkflow
-  imgdecryptimg -up- imgworkflow
-  imgbundleimg  -up- imgworkflow
-  imgunbundleimg -up- imgworkflow
-  component "Image Toolkit" as imgtoolkit
-  database "Local Work Cache" as imgcache
-  imgworkflow -down- imgtoolkit
-  imgtoolkit -down- imgcache
+frame "Classic EC2 Service" as EC2{
+  interface "- RegisterImage" as ec2register
+  interface "- BundleInstance" as ec2bundle
 }
-impexservice -- imgimportinst
-impexservice -- imgimportvol
-impexservice -- imgdescribe
-impexservice -- imgcancel
-frame Database {
-  database "Conversion Task State" as taskstate
-}
-imgworkflow -left- taskstate
 frame ObjectStorage {
     component "Input Bucket" as bucketin
     component "Output Bucket" as bucketout
 }
 frame NodeController {
-  component BundleInstance
+  component BundleInstance as ncbundle
 }
-bucketin -up-> imgcache
-imgcache -down-> bucketout
-BundleInstance -up- imgimportimg
+frame "Imaging Service" as imagingservice {
+  interface "- ImportImage\n- ImportVolume\n- ValidateInstance\n- DescribeImagingTasks\n- CancelImagingTask" <<InternalOperation>> as imgserviceops
+  component "Imaging Workflow Executor" as imgworkflowexec
+  database "Local Work Cache" as imgcache 
+  frame "Imaging Toolkit" as imgtoolkit {
+    interface "- download/upload\n- bundle/unbundle\n- mount/unmount\n- convert\n- validate (image,instance)" as imgtoolkitops
+  }
+  imgtoolkitops -- imgcache
+}
+ncbundle -down-> bucketin
+ncbundle -left-> imgserviceops
+importops -right-> imgserviceops
+ec2register -down-> imgserviceops
+ec2bundle -down-> ncbundle
+imgserviceops --> imgworkflowexec
+imgworkflowexec --> imgtoolkitops
+frame Database as taskstatedb {
+  database "Conversion Task State"  as taskstate
+}
+imgworkflowexec --> taskstate
+bucketin -left-> imgcache
+imgcache -right-> bucketout
+
 @enduml

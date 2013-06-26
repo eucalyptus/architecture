@@ -1,14 +1,55 @@
 = Image Management =
-The way machine images are handled will receive attention in following areas:
-# '''Disk-images''':  Support for direct boot of disk based machine images (i.e., kernel and ramdisk are embedded)
-# '''CreateImage/BundleInstance''':  Creation of images from currently running instances; both linux & windows and instance-store & ebs.
-# '''Image Toolkit''':  Library of tools implementing image validation, conversion, and test.
-# '''Instance Import''':  Enabling services which validate, convert, and test images using the image toolkit.
-# '''Image Import CLIs''':  Client tools which orchestrate the validation, conversion, and test just like the above service, but usable from the command line.
-# '''Instance Import Tools''':  Client tools which, using the above, enable the import of instances from AWS and VMware.
-# '''Canonical Image Format''':  The way the system stores images internally will converge on a single format (rather than doing on-the-fly conversion).
-# '''NOTE''': The converse ''export'' functionality is not within scope as the AWS import services are limited to windows.
+'''Image management''' is an ''umbrella'' for features which independently improve the simplicity, ease of use, and flexibility of ingressing images into Eucalyptus.  The umbrella covers a number of interacting, but independently viable, pieces.  Individually, the facets of the feature are meant to:
+# Increase fidelity w/ AWS by expanding support to include the kinds of images which are presently supported in AWS.
+# Improve tool support for bringing an existing image into Eucalyptus (from AWS, VMware, and, eventually, other sources).
+# Simplify the creation of registered images from instances currently running in Eucalyptus.
+# Automate the import of instances and volumes into Eucalyptus installation
+# Introduce validation of images through static image-based checking as well as ''runtime'' instance checks (to ensure an image runs and is otherwise minimally functional; e.g., ssh/rdp works for linux/windows images).
+# Provide tool support for the import of instances/images from VMware and AWS.
 
+The way machine images are handled will receive attention in following areas:
+{|
+|+ '''3.4 Image Management ToC'''
+|-
+! [[image-management-3.4-spec-boot-disks|Booting Disk Images]]
+! [[image-management-3.4-spec-boot-disks#test-plan|Test Plan]]
+| Support for direct boot of disk based machine images (i.e., kernel and ramdisk are embedded) 
+|-
+! [[image-management-3.4-spec-create-image-and-bundle-instance|CreateImage and BundleInstance Enhancements]]
+! [[image-management-3.4-spec-create-image-and-bundle-instance#test-plan|Test Plan]]
+| Creation of images from currently running instances; both linux & windows and instance-store & ebs.
+|-
+! [[image-management-3.4-spec-imaging-toolkit|The Imaging Toolkit]] 
+! [[image-management-3.4-spec-imaging-toolkit#test-plan|Test Plan]]
+| Collection of tools implementing image validation, conversion, and instance validation.
+|-
+! [[image-management-3.4-spec-workflow-declaration|Imaging Workflows]] 
+! [[image-management-3.4-spec-workflow-declaration#test-plan|Test Plan]]
+| Collection of tools implementing image validation, conversion, and instance validation.
+|-
+! [[image-management-3.4-spec-imaging-service|Instance Import and the Imaging Service]]
+! [[image-management-3.4-spec-imaging-service#test-plan|Test Plan]]
+| User-facing services which validate, convert, and test images using the image toolkit.<br/>Also provides internal image conversion and validation in support of image registration, instance bundling, etc.
+|-
+! [[image-management-3.4-spec-imaging-clis|Imaging CLIs]]
+! [[image-management-3.4-spec-imaging-clis#test-plan|Test Plan]]
+| Client tools which orchestrate the validation, conversion, and test just like the above service, but usable from the command line.
+|-
+! [[image-management-3.4-spec-instance-import-tools|Instance Import Tools]]
+! [[image-management-3.4-spec-instance-import-tools#test-plan|Test Plan]]
+| Client tools which, using the above, enable the import of instances from AWS and VMware.
+|-
+! [[image-management-3.4-spec-upgrade-plan|Upgrading Existing Images]]
+! [[image-management-3.4-spec-upgrade-plan#test-plan|Test Plan]]
+| Images registered prior to 3.4 will have to be ''adopted'' by the new imaging system.
+|- 
+! Canonical Image Format ''(possibly)''
+! &nbsp;
+| The way the system stores images internally will converge on a single format (rather than doing on-the-fly conversion).
+|-
+! NOTE: Out-of-scope
+|colspan="2"| The converse ''export'' functionality is not within scope as the AWS import services are limited to windows.
+|}
 
 == Ingress Vectors ==
 * Raw disk -> Eucalyptus: This is required for 3.4.
@@ -25,545 +66,6 @@ The Instance Import/Export Service <ref>EC2 Importing and Exporting Instances: h
 # Bundle and upload the VMDK to S3.
 # Invoke the ImportInstance/ImportVolume (from EC2) with a reference to the S3 bucket.
 The service then fetches the VMDK, validates its, spins up an instance, confirms the instance is setup correctly (by logging into it), and, eventually, provides the instance id to the user.
-
-
-== Service Design ==
-[[image-management-3.4-image-service.png|float|width=2000px|align=right|frame]]
-* '''EC2 Instance Import/Export service''': User facing service implementing AWS/EC2 specified operations.
-* '''Imaging service''': Internal-only service which manages all conversion tasks (not only the import/export requests).
-
-=== EC2 Instance Import/Export Service ===
-This service is part of the EC2 API implementation and performs a portion of the work of processing requests:
-* Accepts user requests
-* Validates the parameters
-* Sends the request to the '''imaging''' service
-* Responds to the user.  
-* Subsequently, the user can poll the state of the import task.
-Import/Conversion task state is stored in the persistence subsystem (DB) and is managed by the '''Imaging''' service.
-
-=== Imaging Service === 
-The '''Imaging''' service is:
-* The engine for driving image conversion/import tasks.  
-* Is the ground-truth for conversion task state
-* Will have to be queried for information needed to fulfill '''EC2 Instance Import/Export Service''' requests.
-This service has several parts:
-
-==== Import/Export Operations ====
-These are the user-facing service operations defined by AWS as part of the Instance Import/Export services:
-{|
-! Name !! Description
-|-
-! '[[#ImportInstance|ImportInstance]] || [[EC2 ImportInstance|http://docs.aws.amazon.com/AWSEC2/latest/APIReference/ApiReference-query-ImportInstance.html]] This is the new operation corresponding to the user-facing EC2 ImportInstance operation.  The important distinction here is that the runtime validations are performed and the instance is subsequently made available to the user.  This operation is a composition of the below primitives.
-|-
-! '[[#ImportVolume|ImportVolume]] || [[EC2 ImportVolume|http://docs.aws.amazon.com/AWSEC2/latest/APIReference/ApiReference-query-ImportVolume.html]] This is the new operation corresponding to the user-facing EC2 ImportVolume operation.  The important distinction here is that the runtime validations are performed and the volume is subsequently made available to the user.  This operation is a composition of the below primitives.
-|-
-! '[[#DescribeConversionTasks|DescribeConversionTasks]] || [[EC2 DescribeConversionTasks|http://docs.aws.amazon.com/AWSEC2/latest/APIReference/ApiReference-query-DescribeConversionTasks.html]] This operation lists the status of currently ongoing import tasks (any of the above kinds need to be queryable in this fashion)
-|-
-! '[[#CancelConversionTask|CancelConversionTask]] || [[EC2 CancelConversionTask|http://docs.aws.amazon.com/AWSEC2/latest/APIReference/ApiReference-query-CancelConversionTask.html]] This operation cancels an extent conversion task
-|-
-| ''CreateInstanceExportTask'' || [[EC2 CreateInstanceExportTask|http://docs.aws.amazon.com/AWSEC2/latest/APIReference/ApiReference-query-CreateInstanceExportTask.html]]
-|-
-| ''CancelExportTask'' || [[EC2 CancelExportTask|http://docs.aws.amazon.com/AWSEC2/latest/APIReference/ApiReference-query-CancelExportTask.html]]
-|-
-| ''DescribeExportTasks'' || [[DescribeExportTasks|http://docs.aws.amazon.com/AWSEC2/latest/APIReference/ApiReference-query-DescribeExportTasks.html]]
-|}
-The backend implementation for the '''bolded''' operations are required for 3.4 while those that are ''italicized'' are out of scope for 3.4.  
-
-==== Internal Import/Export Operations ====
-These operations are to serve as the internal complement for the user-facing operations defined above for the '''EC2 Instance Import/Export service'''.
-{|
-! Name !! Description
-|-
-! '[[#ImportImage|ImportImage]] || This is an internal service operation which corresponds with the internal import image workflow supporting bundling of instances.  This operation is a composition of the below primitives.
-|}
-
-==== Service-Local Primitive Operations ====
-These operations are endpoints different image conversion workflows which are used internally w/in the system.  There are a number of different image ingress workflows which are really composed of a collection of fundamental ''factors'' -- these are used by system-facing operations below composed into some process for handling images (e.g., import instance, bundle instance, and create image).
-{|
-! Name !! Description
-|-
-! '[[#ConvertImage|ConvertImage]] || converts an image from input type to the canonical output type using the '''image toolkit'''
-|-
-! '[[#ValidateImage|ValidateImage]] || runs a collection of static image validation checks using the '''image toolkit''' against the image without running an instance (i.e., just mounted).
-|-
-! '[[#ValidateInstance|ValidateInstance]] || runs a collection of image validation checks which are performed on a ''running instance'', again, using the '''image toolkit'''.
-|-
-! '[[#GetDecryptedImage|GetDecryptedImage]] || This was previosly an operation in walrus and will be split out of walrus as part of the Riak effort.  This service fetches image bundles using the S3 interface from walrus, performs decryption and publication of the decrypted image to the NCs in support of run instances.
-|-
-! '[[#PutEncryptedImage|PutEncryptedImage]] || This operation is for putting an image back using the S3 interface into some bucket.
-|}
-
-
-
-== Image Toolkit ==
-A collection of utilities in several classes (detailed below) that, when composed in a process, handle the micro-steps of various image management processes.  The classes are Mounters, Validators, Converters, and Runtime Validators.
-* Collection of utilities which are composed to define the various image management processes.
-* Extensible: each of the below classes has to be extensible so that a particular mounter, 
-* Partial execution
-* State feedback
-* Sub-task resource management
-* The parts of image toolkit are in the following table
-{|
-! Name !! Description
-|-
-! '[[#Mounters|Mounters]] || Are able to mount a particular type of image.
-|- 
-! '[[#Image_Validators|Image Validators]] || Scripts which are executed against a mounted image, under certain conditions, and tests one assertion that must be true.
-|- 
-! '[[#Converters|Converters]] || These change an input disk image from one type to another.
-|-
-! '[[#Instance_Validators|Instance Validators]] || Scripts which execute within a running instance and perform sanity checks before an imported instance is returned to the user.
-|-
-! '[[#Crypt|Crypt]] || This is the mechanism used for encrypting and decrypting images.
-|-
-! '[[#Bundlers|Bundlers]] || This is the mechanism used for bundling/unbundling images which are stored in the object store.
-|}
-
-
-== Ansible ==
-A quick investigation indicates that it may be possible to express the orchestration of the image toolkit operations as an ansible playbook.  That is, it has the following attributes:
-# Small and sensible set of dependencies (yaml and jinja2)
-# Support for nested playbooks:  this is necessary so that the service implementation may execute the leaves of the validation/conversion/runtime-validation/crypt stages piecemeal.
-# Support for operating on a chroot'd image <ref>Ansible chroot support: https://github.com/mmoya/ansible/commit/9a493ef3881ba1153a1894c6fb19a5a54da24183</ref> (verified present in the 1.2 release; which is current)
-# Supports instrumentation of playbook execution to through callbacks to allow externalizing execution state <ref>Ansible Callback Plugins: https://github.com/ansible/ansible/blob/devel/lib/ansible/callback_plugins/noop.py</ref>
-
-== Image Toolkit API ==
-=== Mounters ===
-These which are able to mount a particular disk image type.
-# Raw disk:  this is the most important one.
-# Disk partition:  this is the ami/ari/aki case.
-# VMDK:  this is the AWS defined instance import case.
-# Others:  any others are out of scope.
-{|
-! Function !! Arguments !! Return Value !! Notes
-|-
-! accepts || diskType || boolean || Checks if this mounter is able to mount the argument disk type
-|-
-| &nbsp; !! diskType || String || Describing the image type
-|-
-| &nbsp; || &nbsp; || &nbsp; || &nbsp;
-|-
-! mount || diskType, filePath, mountPoint || void || Mounts the disk image at filePath onto mountPoint using the mounter for diskType
-|-
-| &nbsp; !! diskType || String || describing the image type
-|-
-| &nbsp; !! filePath || String || the path to the disk image
-|-
-| &nbsp; !! mountPoint || String || the path to the directory which serves as the mount point
-|-
-| &nbsp; !! errors || exceptions || Occur when the tool fails (and the exception clarifies the reason) or when a failure occurs for any other reason (in which case ''at least'' the context of the failure is reported if no further information is available).
-|}
-
-
-=== Image Validators ===
-These are scripts which are executed against a mounted image, under certain conditions, and tests one assertion that must be true.  A validator can be '''optional''' which means that its failure is recorded and reported but does not result in aborting the calling image management process. 
-{|
-! Function !! Arguments !! Return Value !! Notes
-|-
-! accepts || platform || boolean || Checks if this validator applies to the given platform and os pair
-|-
-| &nbsp; !! platform || Enum || Describing the operating system, either '''linux''', '''windows''', '''unknown'''
-|-
-| &nbsp; || &nbsp; || &nbsp; || &nbsp;
-|-
-! validate || none || String || Performs a single test and fails with a descriptive exception when there is an error.  Returns a String describing the check which was performed when it succeeds.
-|-
-| &nbsp; !! errors || exceptions || Occur when the tool fails (and the exception clarifies the reason) or when a failure occurs for any other reason (in which case ''at least'' the context of the failure is reported if no further information is available).
-|-
-| &nbsp; || &nbsp; || &nbsp; || &nbsp;
-|-
-! optional || none || boolean || Returns true if the validator is optional.  If it is optional, errors which occur when invoking '''validate''' are treated as warnings:  They are recorded and reported to the user, but the image management process continues
-|}
-
-
-=== Converters ===
-These change an input disk image from one type to another.  Conversion has several wrinkles which need to be kept in mind.  It can be a multi step process and intermediate state information is needed to understand what is happening.  It can be a long running process so progress information is similarly important.  Last, conversion can demand a 
-# Raw disk -> Raw disk:  The trivial case.
-# AMI -> Raw disk:  This has two parts: partition based and disk based images.
-# VMDK -> Raw disk:  This is much like euca_imager
-Note that converters are defined here in a manner that supports eventual implementation of round-trip conversion.  That is, from VMDK to Raw disk and also back from Raw disk to VMDK.
-{|
-! Function !! Arguments !! Return Value !! Notes
-|-
-! accepts || sourceImageType, destImageType || boolean || Checks if this converter applies to the given sourceType and destType
-|-
-| &nbsp; !! sourceImageType || String || Describing the source image type
-|-
-| &nbsp; !! destImageType || String || Describing the destination image type
-|-
-| &nbsp; !! exceptions || TBD || Exceptions must only occur when the tool determines that it ''should'' be performing the but knows apriori that the resources required are not available (e.g., disk space).  A failure of assumptions in the '''accepts''' method (e.g., missing dependencies) must never result in throwing an exception; it should return false.
-|-
-| &nbsp; || &nbsp; || &nbsp; || &nbsp;
-|-
-! requiredCapacity || sourceImageType, destImageType || long || Returns the additional capacity required to perform the operation
-|-
-| &nbsp; !! sourceImageType || String || Describing the source image type
-|-
-| &nbsp; !! destImageType || String || Describing the destination image type
-|-
-| &nbsp; || &nbsp; || &nbsp; || &nbsp;
-|-
-! convert || sourceImageType, destImageType, sourceFilePath, destFilePath || String || Performs the conversion of sourceFilePath stored in sourceImageType and converts it to destImageType in the file destFilePath.  Returns a String describing the check which was performed when it succeeds.
-|-
-| &nbsp; !! sourceImageType || String || Describing the source image type
-|-
-| &nbsp; !! destImageType || String || Describing the destination image type
-|-
-| &nbsp; !! sourceFilePath || String || Indicating the source image path
-|-
-| &nbsp; !! destFilePath || String || Indicating the destination image path
-|-
-| &nbsp; !! exceptions || TBD || Occur when the tool fails (and the exception clarifies the reason) or when a failure occurs for any other reason (in which case ''at least'' the context of the failure is reported if no further information is available).
-|}
-
-
-=== Runtime Validators ===
-These are scripts which execute within a running instance and perform sanity checks before an imported instance is returned to the user.
-{|
-! Function !! Arguments !! Return Value !! Notes
-|-
-! accepts || platform || boolean || Checks if this validator applies to the given platform and os pair
-|-
-| &nbsp; !! platform || Enum || Describing the operating system, either '''linux''', '''windows''', '''unknown'''
-|-
-| &nbsp; || &nbsp; || &nbsp; || &nbsp;
-|-
-! validate || none || String || Performs a single test and fails with a descriptive exception when there is an error.  Returns a String describing the check which was performed when it succeeds. Note: it is '''not''' an error for a validator to be run against an unsupported flavor of the platform type:  This case should be indicated by a human readable message stating the mismatch of expectations (e.g., "Expected RHEL/CentOS or 5.x/6.x, but failed to find /etc/redhat-version")
-|-
-| &nbsp; !! exceptions || TBD || Occur when the tool fails (and the exception clarifies the reason) or when a failure occurs for any other reason (in which case ''at least'' the context of the failure is reported if no further information is available).
-|-
-| &nbsp; || &nbsp; || &nbsp; || &nbsp;
-|-
-! optional || none || boolean || Returns true if the validator is optional.  If it is optional, errors which occur when invoking '''validate''' are treated as warnings:  They are recorded and reported to the user, but the image management process continues
-|}
-
-=== Crypt ===
-This is the mechanism used for encrypting and decrypting images.  Today the implementation is singular, but will be handled here as if multiplicity existed.  This should be understood as meaning the same mechanism be used to orchestrate the encrypt/decrypt actions and they are not embedded in the service or image toolkit implementation.   That is, their execution is expressed as part of the workflow.
-{|
-! Function !! Arguments !! Return Value !! Notes
-|-
-! accepts || sourceCryptType, destCryptType || boolean || Checks if this encrypt/decrypt script applies to the given sourceCryptType and destCryptType encryption types.  One of sourceCryptType and destCryptType is necessarily "none" -- that is, not encrypted.
-|-
-| &nbsp; !! sourceCryptType || String || Describing the source encryption type; possible "none"
-|-
-| &nbsp; !! destCryptType || String || Describing the destination encryption type; possible "none"
-|-
-| &nbsp; !! exceptions || TBD || Exceptions must only occur when the tool determines that it ''should'' be performing the but knows apriori that the resources required are not available (e.g., disk space).  A failure of assumptions in the '''accepts''' method (e.g., missing dependencies) must never result in throwing an exception; it should return false.
-|-
-| &nbsp; || &nbsp; || &nbsp; || &nbsp;
-|-
-! crypt || sourceCryptType, destCryptType, sourceFilePath, destFilePath || String || Performs the conversion of sourceFilePath, encrypted as sourceCryptType, and de/encrypts it to destFilePath as appropriate for destCryptType
-|-
-| &nbsp; !! sourceCryptType || String || Describing the source image encryption type
-|-
-| &nbsp; !! destCryptType || String || Describing the destination image encryption type
-|-
-| &nbsp; !! exceptions || TBD || Exceptions occur when the tool fails (and the exception clarifies the reason) or when a failure occurs for any other reason (in which case ''at least'' the context of the failure is reported if no further information is available).
-|}
-
-=== Bundlers ===
-This is the mechanism used for bundling and unbundling of images.  Today the implementation is singular, but will be handled here as if multiplicity existed.  This should be understood as meaning the same mechanism be used to orchestrate the bundling/unbundling actions and they are not embedded in the service or image toolkit implementation.  That is, their execution is expressed as part of the workflow.
-{|
-! Function !! Arguments !! Return Value !! Notes
-|-
-! accepts || sourceCryptType, destCryptType || boolean || Checks if this encrypt/decrypt script applies to the given sourceCryptType and destCryptType encryption types.  One of sourceCryptType and destCryptType is necessarily "none" -- that is, not encrypted.
-|-
-| &nbsp; !! sourceCryptType || String || Describing the source encryption type; possible "none"
-|-
-| &nbsp; !! destCryptType || String || Describing the destination encryption type; possible "none"
-|-
-| &nbsp; !! exceptions || TBD || Exceptions must only occur when the tool determines that it ''should'' be performing the but knows apriori that the resources required are not available (e.g., disk space).  A failure of assumptions in the '''accepts''' method (e.g., missing dependencies) must never result in throwing an exception; it should return false.
-|-
-| &nbsp; || &nbsp; || &nbsp; || &nbsp;
-|-
-! crypt || sourceCryptType, destCryptType, sourceFilePath, destFilePath || String || Performs the conversion of sourceFilePath, encrypted as sourceCryptType, and de/encrypts it to destFilePath as appropriate for destCryptType
-|-
-| &nbsp; !! sourceCryptType || String || Describing the source image encryption type
-|-
-| &nbsp; !! destCryptType || String || Describing the destination image encryption type
-|-
-| &nbsp; !! exceptions || TBD || Exceptions occur when the tool fails (and the exception clarifies the reason) or when a failure occurs for any other reason (in which case ''at least'' the context of the failure is reported if no further information is available).
-|}
-
-== Instance Import/Export API ==
-=== ImportInstance ===
-{|
-!colspan="5"| Description 
-|-
-|colspan="5"| [http://docs.aws.amazon.com/AWSEC2/latest/APIReference/ApiReference-query-ImportInstance.html (AWS)] Creates a new import instance task using metadata from the specified disk image.
-|-
-! Parameter 
-!colspan="4"| Description
-|- 
-! &nbsp; !! Type !! Default !! Valid Values !! Required
-|-
-! Description 
-|colspan="4"| A description of the instance being imported.
-|-
-| &nbsp; || Type: String || Default: None || &nbsp; || Required: No
-
-|-
-! LaunchSpecification.<br/>Architecture 
-|colspan="4"| The architecture of the instance.
-|-
-| &nbsp; || Type: String || Default: None || Valid values: i386 ''or'' x86_64 || Required: Yes
-
-|-
-! LaunchSpecification.<br/>GroupName.n 
-|colspan="4"| One or more security group names.
-|-
-| &nbsp; || Type: String || Default: None || &nbsp; || Required: No
-
-|-
-! LaunchSpecification.<br/>UserData 
-|colspan="4"| User data to be made available to the instance.
-|-
-| &nbsp; || Type: String || Default: None || &nbsp; || Required: No
-
-|-
-! LaunchSpecification.<br/>InstanceType 
-|colspan="4"| The instance type. See Available Instance Types for more information.
-|-
-| &nbsp; || Type: String || Default: None || &nbsp; || Required: Yes
-
-|-
-! LaunchSpecification.<br/>Placement.AvailabilityZone 
-|colspan="4"| The Availability Zone to launch the instance into.
-|-
-| &nbsp; || Type: String || Default: We choose a zone for you || &nbsp; || Required: No
-
-|-
-! LaunchSpecification.<br/>Monitoring.Enabled 
-|colspan="4"| Specifies whether to enable detailed monitoring for the instance.
-|-
-| &nbsp; || Type: Boolean || Default: false || &nbsp; || Required: No
-
-
-|-
-! LaunchSpecification.<br/>InstanceInitiatedShutdownBehavior 
-|colspan="4"| Specifies whether the instance stops or terminates on instance-initiated shutdown.
-|-
-| &nbsp; || Type: String || Default: stop || Valid values: stop ''or'' terminate || Required: No
-
-|-
-! DiskImage.n.<br/>Image.Format 
-|colspan="4"| The file format of the disk image.
-|-
-| &nbsp; || Type: String || Default: None || Valid values: VMDK ''or'' RAW ''or'' VHD || Required: Yes
-
-|-
-! DiskImage.n.<br/>Image.Bytes 
-|colspan="4"| The number of bytes in the disk image.
-|-
-| &nbsp; || Type: Long || Default: None || &nbsp; || Required: Yes
-
-|-
-! DiskImage.n.<br/>Image.ImportManifestUrl 
-|colspan="4"| The manifest for the disk image, stored in Amazon S3 and presented here as an Amazon S3 presigned URL. 
-|-
-| &nbsp; || Type: String || Default: None || &nbsp; || Required: Yes
-
-|-
-! DiskImage.n.<br/>Image.Description 
-|colspan="4"| An optional description of the disk image.
-|-
-| &nbsp; || Type: String || Default: None || &nbsp; || Required: No
-
-|-
-! DiskImage.n.<br/>Volume.Size 
-|colspan="4"| The size, in GB (2^30 bytes), of the Amazon EBS volume that will hold the converted image. 
-|-
-|| &nbsp; || &nbsp; || &nbsp; || &nbsp; || Required: Yes
-
-|-
-! Platform 
-|colspan="4"| The instance operating system.
-|-
-| &nbsp; || Type: String || Default: None || Valid value: Windows | Linux | Other || Required: No
-
-|-
-| ''LaunchSpecification.SubnetId'' 
-|colspan="4"| [''unsupported''] The ID of the subnet to launch the instance into.
-|-
-| &nbsp; || Type: String || Default: None || &nbsp; || Required: No
-|-
-| ''LaunchSpecification.PrivateIpAddress'' 
-|colspan="4"| [''unsupported''] You can optionally use this parameter to assign the instance a specific available IP address from the IP address range of the subnet.
-|-
-| &nbsp; || Type: String || Default: We selects an IP address from the IP address range of subnet for the instance || &nbsp; || Required: No
-|}
-
-=== ImportVolume ===
-{|
-! Request Type 
-!colspan="5"| Description 
-|-
-! ImportVolume
-|colspan="5"| [http://docs.aws.amazon.com/AWSEC2/latest/APIReference/ApiReference-query-ImportVolume.html (AWS)] Creates a new import volume task using metadata from the specified disk image.
-|-
-! &nbsp; !! Parameter !! Type !! Default !! Required !! Notes
-|-
-| &nbsp; || &nbsp; || &nbsp; || &nbsp; || &nbsp; || &nbsp;
-|-
-! &nbsp; !! Parameter !! Type !! Default !! Required !! Notes
-|-
-| &nbsp; || &nbsp; || &nbsp; || &nbsp; || &nbsp; || &nbsp;
-|}
-
-=== DescribeConversionTasks ===
-{|
-! Request Type 
-!colspan="5"| Description 
-|-
-! DescribeConversionTasks
-|colspan="5"| [http://docs.aws.amazon.com/AWSEC2/latest/APIReference/ApiReference-query-DescribeConversionTasks.html (AWS)] Creates a new import instance task using metadata from the specified disk image.
-|-
-! &nbsp; !! Parameter !! Type !! Default !! Required !! Notes
-|-
-| &nbsp; || &nbsp; || &nbsp; || &nbsp; || &nbsp; || &nbsp;
-|-
-! &nbsp; !! Parameter !! Type !! Default !! Required !! Notes
-|-
-| &nbsp; || &nbsp; || &nbsp; || &nbsp; || &nbsp; || &nbsp;
-|}
-
-=== CancelConversionTask ===
-{|
-! Request Type 
-!colspan="5"| Description 
-|-
-! CancelConversionTask
-|colspan="5"| [http://docs.aws.amazon.com/AWSEC2/latest/APIReference/ApiReference-query-CancelConversionTask.html (AWS)] Cancels an active conversion task. The task can be the import of an instance or volume. The action removes all artifacts of the conversion, including a partially uploaded volume or instance. If the conversion is complete or is in the process of transferring the final disk image, the command fails and returns an exception.
-|-
-! &nbsp; !! Parameter !! Type !! Default !! Required !! Notes
-|-
-| &nbsp; || &nbsp; || &nbsp; || &nbsp; || &nbsp; || &nbsp;
-|-
-! &nbsp; !! Parameter !! Type !! Default !! Required !! Notes
-|-
-| &nbsp; || &nbsp; || &nbsp; || &nbsp; || &nbsp; || &nbsp;
-|}
-
-== Imaging Service API ==
-=== ImportInstance ===
-{|
-! Request Type 
-!colspan="5"| Description 
-|-
-! ImportInstance
-|colspan="5"| Internal operation which begins the workflow for importing an instance.
-|-
-! &nbsp; !! Parameter !! Type !! Default !! Required !! Notes
-|-
-| &nbsp; || &nbsp; || &nbsp; || &nbsp; || &nbsp; || &nbsp;
-|-
-! &nbsp; !! Parameter !! Type !! Default !! Required !! Notes
-|-
-| &nbsp; || &nbsp; || &nbsp; || &nbsp; || &nbsp; || &nbsp;
-|}
-
-=== ImportImage ===
-{|
-! Request Type 
-!colspan="5"| Description 
-|-
-! ImportImage
-|colspan="5"| DESCRIPTION.
-|-
-! &nbsp; !! Parameter !! Type !! Default !! Required !! Notes
-|-
-| &nbsp; || &nbsp; || &nbsp; || &nbsp; || &nbsp; || &nbsp;
-|-
-! &nbsp; !! Parameter !! Type !! Default !! Required !! Notes
-|-
-| &nbsp; || &nbsp; || &nbsp; || &nbsp; || &nbsp; || &nbsp;
-|}
-
-=== ImportVolume ===
-{|
-! Request Type 
-!colspan="5"| Description 
-|-
-! ImportVolume
-|colspan="5"| DESCRIPTION.
-|-
-! &nbsp; !! Parameter !! Type !! Default !! Required !! Notes
-|-
-| &nbsp; || &nbsp; || &nbsp; || &nbsp; || &nbsp; || &nbsp;
-|-
-! &nbsp; !! Parameter !! Type !! Default !! Required !! Notes
-|-
-| &nbsp; || &nbsp; || &nbsp; || &nbsp; || &nbsp; || &nbsp;
-|}
-
-=== DescribeConversionTasks ===
-{|
-! Request Type 
-!colspan="5"| Description 
-|-
-! DescribeConversionTasks
-|colspan="5"| DESCRIPTION.
-|-
-! &nbsp; !! Parameter !! Type !! Default !! Required !! Notes
-|-
-| &nbsp; || &nbsp; || &nbsp; || &nbsp; || &nbsp; || &nbsp;
-|-
-! &nbsp; !! Parameter !! Type !! Default !! Required !! Notes
-|-
-| &nbsp; || &nbsp; || &nbsp; || &nbsp; || &nbsp; || &nbsp;
-|}
-
-=== ValidateImage ===
-{|
-! Request Type 
-!colspan="5"| Description 
-|-
-! ValidateImage
-|colspan="5"| DESCRIPTION.
-|-
-! &nbsp; !! Parameter !! Type !! Default !! Required !! Notes
-|-
-| &nbsp; || &nbsp; || &nbsp; || &nbsp; || &nbsp; || &nbsp;
-|-
-! &nbsp; !! Parameter !! Type !! Default !! Required !! Notes
-|-
-| &nbsp; || &nbsp; || &nbsp; || &nbsp; || &nbsp; || &nbsp;
-|}
-
-=== ConvertImage ===
-{|
-! Request Type 
-!colspan="5"| Description 
-|-
-! ConvertImage
-|colspan="5"| DESCRIPTION.
-|-
-! &nbsp; !! Parameter !! Type !! Default !! Required !! Notes
-|-
-| &nbsp; || &nbsp; || &nbsp; || &nbsp; || &nbsp; || &nbsp;
-|-
-! &nbsp; !! Parameter !! Type !! Default !! Required !! Notes
-|-
-| &nbsp; || &nbsp; || &nbsp; || &nbsp; || &nbsp; || &nbsp;
-|}
-
-=== ValidateInstance ===
-{|
-! Request Type 
-!colspan="5"| Description 
-|-
-! ValidateInstance
-|colspan="5"| DESCRIPTION.
-|-
-! &nbsp; !! Parameter !! Type !! Default !! Required !! Notes
-|-
-| &nbsp; || &nbsp; || &nbsp; || &nbsp; || &nbsp; || &nbsp;
-|-
-! &nbsp; !! Parameter !! Type !! Default !! Required !! Notes
-|-
-| &nbsp; || &nbsp; || &nbsp; || &nbsp; || &nbsp; || &nbsp;
-|}
-
 
 
 == Comments ==

@@ -1,0 +1,223 @@
+= Image Toolkit API =
+A collection of utilities in several classes (detailed below) that, when composed in a process, handle the micro-steps of various image management processes.  The classes are Mounters, Validators, Converters, and Runtime Validators.
+* Collection of utilities which are composed to define the various image management processes.
+* Extensible: each of the below classes has to be extensible so that a particular mounter, 
+* Partial execution
+* State feedback
+* Sub-task resource management
+* The parts of image toolkit are in the following table
+{|
+! Name !! Description
+|-
+! '[[#Transfers|Transfers (Upload/Download)]] || Are able to fetch and store images in permanent storage.
+|-
+! '[[#Bundlers|Bundlers]] || This is the mechanism used for bundling/unbundling images which are stored in the object store.
+|-
+! '[[#Mounters|Mounters]] || Are able to mount a particular type of image.
+|- 
+! '[[#Image_Validators|Image Validators]] || Scripts which are executed against a mounted image, under certain conditions, and tests one assertion that must be true.
+|- 
+! '[[#Converters|Converters]] || These change an input disk image from one type to another.
+|-
+! '[[#Instance_Validators|Instance Validators]] || Scripts which execute within a running instance and perform sanity checks before an imported instance is returned to the user.
+|}
+
+== Bundle Transfers ==
+These which are able to pull in an image "bundle" or put back an image "bundle".  May support various protocols, e.g., S3, HTTP, bittorrent.
+{|
+!colspan="2"| Function !! Return Value !! Notes
+|-
+
+!colspan="2"| accepts(sourceUrl, destinationUrl) || boolean || Checks if this bundle transfer can interact with the given source and destination URLs
+|-
+| &nbsp; 
+! manifestUrl
+| String 
+| URL of a bundle manifest, maybe source or destination.
+|-
+| &nbsp; 
+! exceptions 
+|colspan="2"| This method should never throw exceptions.
+|-
+
+!colspan="2"| transfer(sourceUrl, destinationUrl) || void || Transfers a bundle from the sourceUrl to the destinationUrl
+|-
+| &nbsp; 
+! sourceUrl<br/>
+destinationUrl
+| String<br/>
+String
+| URL of the source manifest<br/>
+URL of the destination manifest
+|-
+| &nbsp; 
+! exceptions 
+|colspan="2"| Occur when the tool fails (and the exception clarifies the reason) or when a failure occurs for any other reason (in which case ''at least'' the context of the failure is reported if no further information is available).
+|}
+
+== Bundlers ==
+This is the mechanism used for bundling and unbundling of images.  Today the implementation is singular, but will be handled here as if multiplicity existed.  This should be understood as meaning the same mechanism be used to orchestrate the bundling/unbundling actions and they are not embedded in the service or image toolkit implementation.  That is, their execution is expressed as part of the workflow.
+{|
+!colspan="2"| Function !! Return Value !! Notes
+|-
+!colspan="2"| accepts(bundleType,sourceFilePath, destFilePath) || boolean || Checks if this encrypt/decrypt script applies to the given sourceCryptType and destCryptType encryption types.  One of sourceCryptType and destCryptType is necessarily "none" -- that is, not encrypted.
+|-
+| &nbsp; !! sourceCryptType || String || Describing the source encryption type; possible "none"
+|-
+| &nbsp; !! destCryptType || String || Describing the destination encryption type; possible "none"
+|-
+| &nbsp;
+! exceptions 
+|colspan="2"| Exceptions must only occur when the tool determines that it ''should'' be performing the but knows apriori that the resources required are not available (e.g., disk space).  A failure of assumptions in the '''accepts''' method (e.g., missing dependencies) must never result in throwing an exception; it should return false.
+|-
+!colspan="2"| bundle(bundleType,sourceFilePath, destFilePath) || String || Bundles or unbundlesthe given sourceFilePath into destFilePath according to bundling kind bundleType
+|-
+| &nbsp; !! bundleType || String || Describing the kind of bundle to create or unbundle
+|-
+| &nbsp; !! sourceFilePath || String || Describing the source image or bundle location
+|-
+| &nbsp; !! destFilePath || String || Describing the destination image or bundle location
+|-
+| &nbsp;
+! exceptions 
+|colspan="2"| Exceptions occur when the tool fails (and the exception clarifies the reason) or when a failure occurs for any other reason (in which case ''at least'' the context of the failure is reported if no further information is available).
+|}
+
+
+== Mounters ==
+These which are able to mount a particular disk image type.
+# Raw disk:  this is the most important one.
+# Disk partition:  this is the ami/ari/aki case.
+# VMDK:  this is the AWS defined instance import case.
+# Others:  any others are out of scope.
+# Various filesystems would be required: ext3, ext4, XFS, NTFS, VFAT, BRTFS, etc.  More in AWS spec.
+{|
+!colspan="2"| Function !! Return Value !! Notes
+|-
+
+!colspan="2"| accepts(diskType) || boolean || Checks if this mounter is able to mount the argument disk type
+|-
+| &nbsp; 
+! diskType
+| String 
+| Describing the image type
+|-
+| &nbsp; 
+! exceptions 
+|colspan="2"| This method should never throw exceptions.
+|-
+
+!colspan="2"| mount(diskType, filePath, mountPoint) || void || Mounts the disk image at filePath onto mountPoint using the mounter for diskType
+|-
+| &nbsp; 
+! diskType<br/>
+filePath<br/>
+mountPoint
+| String<br/>
+String<br/>
+String
+| describing the image type<br/>
+the path to the disk image<br/>
+the path to the directory which serves as the mount point
+|-
+| &nbsp; 
+! exceptions 
+|colspan="2"| Occur when the tool fails (and the exception clarifies the reason) or when a failure occurs for any other reason (in which case ''at least'' the context of the failure is reported if no further information is available).
+|}
+
+
+== Image Validators ==
+These are scripts which are executed against a mounted image, under certain conditions, and tests one assertion that must be true.  A validator can be '''optional''' which means that its failure is recorded and reported but does not result in aborting the calling image management process. 
+{|
+!colspan="2"| Function !! Return Value !! Notes
+|-
+!colspan="2"| accepts(platform) || boolean || Checks if this validator applies to the given platform and os pair
+|-
+| &nbsp; 
+! platform 
+| Enum 
+| Describing the operating system, either '''linux''', '''windows''', '''unknown'''
+|-
+| &nbsp; 
+! exceptions 
+|colspan="2"| This method should never throw exceptions.
+
+|-
+!colspan="2"| validate(imageMountPath) || String || Performs the suite of validation tests for the image mounted at imageMountPath.  This method fails with a descriptive exception when there is an error.  Returns a String describing the check which was performed when it succeeds.
+|-
+| &nbsp; !! errors || exceptions || Occur when the tool fails (and the exception clarifies the reason) or when a failure occurs for any other reason (in which case ''at least'' the context of the failure is reported if no further information is available).
+|}
+
+
+== Converters ==
+These change an input disk image from one type to another.  Conversion has several wrinkles which need to be kept in mind.  It can be a multi step process and intermediate state information is needed to understand what is happening.  It can be a long running process so progress information is similarly important.  Last, conversion can demand a 
+# Raw disk -> Raw disk:  The trivial case.
+# AMI -> Raw disk:  This has two parts: partition based and disk based images.
+# VMDK -> Raw disk:  This is much like euca_imager
+Note that converters are defined here in a manner that supports eventual implementation of round-trip conversion.  That is, from VMDK to Raw disk and also back from Raw disk to VMDK.
+{|
+!colspan="2"| Function !! Return Value !! Notes
+|-
+!colspan="2"| accepts || sourceImageType, destImageType || boolean || Checks if this converter applies to the given sourceType and destType
+|-
+| &nbsp; 
+! sourceImageType<br/>
+destImageType
+| String<br/>
+String
+| Describing the source image type<br/>
+Describing the destination image type
+|-
+| &nbsp; 
+! exceptions 
+|colspan="2"| Exceptions must only occur when the tool determines that it ''should'' be performing the but knows apriori that the resources required are not available (e.g., disk space).  A failure of assumptions in the '''accepts''' method (e.g., missing dependencies) must never result in throwing an exception; it should return false.
+|-
+!colspan="2"| requiredCapacity || sourceImageType, destImageType || long || Returns the additional capacity required to perform the operation
+|-
+| &nbsp;
+! sourceImageType<br/>
+destImageType
+| String<br/>
+String
+| Describing the source image type<br/>
+Describing the destination image type
+|-
+!colspan="2"| convert || sourceImageType, destImageType, sourceFilePath, destFilePath || String || Performs the conversion of sourceFilePath stored in sourceImageType and converts it to destImageType in the file destFilePath.  Returns a String describing the check which was performed when it succeeds.
+|-
+| &nbsp; !! sourceImageType || String || Describing the source image type
+|-
+| &nbsp; !! destImageType || String || Describing the destination image type
+|-
+| &nbsp; !! sourceFilePath || String || Indicating the source image path
+|-
+| &nbsp; !! destFilePath || String || Indicating the destination image path
+|-
+| &nbsp; !! exceptions || TBD || Occur when the tool fails (and the exception clarifies the reason) or when a failure occurs for any other reason (in which case ''at least'' the context of the failure is reported if no further information is available).
+|}
+
+
+== Instance Validators ==
+These are scripts which execute within a running instance and perform sanity checks before an imported instance is returned to the user.
+{|
+!colspan="2"| Function !! Return Value !! Notes
+|-
+!colspan="2"| accepts(platform) || boolean || Checks if this validator applies to the given platform and os pair
+|-
+| &nbsp; !! platform || Enum || Describing the operating system, either '''linux''', '''windows''', '''unknown'''
+|-
+!colspan="2"| validate(host) || none || String || Performs the suite of validation tests for the image mounted at imageMountPath.  This method fails with a descriptive exception when there is an error.  Returns a String describing the check which was performed when it succeeds.  Note: it is '''not''' an error for a validator to be run against an unsupported flavor of the platform type:  This case should be indicated by a human readable message stating the mismatch of expectations (e.g., "Expected RHEL/CentOS or 5.x/6.x, but failed to find /etc/redhat-version")
+|-
+| &nbsp; !! host || String || Host address for the instance against which to perform tests
+|-
+| &nbsp;
+! exceptions 
+|colspan="2"| Occur when the tool fails (and the exception clarifies the reason) or when a failure occurs for any other reason (in which case ''at least'' the context of the failure is reported if no further information is available).
+|}
+
+
+
+
+= Test Plan =
+
+----
+[[tag:rls-3.4]]

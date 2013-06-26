@@ -1,0 +1,10 @@
+= Imaging CLIs =
+These are the user accessible CLI tools which actuate the same workflows as performed by the '''Imaging''' service.  That is, for the things which are done in the Imaging service using the Imaging toolkit, there is a corresponding way to invoke the workflow/task using a command line tool.  The neccessity of these tools is due to several things:
+# Debugging images which fail in the Imaging service (which would report the cause of failure).
+# Testing of the Imaging toolkit.
+# Ability to manually operate the image workflow for sophisticated users wishing to elaborate on the existing workflows.
+
+= Test Plan =
+
+----
+[[tag:rls-3.4]]

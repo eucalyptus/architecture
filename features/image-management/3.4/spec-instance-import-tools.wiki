@@ -1,0 +1,14 @@
+= Instance Import Tools =
+See:
+* [http://docs.aws.amazon.com/AWSEC2/latest/CommandLineReference/ApiReference-cmd-ImportInstance.html ec2-import-instance]
+* [http://docs.aws.amazon.com/AWSEC2/latest/CommandLineReference/ApiReference-cmd-ImportVolume.html ec2-import-volume]
+* [http://docs.aws.amazon.com/AWSEC2/latest/CommandLineReference/ApiReference-cmd-DescribeConversionTasks.html ec2-describe-conversion-tasks]
+* [http://docs.aws.amazon.com/AWSEC2/latest/CommandLineReference/ApiReference-cmd-DeleteDiskImage.html ec2-delete-disk-image]
+* [http://docs.aws.amazon.com/AWSEC2/latest/CommandLineReference/ApiReference-cmd-CancelConversionTask.html ec2-cancel-conversion-task]
+* [http://docs.aws.amazon.com/AWSEC2/latest/CommandLineReference/ApiReference-cmd-CreateInstanceExportTask.html ec2-create-export-task] '''(future)'''
+* [http://docs.aws.amazon.com/AWSEC2/latest/CommandLineReference/ApiReference-cmd-DescribeExportTasks.html ec2-describe-export-tasks] '''(future)'''
+
+= Test Plan =
+
+----
+[[tag:rls-3.4]]

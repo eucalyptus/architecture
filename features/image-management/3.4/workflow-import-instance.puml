@@ -1,0 +1,60 @@
+@startuml
+title ImportInstance (EC2 Service)
+
+start
+:#ffbbbb:ImportInstance invoked;
+note right: Red indicates EC2 Service
+if (imageLocation\nis valid) then (exists &\naccessible)
+  :#ffbbbb:fetch\nmanifest;
+  if (imageLocation's manifest\nis valid) then (yes)
+    :#ffbbbb:populate\nmetadata\nfrom manifest;
+    fork
+      :#ddffdd:<b>Call:</b>\nImportImage;
+      note right: green indicates\nImaging Service
+      fork
+        ''
+        '' Wait for the imaging task to complete
+        ''
+        while (imaging task not complete)
+          :#ffbbbb:check imaging task;
+          :#ddffdd:<b>Call:</b>\nDescribeImagingTasks;
+        endwhile
+        :#ffbbbb:image state\navailable;
+        ''
+        '' Run the instance
+        ''
+        :#ffbbbb:<b>Call:</b>\nRunInstance;
+        while (instance not running)
+          :#ffbbbb:check instance state;
+          :#ffbbbb:<b>Call:</b>\nDescribeInstances;
+        endwhile
+
+        :#ddffdd:<b>Call:</b>\nValidateInstance;
+        fork
+          while (imaging task not complete)
+            :#ffbbbb:check imaging task state;
+            :#ddffdd:<b>Call:</b>\nDescribeImagingTasks;
+          endwhile
+          :#ffbbbb:image state\navailable;
+        fork again
+          :#ddffdd:<b>Executes</b>\nValidateInstance workflow;
+        endfork
+      fork again
+        :#ddffdd:<b>Executes</b>\nImportImage workflow;
+      endfork
+    fork again
+      :#ffbbbb:image state\nunavailable;
+      :#ffbbbb:assign\nimage id;
+      :#ffbbbb:<b>return image id</b>;
+      end
+    endfork
+  else (invalid)
+    :#ffbbbb:<b>return error</b>;
+    end
+  endif
+else (invalid)
+  :#ffbbbb:<b>return error</b>;
+  end
+endif
+end
+@enduml

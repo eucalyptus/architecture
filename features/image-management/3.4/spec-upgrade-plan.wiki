@@ -1,0 +1,7 @@
+= Upgrading Existing Images =
+When the imaging service is introduce in 3.4 any images which had previously been registered in the system may need to be converted and ''re-imported'' before being bootable.  This is not clear yet.
+
+= Test Plan =
+
+----
+[[tag:rls-3.4]]

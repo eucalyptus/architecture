@@ -1,0 +1,52 @@
+= Workflow Declaration =
+There are a number of workflows which interact with the image management services and tools.  Some of them are currently supported by other functionality in Eucalyptus which will be superceded by image management services/tools and will be deprecated.  The important workflows are:
+* '''RegisterImage''': an existing workflow which will change.
+* '''BundleInstance''': an existing workflow which will change.
+* '''CreateImage''': ''potentially'' a new workflow.
+* '''ImportInstance''': a new workflow.
+* '''ImportVolume''': a new workflow.
+
+== Ansible ==
+A quick investigation indicates that it may be possible to express the orchestration of the image toolkit operations as an ansible playbook.  That is, it has the following attributes:
+
+# '''Install/Depends''': Small and standard set of dependencies (yaml and jinja2)
+
+# '''Playbook/Task Composition''':
+## [http://www.ansibleworks.com/docs/playbooks2.html#conditional-execution Conditional execution] can be used to execute playbook tasks based on either input parameters or computed values (e.g., to scope tasks to the right input image types).
+## [http://www.ansibleworks.com/docs/playbooks2.html#conditional-imports Conditional imports] can be used to compose the workflow playbooks.
+## [http://www.ansibleworks.com/docs/playbooks.html#task-include-files-and-encouraging-reuse parameterizable and included tasks]
+## [http://www.ansibleworks.com/docs/playbooks2.html#playbooks-including-playbooks nested playbooks]
+
+# '''Execution State Information''':
+## [http://www.ansibleworks.com/docs/playbooks.html#tasks-list Descriptive declaration of tasks]
+## A [http://www.ansibleworks.com/docs/playbooks2.html#check-mode-dry-run-check Dry Run] execution mode
+## [http://www.ansibleworks.com/docs/playbooks2.html#asynchronous-actions-and-polling Asynchronous Tasks] and access to [http://www.ansibleworks.com/docs/modules.html#async-status Asynchronous Task State]
+## Additional instrumentation of playbook execution through callbacks [https://github.com/ansible/ansible/blob/devel/lib/ansible/callback_plugins/noop.py Ansible Callback Plugins]
+
+# '''Execution Environments''':
+## NOTE: ssh to a host is the standard behaviour
+## Support for [http://www.ansibleworks.com/docs/playbooks2.html#local-playbooks Local Playbook] execution mode
+## Operating in a [https://github.com/mmoya/ansible/commit/9a493ef3881ba1153a1894c6fb19a5a54da24183 chroot] (verified present in the 1.2 release; which is current)
+
+# '''AWS service support''':
+## Support for [http://www.ansibleworks.com/docs/modules.html#ec2 EC2] (can run instances)
+## Support for [http://www.ansibleworks.com/docs/modules.html#s3 S3] (only for testing existence of objects)
+
+== RegisterImage ==
+=== EC2 Service ===
+[[image-management-3.4-workflow-register-image.png|width=100%|align=center|frame]]
+=== Imaging Service ===
+[[image-management-3.4-workflow-imaging-register-image.png|float|width=100%|align=right|frame]]
+
+== Import Instance ==
+=== EC2 Service ===
+'[[image-management-3.4-workflow-register-image.png|width=800px|align=center|frame]]
+=== Imaging Service ===
+'[[image-management-3.4-workflow-imaging-register-image.png|float|width=800px|align=right|frame]]
+
+
+
+= Test Plan =
+
+----
+[[tag:rls-3.4]]

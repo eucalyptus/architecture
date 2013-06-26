@@ -1,0 +1,16 @@
+= Booting Disk Images =
+This feature consists of supporting booting directly from a full-disk image which has a bootloader setup in the MBR and, so, subsequently boots using an image internal kernel/ramdisk configuration (in the case of linux).
+
+== KVM ==
+Requires changes to the way that instances are started up.  There are no known technical obstacles.
+
+== VMware ==
+This is already the case.
+
+== Xen ''(out-of-scope)'' ==
+Currently Xen is not part of the supported/tested hypervisor sets.  However, with the return of Xen4 in CentOS 5.4 it may become a consideration.  Support for Xen would come in the form of pv-grub.  
+
+= Test Plan =
+
+----
+[[tag:rls-3.4]]
