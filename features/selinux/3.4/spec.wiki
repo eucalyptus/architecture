@@ -2,6 +2,14 @@
 
 The purpose of this feature is to implement a complete SELinux security policy for the core Eucalyptus Cloud services.
 
+## Reasons for SELinux Support
+
+There are two reasons we're focusing on SELinux support for Eucalyptus at this time:
+
+1. Providing Mandatory Access Control to prevent damage when services are compromised. Services adhere to a strict security policy that cannot be modified by the user, as oppose to Discretionary Access Control (which is the typical type of access control found on Linux systems). MAC does not replace DAS, but is used in addition to it.
+
+2. Making Eucalyptus even easier to use by reducing the number of steps one must follow to install the software. There would no longer be a need to disable SELinux support.
+
 ## Services to support
 
 All core services, which includes:
