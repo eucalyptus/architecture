@@ -55,7 +55,16 @@ The eucalyptus account is currently used to perform a variety of privileged oper
 * accounts with privileged access should not have preset default password
 
 == UX Requirements ==
-* TBD
+* That usage of privileged personae should not require extra steps from the GUI console once the policies have been defined and the user is logged in (usage of privileged personae should be transparent to the user).
+* That usage of privileged personae should not require extra steps from the CLI tools once the policies have been defined (assumption of roles from CLI may require extra step you mentioned above)
+* That options which are not allowed for a logged in user of a GUI console are either hidden or disabled (which of these to use will be TBD on a case-by-case basis)
+* That options which are not allowed for a user of CLI tools will have a clear error message indicating cause and remedy
+* That canned policies are provided with Eucalyptus
+* That predefined roles using the canned policies will be provided
+* These predefined policies and roles must be editable by those with permissions to do so
+* That cloud admins or users with IAM permissions can easily assign full roles or just the operations they want to grant access to with any level of desired granularity
+* That any errors related to privileged personae must have clear and concise error messages returned indicating cause and remedy to be displayed in either CLI or GUI
+
 
 == Notes ==
 * euca-modify-property should be separated into 2 operation: to modify properties (for IA) and to modify runtime (by default, for CSA only)
