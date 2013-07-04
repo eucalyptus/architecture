@@ -29,12 +29,12 @@ As well as enterprise services:
 
 === Things to consider ===
 
-* There should be a _single_ policy for the Eucalyptus core services
-* All Java services on a host run within a _single_ JVM instance
-** Java service support should be enabled/disabled by use of SELinux booleans (run `semanage boolean -l` for a list of existing booleans)
+* There should be a ''single'' policy for the Eucalyptus core services
+* All Java services on a host run within a ''single'' JVM instance
+** Java service support should be enabled/disabled by use of SELinux booleans (run <code>semanage boolean -l</code> for a list of existing booleans)
 * We are really only concerned about types and type transitions
-** Services will run as the `system_u` user with the `system_r` role
-** Files will use the `system_u` user and the `object_r` role
+** Services will run as the <code>system_u</code> user with the <code>system_r</code> role
+** Files will use the <code>system_u</code> user and the <code>object_r</code> role
 ** Multilevel security (MLS) is also not necessary to consider
 * Services should share as many types as possible as it makes sense (KISS)
 
