@@ -5,6 +5,13 @@
 
 The eucalyptus account is currently used to perform a variety of privileged operations ranging from cloud setup to cross-account resource management. In the new user model, there is going to a single super privileged user that can do all functionality currently available to the ''eucalyptus'' account but be limited by local-host access only. This user can be used to perform privileged operations when needed using local-host access and can bootstrap other privileged accounts/users/roles that can be used remotely and delegate a customizable set of privileges (defined by policies) to them. 
 
+== Phased Introduction ==
+Support for the full roles specification will be introduced in phases which are:
+# Role names are hard coded -- they cannot be altered either on the server or CLI.  This means that each implementation on the client side of a privileged operation will know ''apriori'' the name of the role to assume.
+# Role names can be specified as configuration to CLI tools and UI server -- a user will be able to change the Role used on a ''per operation basis''.  This means that if a different role should be used for a certain operation, based on server side changes, then there is a ''mechanism'' for configuring the client to use that alternative Role.
+# Role names will be determined dynamically by tool from server -- there will be a ''protocol'' between the client and the server to determine what Roles grant access to which operations.
+
+
 == Privileged Personas ==
 * the ''Cloud Super Admin'' (CSA)
 ** the super powerful user, which can perform any privileged operation in Eucalyptus and delegate these privileges
