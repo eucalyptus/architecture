@@ -1,16 +1,16 @@
-# SELinux
+== SELinux ==
 
 The purpose of this feature is to implement a complete SELinux security policy for the core Eucalyptus Cloud services.
 
-## Reasons for SELinux Support
+=== Reasons for SELinux Support ===
 
 There are two reasons we're focusing on SELinux support for Eucalyptus at this time:
 
-1. Providing Mandatory Access Control to prevent damage when services are compromised. Services adhere to a strict security policy that cannot be modified by the user, as oppose to Discretionary Access Control (which is the typical type of access control found on Linux systems). MAC does not replace DAS, but is used in addition to it.
+# Providing Mandatory Access Control to prevent damage when services are compromised. Services adhere to a strict security policy that cannot be modified by the user, as oppose to Discretionary Access Control (which is the typical type of access control found on Linux systems). MAC does not replace DAS, but is used in addition to it.
 
-2. Making Eucalyptus even easier to use by reducing the number of steps one must follow to install the software. There would no longer be a need to disable SELinux support.
+# There would no longer be a need to disable SELinux support.
 
-## Services to support
+=== Services to support ===
 
 All core services, which includes:
 
@@ -25,28 +25,28 @@ As well as enterprise services:
 * SAN Controllers (Equallogic, EMC, and NetApp)
 * VMWare Broker
 
-**NOTE**: While there are other parts of the Eucalyptus ecosystem (i.e., the user console and load balancer image) that also ought to include SELinux policies, these are not within the scope of this feature.
+'''NOTE''': While there are other parts of the Eucalyptus ecosystem (i.e., the user console and load balancer image) that also ought to include SELinux policies, these are not within the scope of this feature.
 
-## Things to consider
+=== Things to consider ===
 
-* There should be a _single_ policy for the Eucalyptus core services
-* All Java services on a host run within a _single_ JVM instance
-  + Java service support should be enabled/disabled by use of SELinux booleans (run `semanage boolean -l` for a list of existing booleans)
+* There should be a ''single'' policy for the Eucalyptus core services
+* All Java services on a host run within a ''single'' JVM instance
+** Java service support should be enabled/disabled by use of SELinux booleans (run <code>semanage boolean -l</code> for a list of existing booleans)
 * We are really only concerned about types and type transitions
-  + Services will run as the `system_u` user with the `system_r` role
-  + Files will use the `system_u` user and the `object_r` role
-  + Multilevel security (MLS) is also not necessary to consider
+** Services will run as the <code>system_u</code> user with the <code>system_r</code> role
+** Files will use the <code>system_u</code> user and the <code>object_r</code> role
+** Multilevel security (MLS) is also not necessary to consider
 * Services should share as many types as possible as it makes sense (KISS)
 
-## Enforcing versus Permissive
+== Enforcing versus Permissive ==
 
-The goal is to have a security policy that will run in _permissive_ mode on an enforcing system. Chances are that something will be missed in the policy implementation, and we should not penalize the user for that by denying access to resources or hindering the functionality of their cloud services. As our first iteration, we will release the security policy as a _permissive_ policy that can be used to collect information from audit logs to further improve the policy.
+The goal is to have a security policy that will run in ''permissive'' mode on an enforcing system. Chances are that something will be missed in the policy implementation, and we should not penalize the user for that by denying access to resources or hindering the functionality of their cloud services. As our first iteration, we will release the security policy as a _permissive_ policy that can be used to collect information from audit logs to further improve the policy.
 
-## Resources
+== Resources ==
 
-* [SELinux User Guide](https://access.redhat.com/site/documentation/en-US/Red_Hat_Enterprise_Linux/6/html/Security-Enhanced_Linux/index.html)
-* [SELinux Reference List](https://access.redhat.com/site/documentation/en-US/Red_Hat_Enterprise_Linux/6/html/Security_Guide/chap-Security_Guide-References.html)
+* [https://access.redhat.com/site/documentation/en-US/Red_Hat_Enterprise_Linux/6/html/Security-Enhanced_Linux/index.html SELinux User Guide]
+* [https://access.redhat.com/site/documentation/en-US/Red_Hat_Enterprise_Linux/6/html/Security_Guide/chap-Security_Guide-References.html SELinux References]
 
-
-*****
+----
 [[tag:rls-3.4]]
+
