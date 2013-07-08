@@ -17,7 +17,7 @@ Support for the full roles specification will be introduced in phases which are:
 ** the super powerful user, which can perform any privileged operation in Eucalyptus and delegate these privileges
 ** should have limited access (local root only?)
 ** the only user who can create, modify and delete privileged policies and assign these policies to users
-* the ''Cloud Resource Manager'' (CRM) 
+* the ''Cloud Resource Admin'' (CRA) 
 ** can manage AWS-defined resources (such as S3 objects, instances, users, etc) across accounts
 ** from PRD-37, typical responsibilities 
 *** Management (accounts, cloud resources, policies, quotas, users, groups)
@@ -42,16 +42,19 @@ Support for the full roles specification will be introduced in phases which are:
 * Users
 ** CSA
 * Roles
-** CRM
+** CRA
 *** a policy should allow for any supported AWS action (e.g., actions: "ec2:*", "s3:*", "iam:*", "elb:*", "as:*", "cw:*") + reporting
 *** need a way to specify in a policy that cross-account access is allowed (e.g., by prepending a special namespace to all actions "euca:ec2:*" or by employing ARNs "arn:aws:service:region:*:resource") 
 ** IA
-*** a policy should allow for the actions supported by Empyrean, Configuration, and Properties services)
+*** a policy should allow for the actions supported by Empyrean, Configuration, and Properties services
 
 == Requirements ==
+* privileged functionality should only be exposed via roles or local access 
 * a user can assume more than one role (is there a limit?) 
 * provide canned policies for privileged roles
-* policy language should allow for specifying cross-account access
+* policy language should allow for specifying cross-account access 
+* policy language should allow for specifying eucalyptus-specific operations that are needed for implementing IA
+* audit trail for privileged operations and change of privileges
 
 == Security Restrictions ==
 * limited access to CSA functionality (local root only?)
@@ -59,7 +62,9 @@ Support for the full roles specification will be introduced in phases which are:
 ** define privileged policies
 ** define privileged policies to users and roles
 ** grant/revoke access to privileged roles
-* accounts with privileged access should not have preset default password
+* by default, grant policies for privileged roles should deny access by anyone
+* accounts with privileged access should not have default (preset) credentials
+* it should be possible to limit some functionality to CSA only (but it should be possible to delegate it to another privileged persona if needed)
 
 == UX Requirements ==
 * That usage of privileged personae should not require extra steps from the GUI console once the policies have been defined and the user is logged in (usage of privileged personae should be transparent to the user).
@@ -75,7 +80,7 @@ Support for the full roles specification will be introduced in phases which are:
 
 == Notes ==
 * euca-modify-property should be separated into 2 operation: to modify properties (for IA) and to modify runtime (by default, for CSA only)
-* how to distinguish between expired and invalid credentials?! (if valid, but expired, the error message can say that they are expired)
+* UI: how to distinguish between expired and invalid credentials?! (if valid, but expired, the error message can say that they are expired)
 * lifetime of STS credentials for privileged roles
 ** should be short, allow for one operation only?
 * role discovery by client tools and UI
