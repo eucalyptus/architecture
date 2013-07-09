@@ -1,0 +1,33 @@
+#Design Document for Scalable Walrus
+
+## Overview
+The current Walrus implementation is limited to a single host for servicing S3 requests as well as storing actual user data. This limits the system to scale-up models rather than scale-out. The objective of this design is to achive scale-out capabilities for Walrus in the dimensions of both IO/throughput and storage capacity.
+
+Scalable Walrus is basically a division of the Walrus implementation into two distinct pieces: front-end API translation and authentication/authorization and a back-end that provides the persistent storage. The front-end components are stateless and can be deployed in a scale-out manner where all are active and service user requests. The back-end component is stateful and also is responsible for interacting with the storage medium (disk, external storage service etc).
+
+The back-end component is responsible for interacting with the storage medium and thus may manage local resources and/or remote resources provided by another service (such as RiakCS or Swift). There may be many back-end implementations althought only one type can be used in any given deployment (this may be relaxed in future releases/designs). The back-end component must serve the data and S3 metadata in response to requests from the front-end component(s).
+
+## Functional Design
+
+
+## Logical Design
+###Front-End:
+####Input language: S3
+####Output language: backend-API (TBD)
+####Responsibilities: Receive user request, authenticate, map to proper back-end request.
+
+###Back-End:
+####Input language: backend-API (TBD)
+####Output language: implementation specific (i.e. CloudFiles/Swift, Raw HTTP, Posix, etc)
+####Responsibilities: Manage metadata, receive requests and send/receive data and persist that data in a durable manner.
+
+
+## External Interfaces
+S3 API
+Operations on Service: GET
+Operations on Buckets: GET/PUT/HEAD/DELETE ?versioning|?logging|?acl
+Operations on Objects: GET/PUT/HEAD/DELETE ?acl|?versionId
+
+Image API (deprecated)
+Snapshot API (deprecated)
+
