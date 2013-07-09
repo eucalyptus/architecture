@@ -5,12 +5,19 @@
 
 The eucalyptus account is currently used to perform a variety of privileged operations ranging from cloud setup to cross-account resource management. In the new user model, there is going to a single super privileged user that can do all functionality currently available to the ''eucalyptus'' account but be limited by local-host access only. This user can be used to perform privileged operations when needed using local-host access and can bootstrap other privileged accounts/users/roles that can be used remotely and delegate a customizable set of privileges (defined by policies) to them. 
 
+== Phased Introduction ==
+Support for the full roles specification will be introduced in phases which are:
+# Role names are hard coded -- they cannot be altered either on the server or CLI.  This means that each implementation on the client side of a privileged operation will know ''apriori'' the name of the role to assume.
+# Role names can be specified as configuration to CLI tools and UI server -- a user will be able to change the Role used on a ''per operation basis''.  This means that if a different role should be used for a certain operation, based on server side changes, then there is a ''mechanism'' for configuring the client to use that alternative Role.
+# Role names will be determined dynamically by tool from server -- there will be a ''protocol'' between the client and the server to determine what Roles grant access to which operations.
+
+
 == Privileged Personas ==
 * the ''Cloud Super Admin'' (CSA)
 ** the super powerful user, which can perform any privileged operation in Eucalyptus and delegate these privileges
 ** should have limited access (local root only?)
 ** the only user who can create, modify and delete privileged policies and assign these policies to users
-* the ''Cloud Resource Manager'' (CRM) 
+* the ''Cloud Resource Admin'' (CRA) 
 ** can manage AWS-defined resources (such as S3 objects, instances, users, etc) across accounts
 ** from PRD-37, typical responsibilities 
 *** Management (accounts, cloud resources, policies, quotas, users, groups)
@@ -35,16 +42,19 @@ The eucalyptus account is currently used to perform a variety of privileged oper
 * Users
 ** CSA
 * Roles
-** CRM
+** CRA
 *** a policy should allow for any supported AWS action (e.g., actions: "ec2:*", "s3:*", "iam:*", "elb:*", "as:*", "cw:*") + reporting
 *** need a way to specify in a policy that cross-account access is allowed (e.g., by prepending a special namespace to all actions "euca:ec2:*" or by employing ARNs "arn:aws:service:region:*:resource") 
 ** IA
-*** a policy should allow for the actions supported by Empyrean, Configuration, and Properties services)
+*** a policy should allow for the actions supported by Empyrean, Configuration, and Properties services
 
 == Requirements ==
+* privileged functionality should only be exposed via roles or local access 
 * a user can assume more than one role (is there a limit?) 
 * provide canned policies for privileged roles
-* policy language should allow for specifying cross-account access
+* policy language should allow for specifying cross-account access 
+* policy language should allow for specifying eucalyptus-specific operations that are needed for implementing IA
+* audit trail for privileged operations and change of privileges
 
 == Security Restrictions ==
 * limited access to CSA functionality (local root only?)
@@ -52,14 +62,25 @@ The eucalyptus account is currently used to perform a variety of privileged oper
 ** define privileged policies
 ** define privileged policies to users and roles
 ** grant/revoke access to privileged roles
-* accounts with privileged access should not have preset default password
+* by default, grant policies for privileged roles should deny access by anyone
+* accounts with privileged access should not have default (preset) credentials
+* it should be possible to limit some functionality to CSA only (but it should be possible to delegate it to another privileged persona if needed)
 
 == UX Requirements ==
-* TBD
+* That usage of privileged personae should not require extra steps from the GUI console once the policies have been defined and the user is logged in (usage of privileged personae should be transparent to the user).
+* That usage of privileged personae should not require extra steps from the CLI tools once the policies have been defined (assumption of roles from CLI may require extra step you mentioned above)
+* That options which are not allowed for a logged in user of a GUI console are either hidden or disabled (which of these to use will be TBD on a case-by-case basis)
+* That options which are not allowed for a user of CLI tools will have a clear error message indicating cause and remedy
+* That canned policies are provided with Eucalyptus
+* That predefined roles using the canned policies will be provided
+* These predefined policies and roles must be editable by those with permissions to do so
+* That cloud admins or users with IAM permissions can easily assign full roles or just the operations they want to grant access to with any level of desired granularity
+* That any errors related to privileged personae must have clear and concise error messages returned indicating cause and remedy to be displayed in either CLI or GUI
+
 
 == Notes ==
 * euca-modify-property should be separated into 2 operation: to modify properties (for IA) and to modify runtime (by default, for CSA only)
-* how to distinguish between expired and invalid credentials?! (if valid, but expired, the error message can say that they are expired)
+* UI: how to distinguish between expired and invalid credentials?! (if valid, but expired, the error message can say that they are expired)
 * lifetime of STS credentials for privileged roles
 ** should be short, allow for one operation only?
 * role discovery by client tools and UI
