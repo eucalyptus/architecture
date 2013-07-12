@@ -22,12 +22,14 @@ OSPs can be composed of many hosts or a single host. The minimum requirement is 
 ## Overall System Functional Design
 The OSG(s) handle *all* client requests. Any client wishing to use Eucalyptus for Object Storage should be configured to connect to the OSG(s) using Eucalyptus user credentials and the S3 API. The OSP is unknown to the end-user and should be considered an internal component of Eucalyptus.
 
+The OSG (as a global entity) is configured to use a specific backend by setting a configurable property: 'euca-modify-property -p osg.backend=[walrus|riakcs|...]'
 
+Additional properties may the require configuration for the specific backend. Examples include: endpoint URI, endpoint credentials, etc. It is expected that a backend be configured prior to configuration of the OSG.
 
 ## External Interfaces
-S3 API
-Image API (deprecated, subsumed by an independent Image Service)
-Snapshot API (deprecated, will be subsumed by S3 API directly)
+* S3 API
+* Internal-euca-only Image API (deprecated, subsumed by an independent Image Service)
+* Internal-euca-only Snapshot API (deprecated, will be subsumed by S3 API directly)
 
 ## OSG Security Design
 ### Credential Management for OSPs
