@@ -1,1 +1,21 @@
-When new services are implemented or integrated with Eucalyptus, the following high-level security guidelines should be followed.
+This is a collection of high-level security guidelines to follow when implementing a new service or intergrating an external component with Eucalyptus.
+
+== Eucalyptus Services ==
+* Should require authentication and authorization for all operations/resources that are not intended to be public
+* Stand-alone services should have a separate set of component keys
+* Should not have permissions to write into its own config files
+* Should not require root privileges to run
+* Should protect its data from unauthorized access (in database and on the filesystem)
+* Should treat third-party credentials/secrets with extra caution and never store/log/transmit them in unencrypted form 
+* Should verify authenticity, integrity, and timestamps of received messages
+* Should follow other general security [[security.wiki|guidelines]] as applicable
+
+== Front-end Services ==
+* Should follow all of the above requirement for a Eucalyptus service
+* Should integrate with IAM and have support for IAM policies (all operations and resources) unless explicitly not required
+* Should have SSL support for all endpoints
+* Should allow for installation of CA-signed SSL certificates for all endpoints
+
+== Third-party/External Services Integration ==
+* Do not allow external services direct access to any internal data (credentials, database, files, etc.)
+* Use a dedicated set of credentials for authentication and communications with external services
