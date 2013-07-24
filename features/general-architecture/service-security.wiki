@@ -1,0 +1,1 @@
+When new services are implemented or integrated with Eucalyptus, the following high-level security guidelines should be followed.
