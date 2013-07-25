@@ -4,7 +4,7 @@ This is a collection of high-level security guidelines to follow when implementi
 * Should require authentication and authorization for all operations/resources that are not intended to be public
 * Stand-alone services should have a separate set of component keys
 * Should not have permissions to write into its own config files
-* Should not require root privileges to run
+* Should not run with root privileges
 * Should protect its data from unauthorized access (in database and on the filesystem)
 * Should treat third-party credentials/secrets with extra caution and never store/log/transmit them in unencrypted form 
 * Should verify authenticity, integrity, and timestamps of received messages
