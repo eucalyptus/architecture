@@ -1,3 +1,159 @@
-cluster-policies.wiki
+= Overview =
+This document contains requirements and specification for IAM policy updates allowing restriction of images to availability zones. This feature is under consideration for inclusion in the 3.4 release.
+
+== Tracking ==
+{|
+! Status || Draft || 
+|-
+! Updated || 2013/08/28 || Initial document
+|}
+
+= Requirements =
+== Hard ==
+* Policy allows restricting specified images to specified availability zones when running instances.
+
+== Soft ==
+* Policy can be specified at the account level and applies to account administrators.
+* Propagation of restrictions to images created from an image with a restriction (also snapshots)
+* Ability to specify restrictions indirectly using mechanisms such as product codes or resource tags
+
+= Analysis =
+== AWS Gap ==
+EC2/IAM added support for EC2 specific condition keys earlier in 2013. This includes the key
+
+  ec2:AvailabilityZone
+
+which at first appears useful for restricting images to certain availability zones. This is not the case as the new conditions allow restriction/filtering against (properties of) existing resources rather than filtering on request properties.
+
+== Availabiliy Zone Selection ==
+In the case of running an instance without specification of an availability zone it is important that the policy mechanism supports selection of an availability zone suitable for the image being launched. This implies that any new condition must restrict/filter availability zones.
+
+= Specification =
+We will add a new condition key and support for the ARN evaluation type to allow restriction of specified images to specified availability zones.
+
+== IAM Refresh ==
+ARN type support is required, other items are nice to have.
+
+=== ARN Evaluation Type Support ===
+ARN support is required for conditions on values with type ARN (such as the ARN of an image)
+
+=== New Conditions ===
+The following conditions are useful for conditions on values that are optional:
+
+* Null condition
+* ..IfExists conditions ( e.g. StringEqualsIfExists )
+
+=== New EC2 Condition Keys ===
+The following EC2 conditions can further restrict users permissions on instances, volumes and security groups:
+
+* ec2:AvailabilityZone
+* ec2:InstanceProfile
+* ec2:InstanceType
+* ec2:ParentSnapshot
+* ec2:Region
+* ec2:RootDeviceType
+* ec2:VolumeSize
+
+Additionally these conditions can be present in a policy but are not fully implemented as we do not support the underlying functionality:
+
+* ec2:EbsOptimized
+* ec2:PlacementGroup
+* ec2:Tenancy
+* ec2:VolumeIops
+* ec2:VolumeType
+* ec2:Vpc
+
+The following condition will likely not be implemented:
+
+* ec2:ResourceTag/tag-key
+
+== IAM Extension ==
+IAM/EC2 extensions will be added for this feature.
+
+=== Account Deny Effect ===
+Currently only quota policies can be attached to accounts, we will extend this to allow statements with a deny effect, for example:
+
+=== Extension Condition Keys ===
+The following Eucalyptus specific extension condition key will be added:
+
+* ec2:TargetImage  (or ec2:RequestImage?)
+
+This will be of type ARN and will allow restriction based on the image specified in the current request.
+
+== Use Cases ==
+=== Restrict Image to Availability Zone ===
+
+* Attach policy to user:
+
+  {
+    "Statement":[
+      {
+        "Effect":"Allow",
+        "Action":"ec2:*",
+         "Resource":"*"
+      },
+      {
+        "Effect": "Deny",
+        "Action": [ "ec2:*" ],
+        "Resource": "arn:aws:ec2:::availabilityzone/PARTI00",
+        "Condition": {
+          "ArnEqualsIfExists": {
+            "ec2:TargetImage": "arn:aws:ec2:::image/emi-239D37F2"
+          }
+        }
+      }
+    ]
+  }
+
+* Launch non permitted image as user:
+
+  $> euca-run-instances -z PARTI00 emi-239D37F2
+  euca-run-instances: error (RunInstancesType): Not authorized to use cluster PARTI00
+
+=== RunInstance without specified Availability Zone ===
+* Launch non permitted image:
+
+  $> euca-run-instances emi-239D37F2
+  euca-run-instances: error (RunInstancesType): Not enough resources: no availability zone is available in which you have permissions to run instances.
+
+=== Account policy ===
+* Attach policy to account:
+
+  {
+    "Statement": [ {
+      "Effect": "Deny",
+      "Action": [ "ec2:RunInstances" ],
+      "Resource": "arn:aws:ec2:::availabilityzone/PARTI00",
+      "Condition": {
+          "ArnEquals": {
+              "ec2:TargetImage": "arn:aws:ec2:::image/emi-239D37F2"
+          }
+      }
+    } ]
+  }
+
+=== Terminate Instance in Availability Zone ===
+* Attach policy to user
+
+  {
+    "Version": "2012-10-17",
+    "Statement": [{
+      "Effect": "Allow",
+      "Action": [ "ec2:TerminateInstances" ],
+      "Resource": "arn:aws:ec2:us-east-1:123456789012:instance/*",
+      "Condition": {
+        "StringEquals": {
+          "ec2:AvailabilityZone": "PARTI00"
+        }
+      }
+    }]
+  }
+
+* User can only terminate instances in specified availability zone
+
+= References =
+* [http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/iam-policies-for-amazon-ec2.html IAM Policies for Amazon EC2]
+* [http://docs.aws.amazon.com/AWSEC2/latest/APIReference/ec2-api-permissions.html Granting IAM Users Required Permissions for Amazon EC2 Resources]
+
 ----
 [[tag:rls-3.4]]
