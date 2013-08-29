@@ -6,6 +6,8 @@ This document contains requirements and specification for IAM policy updates all
 ! Status || Draft || 
 |-
 ! Updated || 2013/08/28 || Initial document
+|-
+! Updated || 2013/08/29 || Listed ARN conditions, added more use cases.
 |}
 
 = Requirements =
@@ -19,7 +21,7 @@ This document contains requirements and specification for IAM policy updates all
 
 = Analysis =
 == AWS Gap ==
-EC2/IAM added support for EC2 specific condition keys earlier in 2013. This includes the key
+EC2/IAM added support for EC2 specific condition keys earlier in 2013. This includes the key:
 
   ec2:AvailabilityZone
 
@@ -32,16 +34,23 @@ In the case of running an instance without specification of an availability zone
 We will add a new condition key and support for the ARN evaluation type to allow restriction of specified images to specified availability zones.
 
 == IAM Refresh ==
-ARN type support is required, other items are nice to have.
+ARN condition support is required, other items are nice to have.
 
-=== ARN Evaluation Type Support ===
-ARN support is required for conditions on values with type ARN (such as the ARN of an image)
+=== EC2 Actions Updated ===
+The actions permitted in an IAM policy will be updated to the 2013-07-15 API version.
 
 === New Conditions ===
+The following conditions are used for conditions on ARN values:
+
+* ArnEquals
+* ArnNotEquals
+* ArnLike
+* ArnNotLike
+
 The following conditions are useful for conditions on values that are optional:
 
 * Null condition
-* ..IfExists conditions ( e.g. StringEqualsIfExists )
+* ..IfExists conditions ( e.g. StringEqualsIfExists, ArnLikeIfExists )
 
 === New EC2 Condition Keys ===
 The following EC2 conditions can further restrict users permissions on instances, volumes and security groups:
@@ -63,7 +72,7 @@ Additionally these conditions can be present in a policy but are not fully imple
 * ec2:VolumeType
 * ec2:Vpc
 
-The following condition will likely not be implemented:
+The following condition will not be implemented:
 
 * ec2:ResourceTag/tag-key
 
@@ -71,7 +80,7 @@ The following condition will likely not be implemented:
 IAM/EC2 extensions will be added for this feature.
 
 === Account Deny Effect ===
-Currently only quota policies can be attached to accounts, we will extend this to allow statements with a deny effect, for example:
+Currently only quota policies can be attached to accounts, we will extend this to allow statements with a deny effect (see use cases for an example)
 
 === Extension Condition Keys ===
 The following Eucalyptus specific extension condition key will be added:
@@ -82,6 +91,7 @@ This will be of type ARN and will allow restriction based on the image specified
 
 == Use Cases ==
 === Restrict Image to Availability Zone ===
+This case covers user policy for preventing launch of an image in an availability zone.
 
 * Attach policy to user:
 
@@ -97,8 +107,8 @@ This will be of type ARN and will allow restriction based on the image specified
         "Action": [ "ec2:*" ],
         "Resource": "arn:aws:ec2:::availabilityzone/PARTI00",
         "Condition": {
-          "ArnEqualsIfExists": {
-            "ec2:TargetImage": "arn:aws:ec2:::image/emi-239D37F2"
+          "ArnLike": {
+            "ec2:TargetImage": "arn:aws:ec2:*:*:image/emi-239D37F2"
           }
         }
       }
@@ -111,12 +121,23 @@ This will be of type ARN and will allow restriction based on the image specified
   euca-run-instances: error (RunInstancesType): Not authorized to use cluster PARTI00
 
 === RunInstance without specified Availability Zone ===
+This case covers running an instance of an image that is permitted in some availability zones.
+
+* Attach relevant policy to user.
+
+* Launch of image is successful (availability zone selected)
+
+=== RunInstance without specified Availability Zone (Failure) ===
+This case if for running an instance of an image that is not permitted in any availability zone.
+
 * Launch non permitted image:
 
   $> euca-run-instances emi-239D37F2
   euca-run-instances: error (RunInstancesType): Not enough resources: no availability zone is available in which you have permissions to run instances.
 
 === Account policy ===
+This case covers account level policy denial.
+
 * Attach policy to account:
 
   {
@@ -125,14 +146,18 @@ This will be of type ARN and will allow restriction based on the image specified
       "Action": [ "ec2:RunInstances" ],
       "Resource": "arn:aws:ec2:::availabilityzone/PARTI00",
       "Condition": {
-          "ArnEquals": {
-              "ec2:TargetImage": "arn:aws:ec2:::image/emi-239D37F2"
+          "ArnLike": {
+              "ec2:TargetImage": "arn:aws:ec2:*:*:image/emi-239D37F2"
           }
       }
     } ]
   }
 
+* Verify administrator in account is not able to run image.
+
 === Terminate Instance in Availability Zone ===
+This case covers restriction of instance termination to a specified availability zone.
+
 * Attach policy to user
 
   {
@@ -140,7 +165,7 @@ This will be of type ARN and will allow restriction based on the image specified
     "Statement": [{
       "Effect": "Allow",
       "Action": [ "ec2:TerminateInstances" ],
-      "Resource": "arn:aws:ec2:us-east-1:123456789012:instance/*",
+      "Resource": "*",
       "Condition": {
         "StringEquals": {
           "ec2:AvailabilityZone": "PARTI00"
@@ -150,6 +175,75 @@ This will be of type ARN and will allow restriction based on the image specified
   }
 
 * User can only terminate instances in specified availability zone
+
+=== Region Condition Key ===
+AWS allows the region condition key to be used in any EC2 action. This case covers use of the condition outside of the expected (instance, security group and volume) actions.
+
+* Attach policy to user
+
+  {
+    "Statement":[
+      {
+        "Effect": "Allow",
+        "Action": [ "ec2:*" ],
+        "Resource": "*",
+        "Condition": {
+          "StringEquals": {
+            "ec2:Region": "eucalyptus"
+          }
+        }
+      }
+    ]
+  }
+
+* Create and describe a key pair as the user.
+
+=== ..IfExists Conditions Accepted ===
+This case ensures that the ..IfExists versions of all conditions are recognized.
+
+* Upload a policy containing ..IfExists versions of each supported condition (other than the Null condition)
+* Policy uploads successfully (conditions are recognized)
+
+=== ..IfExists Condition Operation ===
+In this case the condition is only evaluated if the key is present. For run/describe operations the key is null.
+
+* Upload policy with check against null condition key:
+
+  {
+    "Statement":[
+      {
+        "Effect": "Allow",
+        "Action": [ "ec2:*" ],
+        "Resource": "*",
+        "Condition": {
+          "StringEqualsIfExists": {
+            "ec2:AvailabilityZone": "PARTI00"
+          }
+        }
+      }
+    ]
+  }
+
+* Ensure instances can be run, described and deleted in the zone.
+
+=== Null Condition Operation ===
+This use case covers the Null condition and ec2:AvailabilityZone condition key. The key is present for only some actions (see references)
+
+* Add policy for user
+
+  {
+    "Statement":[{
+        "Action":["ec2:*"],
+        "Effect":"Allow",
+        "Resource":["*"],
+        "Condition":{
+           "Null":{"ec2:AvailabilityZone":"true"}
+        }
+      }
+    ]
+  }
+
+* Verify that a volume can be created and described but not deleted as the user.
 
 = References =
 * [http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/iam-policies-for-amazon-ec2.html IAM Policies for Amazon EC2]
