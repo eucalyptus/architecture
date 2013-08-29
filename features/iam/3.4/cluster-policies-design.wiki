@@ -1,0 +1,83 @@
+= Overview =
+Design for IAM policy changes in support of restricting images to availability zones.
+
+== Tracking ==
+{|
+! Status || Draft || 
+|-
+! Updated || 2013/08/29 || Initial document
+|}
+
+= Design =
+== Null Condition ==
+New '''NullConditionOp''' implements this functionality. Special handling is added in '''PolicyParser''' to allow this condition to be used with any condition key.
+
+== ..IfExists Conditions ==
+'''IfExistsDelegatingConditionOp''' implements this functionality as a wrapper around existing conditions. On discovery by '''ConditionOpDiscovery''' the '''PolicyCondition''' annotation is checked to determine if a ..IfExists condition should be added for each registered condition.
+
+== ARN Conditions ==
+New ARN condtion implementations are:
+
+* '''ArnEqualsConditionOp'''
+* '''ArnLikeConditionOp'''
+* '''ArnNotEqualsConditionOp'''
+* '''ArnNotLikeConditionOp'''
+
+Which all extend '''ArnConditionOp'''. For like comparisons the existing '''PatternUtils''' is used.
+
+== Resource Condition Keys ==
+New EC2 condition keys are added as follows:
+
+  ComputeKey
+  |- AvailabilityZoneKey
+  |- InstanceComputeKey
+  |  |- EbsOptimizedKey
+  |  |- InstanceProfileKey
+  |  |- InstanceTypeKey
+  |  |- PlacementGroupKey
+  |  |- RootDeviceTypeKey
+  |  |- TenancyKey
+  |- RegionKey
+  |- TargetImageKey
+  |- VolumeComputeKey
+  |  |- ParentSnapshotKey
+  |  |- VolumeIopsKey
+  |  |- VolumeSizeKey
+  |  |- VolumeTypeKey
+  |- VpcKey
+
+'''Volume''' is updated with stubs for iops and type properties.
+
+When a policy is evaluated there is now a per-resource callback via the new '''PolicyResourceInterceptor''' interface. These interceptors are discovered via '''PolicyResourceInterceptorDiscovery''' and registed on ''RestrictedTypes'''.
+
+An EC2 specific interceptor '''ComputePolicyResourceInterceptor''' handles callbacks for EC2 resources and manages the new '''ComputePolicyContext''' by setting the relevant '''ComputePolicyContextResource''' from the transformed '''RestrictedType'''. There are transformers for instances, security groups and volumes.
+
+The new condition keys access the '''ComputePolicyContext''' to get the current value for the key.
+
+== Target Image Condition Key ==
+'''TargetImageKey''' implements this functionality. The image identifier is retrieved from the current (contextual) request
+
+= Upgrade =
+No upgrade impact noted.
+
+= Packaging =
+No specific packaging requirements.
+
+= Documentation =
+* New IAM conditions should be documented (Null, ..IfExists, ARN conditions)
+* New EC2 specific IAM condition keys should be documented, Eucalyptus extensions should be clearly noted.
+* New behavior for account level policies with Deny statements should be documented. Existing documention stating only quotas can be used at the account level should be revised.
+
+= Security =
+All changes in this feature are IAM policy related and have security impact.
+
+= Testing =
+Use cases in the specification provide an overview for testing.
+
+= References =
+* [[iam-3.4-cluster-policies | Specification for this feature]]
+* [http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/iam-policies-for-amazon-ec2.html IAM Policies for Amazon EC2]
+* [http://docs.aws.amazon.com/AWSEC2/latest/APIReference/ec2-api-permissions.html Granting IAM Users Required Permissions for Amazon EC2 Resources]
+
+[[tag:rls-3.3]]
+
