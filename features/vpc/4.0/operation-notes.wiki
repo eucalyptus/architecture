@@ -1,0 +1,99 @@
+= VPC =
+* Need tasks for productizing of EDGE
+* Design work backend APIs supporting current EDGE functionality
+* Investigation of the needed parts of VPC
+** http://docs.aws.amazon.com/AWSEC2/latest/APIReference/OperationList-query.html
+** VPCs
+** Subnets
+** Elastic Network Interfaces
+** Gateways:  Customer, Internet, Virtual Private
+** VPNs
+** DHCP Options
+** Network ACLs
+** Route Tables
+** Security Groups: Egress rules
+
+== VPC Fundamentals ==
+VPCs
+* CreateVpc
+* DeleteVpc
+* DescribeVpcAttribute
+* DescribeVpcs
+* ModifyVpcAttribute 
+
+Subnets
+* CreateSubnet
+* DeleteSubnet
+* DescribeSubnets 
+
+DHCP Options
+* AssociateDhcpOptions
+* CreateDhcpOptions
+* DeleteDhcpOptions
+* DescribeDhcpOptions 
+
+== VPC Attributes ==
+Security Groups
+* AuthorizeSecurityGroupEgress
+* RevokeSecurityGroupEgress
+
+Network ACLs
+* CreateNetworkAcl
+* CreateNetworkAclEntry
+* DeleteNetworkAcl
+* DeleteNetworkAclEntry
+* DescribeNetworkAcls
+* ReplaceNetworkAclAssociation
+* ReplaceNetworkAclEntry 
+
+Route Tables
+* AssociateRouteTable
+* CreateRoute
+* CreateRouteTable
+* DeleteRoute
+* DeleteRouteTable
+* DescribeRouteTables
+* DisableVgwRoutePropagation
+* DisassociateRouteTable
+* EnableVgwRoutePropagation
+* ReplaceRoute
+* ReplaceRouteTableAssociation 
+
+== Network Interfaces ==
+Elastic Network Interfaces
+* AssignPrivateIpAddresses
+* AttachNetworkInterface
+* CreateNetworkInterface
+* DeleteNetworkInterface
+* DescribeNetworkInterfaceAttribute
+* DescribeNetworkInterfaces
+* DetachNetworkInterface
+* ModifyNetworkInterfaceAttribute
+* ResetNetworkInterfaceAttribute
+* UnassignPrivateIpAddresses
+
+== Gateways & VPNs ==
+Customer Gateways
+* CreateCustomerGateway
+* DeleteCustomerGateway
+* DescribeCustomerGateways
+
+Internet Gateways
+* AttachInternetGateway
+* CreateInternetGateway
+* DeleteInternetGateway
+* DescribeInternetGateways
+* DetachInternetGateway 
+
+VPN Connections
+* CreateVpnConnection
+* CreateVpnConnectionRoute
+* DeleteVpnConnection
+* DescribeVpnConnections 
+
+Virtual Private Gateways
+* AttachVpnGateway
+* CreateVpnGateway
+* DeleteVpnGateway
+* DescribeVpnGateways
+* DetachVpnGateway 
