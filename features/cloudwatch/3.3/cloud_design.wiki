@@ -214,6 +214,11 @@ Table Operations
 *Delete : removes rows in which have a time stamp that is more than two weeks old
 *Uniqueness Constraints: Only the combination of account_id, metric_name, namespace, and dimension key/values (in order) need to be unique.
 
+
+<b>Note: Metrics returned from the list_metrics table will exist when populated by a 'put_metric_data' call.  This means, if a data point for a metric is not put into the system, the metric will not show up in the list of metrics from list_metrics.  In particular, if an instance is running, with monitoring "disabled", the system metrics, such as AWS/EC2 CPUUtilization for the given instanceId will not show up in
+the list metrics result list.  In addition, metrics will be aware of the last time a value was put in under 'put metric data' as a last_update_time for a metric.  If two weeks have passed since any value for a metric has been put in, it will be removed from the list_metrics table.</b>
+
+
 === Alarms ===
 The Alarm Entity represents alarms in the system.  Alarms are associated with a metric, so have most of the fields associated with it.  '''AlarmEntity''' extends '''AbstractPersistentWithDimensions''' so in addition to the dimension fields, alarms are stored in the table ''alarms'' and have the following fields.
 {|
