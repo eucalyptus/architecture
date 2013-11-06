@@ -1,3 +1,289 @@
-spec.wiki
+= DNS =
+'''NOTE:''' through out this document the following naming assumptions are used:
+** '''DNSDOMAIN.COM''' is the public subdomain which is delegated to Eucalyptus
+** '''${system.dns.dnsdomain}''' refers to the system property of the same name
+** '''${cloud.vmstate.}''' refers to the system property of the same name
+** '''INSTANCESUBDOMAIN''' is the subdomain used for instance DNS
+** '''10.111.1.2''' is the example Eucalyptus CLC host
+
+== Evaluation ==
+=== dig ===
+* For evaluation dig is primarily used as it does not have any behaviour -- it only implements the DNS protocol
+* The following can be assumed as the '''dig''' command used throughout
+** '''10.111.1.2''' is the DNS server, when ommitted dig will resort to resolv.conf and use only the first server
+** '''A''' is the query type
+** '''DNSDOMAIN.COM''' is our query domain
+* The rest of the command cleans output
+```bash
+function check() {
+> dig @10.111.1.2 $1 $2 +retries=0 +timeout=1 | awk '/^$/{getline} $2 == "flags:" {print} /^;[^ ;].*A$/ {print} /^[^;][^ ;]/'
+> }
+```
+* The output includes:
+** The flags set on the response
+** The question sent
+** The answers recieved (all sections; answer, additional, and authority)
+```bash
+;; flags: qr aa rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 0
+;eucalyptus.DNSDOMAIN.COM.	IN	A
+eucalyptus.DNSDOMAIN.COM. 60	IN	A	10.111.1.2
+```
+
+=== ping ===
+* Ping has behaviours which are important to verify work
+** Sends multiple variants of the initial A lookup query (domain searching)
+** Sends PTR requests in order to print the pretty header line
+
+=== host ===
+* Host best reflects the default behaviour of <code>gethostbyname()</code>
+
+== Setup Steps ==
+
+=== Enable Experimental ===
+* Set all the experimental DNS resolvers to be enabled='true'
+```bash
+ clc 17599 > euca-describe-properties experimental.dns
+PROPERTY	experimental.dns.enabled	true
+PROPERTY	experimental.dns.instancedata.enabled	true
+PROPERTY	experimental.dns.ns.enabled	true
+PROPERTY	experimental.dns.recursive.enabled	true
+PROPERTY	experimental.dns.services.enabled	true
+PROPERTY	experimental.dns.split_horizon.enabled	true
+```
+
+=== nameserveraddress ===
+* Set the nameserveraddress given out to instances to be the same as the CLC
+* '''THIS IS NOT RIGHT!'''  The 'nameserveraddress' needs to be dynamic for HA!
+```bash
+euca-modify-property -p system.dns.nameserveraddress=10.111.1.2
+PROPERTY	system.dns.nameserveraddress	10.111.1.2 was 127.0.0.1
+```
+
+=== System and Instance Domains ===
+* Set the public facing domain name -- the cloud internal domain is always 'internal'
+```bash
+ clc 17595 > euca-modify-property -p system.dns.dnsdomain=DNSDOMAIN.COM
+PROPERTY	system.dns.dnsdomain	DNSDOMAIN.COM was localhost
+```
+* Set the sub-domain name used for instances
+```bash
+ clc 17597 > euca-modify-property -p cloud.vmstate.instance_subdomain=.INSTANCESUBDOMAIN
+PROPERTY	cloud.vmstate.instance_subdomain	.INSTANCESUBDOMAIN was .eucalyptus
+```
+
+=== Enable DNS ===
+```bash
+ clc 17610 > euca-modify-property -p bootstrap.webservices.use_dns_delegation=true
+PROPERTY	bootstrap.webservices.use_dns_delegation	true was false
+
+ clc 17610 > euca-modify-property -p bootstrap.webservices.use_instance_dns=true
+PROPERTY	bootstrap.webservices.use_instance_dns	true was false
+```
+
+== DNS Types ==
+{|
++ Type || Responds To || Description
+|-
+! '[[#service-component-resolver|Service/Component Resolver]] 
+| <code>${component.name()}.${system.dns.dnsdomain}</code> 
+| Resolves the address of the currently ENABLED service indicated by the first label in the request.
+|-
+! '[[#recursive-resolver|Recursive Resolver]] 
+| '''not''' <code>*.${system.dns.dnsdomain}</code>
+| Handles resolution of address which are not in domains managed by Eucalyptus.
+|-
+! '[[#split-horizon-resolver|Split Horizon Resolver]] 
+| <code>euca-(.+{3})-(.+{3})-(.+{3})-(.+{3}).${cloud.vmstate.instance_subdomain}.${system.dns.dnsdomain}</code>
+| <code>euca-(.+{3})-(.+{3})-(.+{3})-(.+{3}).${cloud.vmstate.instance_subdomain}.internal</code>
+| Resolves instance addresses based on the requestor's source address; internal source addresses always get internal ip address responses.
+|-
+! '[[#instance-data-resolver|instance-data Resolver]] 
+| <code>instance-data</code>
+<code>instance-data.internal</code>
+<code>instance-data.${cloud.vmstate.instance_subdomain}.internal</code>
+| hi
+|}
+
+
+
+
+== Service/Component Resolver ==
+* '''A records''' for components & services
+* Components:
+** All have a short-name (column 2 of euca-describe-services)
+** May have a partition which deteremines their subdomain (column 3 of euca-describe-services)
+** May be strictly internal (e.g., reporting) and have no DNS name associated as a result
+
+=== Component Name Resolution ===
+* Component name lookups are:
+** Global services: <code>${componentId.name()}.DNSDOMAIN.COM</code>
+** Partitioned services: <code>${componentId.name()}.${partition}.DNSDOMAIN.COM</code>
+* This resolver is authoritative
+* Examples of its behaviour can be seen using the following command:
+```bash
+euca-describe-services --all  |  
+awk '$3 == "PARTI00" {print $2"."$3".DNSDOMAIN.COM"} $3 != "PARTI00" {print $2".DNSDOMAIN.COM"}' |
+sort | uniq |  
+xargs -i dig @10.111.1.2 A {}  +retries=0 +timeout=1 | 
+awk '/^$/{getline} $2 == "flags:" {print} /^;[^ ;].*A$/ {print}'
+```
+
+===== Regular Single Service A Query =====
+```bash
+;; flags: qr aa rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 0
+;autoscaling.DNSDOMAIN.COM.	IN	A
+autoscaling.DNSDOMAIN.COM. 60	IN	A	10.111.1.2
+```
+```bash
+;; flags: qr aa rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 0
+;walrus.DNSDOMAIN.COM.		IN	A
+walrus.DNSDOMAIN.COM.	60	IN	A	10.111.1.2
+```
+
+===== Partitioned Single Service A Query =====
+```bash
+;; flags: qr aa rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 0
+;cluster.PARTI00.DNSDOMAIN.COM.	IN	A
+cluster.PARTI00.DNSDOMAIN.COM. 60 IN	A	10.111.1.2
+```
+```bash
+;; flags: qr aa rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 0
+;storage.PARTI00.DNSDOMAIN.COM.	IN	A
+storage.PARTI00.DNSDOMAIN.COM. 60 IN	A	10.111.1.2
+```
+
+===== Partitioned Multiple Service A Query =====
+```bash
+;; flags: qr aa rd ra; QUERY: 1, ANSWER: 2, AUTHORITY: 0, ADDITIONAL: 0
+;node.PARTI00.DNSDOMAIN.COM.	IN	A
+node.PARTI00.DNSDOMAIN.COM. 60	IN	A	10.111.1.66
+node.PARTI00.DNSDOMAIN.COM. 60	IN	A	10.111.1.16
+```
+===== Failed Service A Query =====
+```bash
+;; flags: qr aa rd ra; QUERY: 1, ANSWER: 0, AUTHORITY: 1, ADDITIONAL: 0
+;reporting.DNSDOMAIN.COM.	IN	A
+DNSDOMAIN.COM.		604800	IN	SOA	root.DNSDOMAIN.COM. b-02.qa1.eucalyptus-systems.com.DNSDOMAIN.COM. 1 86400 604800 2419200 600
+```
+
+
+== Recursive Resolver ==
+* Resolves names outside of the eucalyptus controlled domain names
+** Never resolves names which are in a system controlled subdomain
+** Never reverse-resolves addresses which are controlled by the system
+* Example of lookups against '''facebook.com'''
+=== ANY ===
+```bash
+root@euca-1-109-165-29:~# dig any facebook.com
+
+; <<>> DiG 9.8.1-P1 <<>> any facebook.com
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 60419
+;; flags: qr rd ra; QUERY: 1, ANSWER: 6, AUTHORITY: 0, ADDITIONAL: 2
+
+;; QUESTION SECTION:
+;facebook.com.			IN	ANY
+
+;; ANSWER SECTION:
+facebook.com.		70109	IN	NS	a.ns.facebook.com.
+facebook.com.		70109	IN	NS	b.ns.facebook.com.
+facebook.com.		766	IN	AAAA	2a03:2880:2110:df07:face:b00c:0:1
+facebook.com.		149	IN	MX	10 msgin.t.facebook.com.
+facebook.com.		365	IN	A	173.252.110.27
+facebook.com.		86266	IN	TXT	"v=spf1 redirect=_spf.facebook.com"
+
+;; ADDITIONAL SECTION:
+a.ns.facebook.com.	172265	IN	A	69.171.239.12
+b.ns.facebook.com.	172265	IN	A	69.171.255.12
+
+;; Query time: 76 msec
+;; SERVER: 10.111.1.2#53(10.111.1.2)
+;; WHEN: Fri Aug  2 04:59:54 2013
+;; MSG SIZE  rcvd: 211
+```
+=== Individual Queries: A, AAAA, TXT, MX, NS, SOA, etc. ===
+```bash
+root@euca-1-109-165-29:~# for f in A AAAA TXT MX NS SOA ; do dig +nocmd $f facebook.com +noall +stats +answer ; done
+facebook.com.		473	IN	A	173.252.110.27
+;; Query time: 64 msec
+;; SERVER: 10.111.1.2#53(10.111.1.2)
+;; WHEN: Fri Aug  2 04:58:05 2013
+;; MSG SIZE  rcvd: 113
+
+facebook.com.		874	IN	AAAA	2a03:2880:2110:df07:face:b00c:0:1
+;; Query time: 61 msec
+;; SERVER: 10.111.1.2#53(10.111.1.2)
+;; WHEN: Fri Aug  2 04:58:05 2013
+;; MSG SIZE  rcvd: 125
+
+facebook.com.		86374	IN	TXT	"v=spf1 redirect=_spf.facebook.com"
+;; Query time: 52 msec
+;; SERVER: 10.111.1.2#53(10.111.1.2)
+;; WHEN: Fri Aug  2 04:58:05 2013
+;; MSG SIZE  rcvd: 143
+
+facebook.com.		257	IN	MX	10 msgin.t.facebook.com.
+;; Query time: 65 msec
+;; SERVER: 10.111.1.2#53(10.111.1.2)
+;; WHEN: Fri Aug  2 04:58:05 2013
+;; MSG SIZE  rcvd: 121
+
+facebook.com.		70217	IN	NS	a.ns.facebook.com.
+facebook.com.		70217	IN	NS	b.ns.facebook.com.
+;; Query time: 47 msec
+;; SERVER: 10.111.1.2#53(10.111.1.2)
+;; WHEN: Fri Aug  2 04:58:05 2013
+;; MSG SIZE  rcvd: 97
+
+facebook.com.		78	IN	SOA	a.ns.facebook.com. dns.facebook.com. 2013080100 7200 1800 604800 120
+;; Query time: 51 msec
+;; SERVER: 10.111.1.2#53(10.111.1.2)
+;; WHEN: Fri Aug  2 04:58:05 2013
+;; MSG SIZE  rcvd: 137
+```
+
+== Split Horizon Resolver ==
+== instance-data Resolver ==
+* Responds to:  
+** A record queries for 'instance-data' and possible subdomain variants, always returning 169.254.169.254
+** PTR querires for 169.254.169.254 returning instance-data
+```bash
+;; QUESTION SECTION:
+;instance-data.			IN	A
+;; ANSWER SECTION:
+instance-data.		60	IN	A	169.254.169.254
+```
+```bash
+;; QUESTION SECTION:
+;instance-data.internal.		IN	A
+;; ANSWER SECTION:
+instance-data.		60	IN	A	169.254.169.254
+```
+```bash
+;; QUESTION SECTION:
+;instance-data.eucalyptus.internal. IN	A
+;; ANSWER SECTION:
+instance-data.		60	IN	A	169.254.169.254
+```
+=== A ===
+```bash
+root@euca-1-106-32-141:~# dig A instance-data
+169.254.169.254
+Using domain server:
+Name: 10.111.1.66
+Address: 10.111.1.66#53
+Aliases: 
+
+instance-data has address 169.254.169.254
+```
+=== PTR ===
+```bash
+;; QUESTION SECTION:
+;254.169.254.169.in-addr.arpa.	IN	PTR
+;; ANSWER SECTION:
+254.169.254.169.in-addr.arpa. 60 IN	PTR	instance-data.
+```
+
 ----
 [[tag:rls-3.4]]
