@@ -26,14 +26,6 @@ Current OSP implementations:
 * AWS S3
 Potential future OSPs: Ceph (prototype using RadosGW already exists), OpenStack Swift.
 
-## Functional Design
-The OSG(s) handle *all* client requests. Any client wishing to use Eucalyptus for Object Storage should be configured to connect to the OSG(s) using Eucalyptus user credentials and the S3 API. The OSP is unknown to the end-user and should be considered an internal component of Eucalyptus.
-
-The OSG (as a global entity) is configured to use a specific backend by setting a configurable property: 'euca-modify-property -p osg.backend=[walrus|riakcs|...]'
-
-Additional properties may the require configuration for the specific backend. Examples include: endpoint URI, endpoint credentials, etc. It is expected that a backend be configured prior to configuration of the OSG.
-
-
 ## External Interfaces
 Client->OSG:
 * S3 API, exclusively. REST only supported. No S3 SOAP support.
@@ -41,13 +33,43 @@ Client->OSG:
 OSG->OSP:
 * Any API, but must support CRUD operations on objects and buckets
 
+## Functional Design
+The OSG(s) handle *all* client requests. Any client wishing to use Eucalyptus for Object Storage should be configured to connect to the OSG(s) using Eucalyptus user credentials and the S3 API. The OSP is unknown to the end-user and should be considered an internal component of Eucalyptus.
+
+General request flow:
+* User request enters OSG via S3 API.
+* Request is mapped to internal bucket/key names for dispatch to OSP
+* Request to OSP is configured and dispatched to OSP from OSG by OSP client running in the OSG.
+* OSP returns result to OSG
+* OSG maps result as needed and returns result to user as an S3 API response
+
+TODO: Add Basic Object GET/PUT Design
+TODO: Add Versioning Design
+TODO: Add Bucket Lifecycle Design
+TODO: Add provider designs
+
+## OSG Dependencies
+OSG depends on:
+* Eucalyptus IAM/Accounts
+* Eucalyptus persistence/db
+
 ## OSG internal Metadata
 Persistence Context/DB: 'eucalyptus_osg' database
 * Objects - com.eucalyptus.objectstorage.ObjectEntity class, 'objects' table
 * Buckets - com.eucalyptus.objectstorage.Bucket class, 'buckets' table
 * Parts - com.eucalyptus.objectstorage.PartEntity class, 'parts' table
 * Bucket LifecycleRules - com.eucalyptus.objectstorage.BucketLifecycleRule class, 'lifecycle_rules' table.
+* ObjectEntity and PartEntity have a FK dependency on Bucket
 
+###Entity states
+ObjectEntity: creating, extant, mpu-pending, deleting
+PartEntity: creating, extant, deleting
+Bucket: creating, extant, deleting
+
+'creating' -> Entity has been initialized and persisted by OSG and the operation is in progress. Non-terminal state
+'extant' -> Entity was successfully created and is available to users.
+'mpu-pending' -> Multipart Upload, for ObjectEntity records to indicate the presence of a valid uploadId but the MPU upload has not been completed or aborted
+'deleting' -> Entity is marked for deletion. It is no longer visible to users via the API. This is persisted to allow asynchronous cleanup on failure conditions as needed
 
 ## OSG Security Considerations
 ### Credential Management for OSPs
@@ -59,15 +81,13 @@ Credentials for OSPs are treated as secret information and thus are given the sa
 
 ### Securiting network communications
 SSL/HTTPS with certificate validation is the primary mechanism for security network communications to/from the OSG. This applies to both client operations to the OSG as well as OSG operations to the backend OSP.
-This is configured using properties in Eucalyptus:
-* objectstorage.s3provider.usebackendhttps -- Configures the backend provider for S3 compatible backends (Walrus/RiakCS/Ceph) to use HTTPS for operations from the OSG->OSP
 
 ### Securing data at rest
 Security of data at rest is the responsibility of the OSP implementations themselves.
 
 ## Configuration of Object Storage
 ### Selecting the OSP
-* objectstorage.providerclient=[walrus|riakcs|ceph]
+* objectstorage.providerclient=[walrus|riakcs|ceph (experimental)]
 
 ### Configuring the OSG(s)
 * objectstorage.queue_size=[number of chunks to buffer before declaring timeout] -- Sets the amount of 100K data buffers that the OSG will allow to be kept before failing a PUT operation because the data is not being transfered to the OSP quickly enough relative to the sender
@@ -78,8 +98,5 @@ Security of data at rest is the responsibility of the OSP implementations themse
 * objectstorage.failed_put_timeout_hrs=[# of hours to allow an object to remain in 'creating' state before deciding it has failed, default=168] -- Used to determine, if all other methods fail, when to time-out a PUT operation
 * objectstorage.max_buckets_per_account	100
 * objectstorage.max_total_reporting_capacity_gb=[some number of GBs, default: 2147483647] -- This is the number used for reporting capacity usage. This does NOT limit or restrict usage, only for reporting % usage as (total stored)/(reporting capacity). This may result in usage being > 100% in the Eucalyptus reporting system.
-
-
-### Configuring OSPs
 
 
