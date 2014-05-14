@@ -1,0 +1,10 @@
+= Persistence =
+== Overview ==
+== ORM: Hibernate ==
+== Caching: Infinispan/TreeCache ==
+== Connection pooling: Proxool ==
+== Replication: HA-JDBC ==
+== RDBMS: PostgreSQL ==
+
+----
+[[tag:rls-3.4]]

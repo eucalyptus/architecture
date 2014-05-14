@@ -2,6 +2,7 @@
 
 * http://docs.aws.amazon.com/STS/latest/UsingSTS/STSUseCases.html#MobileApplication-KnownProvider
 * http://docs.aws.amazon.com/STS/latest/UsingSTS/CreatingWIF.html
+* [[https://images-na.ssl-images-amazon.com/images/G/01/lwa/dev/docs/website-developer-guide._TTH_.pdf|Login with Amazon]]
 
 == Steps Involved ==
 Assuming we had support, the workflow a user would have to follow in order to enable the Eucalyptus User Console to interact with AWS is:
@@ -9,6 +10,21 @@ Assuming we had support, the workflow a user would have to follow in order to en
 
 == Console Changes Needed ==
 * FILL IN
+
+== Security Considerations ==
+* use SSL for all endpoints 
+** verify server certificates 
+* use the "authorization code grant" model for authorization
+* use the ''state'' param in the authorization request to prevent CSRF ([[https://images-na.ssl-images-amazon.com/images/G/01/lwa/dev/docs/website-developer-guide._TTH_.pdf|p. 25]] explains details)
+** the state param should be different for each authorization request
+** the state param in the response should match the value in the initial request, if it does not, the communication should be ignored
+* use Authorization header (rather than URL params) in requests that allow it
+* don't use open redirectors in the redirection URI ([[https://images-na.ssl-images-amazon.com/images/G/01/lwa/dev/docs/website-developer-guide._TTH_.pdf|p. 26]])
+* validate all data before using ([[https://images-na.ssl-images-amazon.com/images/G/01/lwa/dev/docs/website-developer-guide._TTH_.pdf|p. 27]])
+* security-sensitive tokens (do not log, protect in transit and at rest, avoid using in URIs, do not distributed to untrusted entities, etc.)
+** ''client secret'' is used to authenticate the application, similar to a password
+** ''access_token'' is a bearer token (which means that it can be used by anyone who has it) that can be used to retrieve a customer's profile and to assume an AWS role, this is essentially a session token
+** ''refresh_token'' has an indefinite lifetime and maybe be used to renew the ''access_token'', it is assigned to a particular client and cannot be used by others, it can only be revoked by removing the website from the list of allowed apps for a user's account
 
 ----
 [[tag:rls-3.4]]
