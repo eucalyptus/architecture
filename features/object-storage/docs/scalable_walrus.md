@@ -1,4 +1,4 @@
-#Design Document for Scalable Object Storage (introduced in Eucalyptus 4.0)
+#Design Document for Scalable Object Storage
 
 ## Overview
 The current Walrus implementation is limited to a single host for servicing S3 requests as well as storing actual user data. This limits the system to scale-up models rather than scale-out. The objective of this design is to achive scale-out capabilities for Walrus in the dimensions of both IO/throughput and storage capacity.
@@ -18,20 +18,21 @@ The OSG receives user S3 requests and authenticates and authorizes them using th
 The OSG is always run in an active/active configuration such that there may be many currently active OSG handling user requests. This mode of operation is independent of that of the OSP, and thus decouples the scale characteristics of the front and back-ends of the system. This is intended for both legacy support (Walrus is active/passive) as well as quick restart and recovery of the front-end components even in the event of complete backend failure. If no OSPs are available the OSGs may still handle requests and simply return HTTP-50X errors that the service is unavailable.
 
 ## Object Storage Provider (OSP) Overview
-The Object Storage Provider is the abstraction of one or more hosts and software components that provide persistent data storage and communicate with clients using an S3-compatible API. It is not required that all S3 operations be supported, but those that are not should return proper 40X errors indicating that the requested operation is invalid/unavailable.
+The Object Storage Provider is the "backend" of Object Storage. This compnent is responsible for persisting the actual user data and must support CRUD operations on data. This may or may not be an internal component of Eucalpytus. It may be an external service, eg. S3 or RiakCS. 
 
-Current OSP implementations: Walrus (non-HA) & Walrus (HA w/DRBD).
-Development OSP implementations for 3.4: RiakCS
-Future potential OSPs: Ceph, AWS S3, OpenStack Swift.
+Current OSP implementations: 
+* Walrus (non-HA) & Walrus (HA w/DRBD), 
+* RiakCS, 
+* AWS S3
+Potential future OSPs: Ceph (prototype using RadosGW already exists), OpenStack Swift.
 
-OSPs can be composed of many hosts or a single host. The minimum requirement is that an OSP is available at a specific URL using the S3 REST API.
-
-## Overall System Functional Design
+## Functional Design
 The OSG(s) handle *all* client requests. Any client wishing to use Eucalyptus for Object Storage should be configured to connect to the OSG(s) using Eucalyptus user credentials and the S3 API. The OSP is unknown to the end-user and should be considered an internal component of Eucalyptus.
 
 The OSG (as a global entity) is configured to use a specific backend by setting a configurable property: 'euca-modify-property -p osg.backend=[walrus|riakcs|...]'
 
 Additional properties may the require configuration for the specific backend. Examples include: endpoint URI, endpoint credentials, etc. It is expected that a backend be configured prior to configuration of the OSG.
+
 
 ## External Interfaces
 Client->OSG:
@@ -39,6 +40,14 @@ Client->OSG:
 
 OSG->OSP:
 * Any API, but must support CRUD operations on objects and buckets
+
+## OSG internal Metadata
+Persistence Context/DB: 'eucalyptus_osg' database
+* Objects - com.eucalyptus.objectstorage.ObjectEntity class, 'objects' table
+* Buckets - com.eucalyptus.objectstorage.Bucket class, 'buckets' table
+* Parts - com.eucalyptus.objectstorage.PartEntity class, 'parts' table
+* Bucket LifecycleRules - com.eucalyptus.objectstorage.BucketLifecycleRule class, 'lifecycle_rules' table.
+
 
 ## OSG Security Considerations
 ### Credential Management for OSPs
@@ -54,7 +63,7 @@ This is configured using properties in Eucalyptus:
 * objectstorage.s3provider.usebackendhttps -- Configures the backend provider for S3 compatible backends (Walrus/RiakCS/Ceph) to use HTTPS for operations from the OSG->OSP
 
 ### Securing data at rest
-
+Security of data at rest is the responsibility of the OSP implementations themselves.
 
 ## Configuration of Object Storage
 ### Selecting the OSP
