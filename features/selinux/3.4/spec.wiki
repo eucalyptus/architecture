@@ -49,4 +49,4 @@ The goal is to have a security policy that will run in ''permissive'' mode on an
 
 ----
 [[tag:rls-3.4]]
-
+[[tag:selinux]]

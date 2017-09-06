@@ -117,4 +117,4 @@ Testing should cover SOAP and Query APIs
 * [[features/rsrc-attributes/3.3/spec | Resource Attributes specification]]
 
 [[tag:rls-3.3]]
-
+[[tag:rsrc-attributes]]

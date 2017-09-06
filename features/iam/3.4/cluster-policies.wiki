@@ -251,3 +251,4 @@ This use case covers the Null condition and ec2:AvailabilityZone condition key. 
 
 ----
 [[tag:rls-3.4]]
+[[tag:iam]]

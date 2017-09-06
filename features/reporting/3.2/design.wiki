@@ -134,3 +134,4 @@ The GUI will display the resultant report in a frame, whereas the CLI will save 
 
 ----
 [[tag:rls-3.2]]
+[[tag:reporting]]

@@ -378,3 +378,4 @@ No specific test cases noted.
 * [http://docs.amazonwebservices.com/AutoScaling/latest/DeveloperGuide/IAM.html AutoScaling and IAM (amazonwebservices.com)]
 
 [[tag:rls-3.3]]
+[[tag:autoscaling]]

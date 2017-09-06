@@ -90,3 +90,4 @@ The service then fetches the VMDK, validates its, spins up an instance, confirms
 
 ----
 [[tag:rls-3.4]]
+[[tag:image-management]]

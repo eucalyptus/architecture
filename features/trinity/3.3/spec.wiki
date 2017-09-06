@@ -39,3 +39,7 @@ Briefly, the use case is:
 
 ----
 [[tag:rls-3.3]]
+[[tag:trinity]]
+[[tag:autoscaling]]
+[[tag:cloudwatch]]
+[[tag:elb]]

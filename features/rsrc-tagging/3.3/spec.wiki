@@ -250,3 +250,4 @@ You can search and filter resources based on the above described tags (e.g., --f
 
 ----
 [[tag:rls-3.3]]
+[[tag:rsrc-tagging]]

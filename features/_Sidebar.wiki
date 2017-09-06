@@ -3,7 +3,7 @@
 ** [https://github.com/eucalyptus/architecture/wiki/organization Organization of...] 
 ----
 * [[tag:index|Tags]]
-** Releases: [[tag:rls-2.0|2.0]], [[tag:rls-3.0|3.0]], [[tag:rls-3.1|3.1]], [[tag:rls-3.2|3.2]], [[tag:rls-3.3|3.3]], [[tag:rls-3.4|3.4]], [[tag:rls-4.0|4.0]], [[tag:rls-4.1|4.1]], [[tag:rls-4.2|4.2]], [[tag:rls-5.0|5.0]]
+** Releases: [[tag:rls-2.0|2.0]], [[tag:rls-3.0|3.0]], [[tag:rls-3.1|3.1]], [[tag:rls-3.2|3.2]], [[tag:rls-3.3|3.3]], [[tag:rls-3.4|3.4]], [[tag:rls-4.0|4.0]], [[tag:rls-4.1|4.1]], [[tag:rls-4.2|4.2]], [[tag:rls-4.3|4.3]], [[tag:rls-4.4|4.4]], [[tag:rls-5.0|5.0]]
 ** Features: [[tag:dns|dns]], [[tag:ebs|ebs]], [[tag:image-management|image management]], [[tag:selinux|selinux]], [[tag:vpc|vpc]]
 ** Services: [[tag:autoscaling|autoscaling]], [[tag:cloudwatch|cloudwatch]], [[tag:elb|elb]], [[tag:iam|iam]], [[tag:object-storage|object storage]], [[tag:sqs|sqs]]
 ** Components: [[tag:eucanetd|eucanetd]]

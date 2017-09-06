@@ -93,3 +93,4 @@ Currently (09/18/12) the [[http://aws.amazon.com/ec2/instance-types/|vm type def
 
 ----
 [[tag:rls-3.3]]
+[[tag:vmtypes]]

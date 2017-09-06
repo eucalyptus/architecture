@@ -287,3 +287,4 @@ instance-data has address 169.254.169.254
 
 ----
 [[tag:rls-3.4]]
+[[tag:dns]]

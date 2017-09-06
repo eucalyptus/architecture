@@ -205,3 +205,4 @@ This limitation excludes support (but not design accommodation) for:
 
 ----
 [[tag:rls-3.2]]
+[[tag:reporting]]

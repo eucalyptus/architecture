@@ -206,3 +206,4 @@ does not require a separate installation and deployment process).
 
 ----
 [[tag:rls-3.2]]
+[[tag:user-ui]]

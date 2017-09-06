@@ -294,3 +294,4 @@ http://docs.amazonwebservices.com/AmazonCloudWatch/latest/DeveloperGuide/CW_Supp
 
 ----
 [[tag:rls-3.3]]
+[[tag:cloudwatch]]

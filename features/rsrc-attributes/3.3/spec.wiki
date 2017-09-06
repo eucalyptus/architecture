@@ -136,5 +136,5 @@ From the 2012-10-01 EC2 API documentation.
 <references />
 
 [[tag:rls-3.3]]
-
+[[tag:rsrc-attributes]]
 

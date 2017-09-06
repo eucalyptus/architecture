@@ -115,3 +115,4 @@ Vmware: Ye
 
 ----
 [[tag:rls-2.0]]
+[[tag:ebs]]

@@ -124,3 +124,6 @@ At a high-level, ALUA (Asymmetric Logical Unit Access) is an active/active setup
 ==== Operational ====
 # The implementation will provide its own handling of DB changes for upgrades from previous Eucalyptus versions.
 # Normal Eucalyptus upgrade procedures should be followed. This may include a shutdown of all NCs. Existing attached volumes do not have to be removed.
+
+[[tag:rls-3.2]]
+[[tag:multipathing]]

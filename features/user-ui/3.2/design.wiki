@@ -63,3 +63,4 @@ The interfaces between the UI proxy and CLC will be mostly the standard web serv
 
 ----
 [[tag:rls-3.2]]
+[[tag:user-ui]]

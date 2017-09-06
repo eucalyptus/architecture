@@ -691,3 +691,4 @@ Testing should verify that that permissions are enforced correctly for each modi
 * [https://eucalyptus.atlassian.net/browse/EUCA-2117 JIRA Task EUCA-2117 - Resource tagging  (atlassian.net)]
 
 [[tag:rls-3.3]]
+[[tag:rsrc-tagging]]

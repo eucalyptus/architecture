@@ -198,3 +198,4 @@ new SchemaUpdate(conf.getHibernateConfiguration()).execute(true, false);
   
 ----
 [[tag:rls-3.2]]
+[[tag:upgrade]]

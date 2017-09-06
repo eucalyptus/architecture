@@ -99,4 +99,4 @@ Security of data at rest is the responsibility of the OSP implementations themse
 * objectstorage.max_buckets_per_account	100
 * objectstorage.max_total_reporting_capacity_gb=[some number of GBs, default: 2147483647] -- This is the number used for reporting capacity usage. This does NOT limit or restrict usage, only for reporting % usage as (total stored)/(reporting capacity). This may result in usage being > 100% in the Eucalyptus reporting system.
 
-
+[[tag:object-storage]]

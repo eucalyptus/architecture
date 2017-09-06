@@ -142,3 +142,4 @@ default_pool_props = [
 ```
 ----
 [[tag:rls-3.4]]
+[[tag:persistence]]

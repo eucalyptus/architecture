@@ -104,3 +104,4 @@ See [[autoscaling-3.3-api-parameters]]
 
 ----
 [[tag:rls-3.3]]
+[[tag:autoscaling]]

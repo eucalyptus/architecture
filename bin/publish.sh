@@ -4,7 +4,7 @@ DESTDIR=${BASEDIR}/wiki
 EXCLUDE="TODO|README.wiki|.wiki.log|EUCA-...."
 EXCLUDE_SUFFIX="pdf|zip|wsdl|git|puml|keep|eucawiki"
 EXCLUDE_DIRS="/bin/|/releases/|/lib/|/wiki/|/.git"
-TAGS="rls-2.0 rls-3.0 rls-3.1 rls-3.2 rls-3.3 rls-3.4 rls-4.0 rls-4.1 rls-4.2 rls-5.0 index"
+TAGS="rls-2.0 rls-3.0 rls-3.1 rls-3.2 rls-3.3 rls-3.4 rls-4.0 rls-4.1 rls-4.2 rls-4.3 rls-4.4 rls-5.0 index"
 echo > ${BASEDIR}/.wiki.log
 FILELIST=$(cd ${BASEDIR}; 
 find features  -type f  | 
