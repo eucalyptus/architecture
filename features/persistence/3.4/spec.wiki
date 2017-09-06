@@ -1,10 +1,144 @@
 = Persistence =
-== Overview ==
-== ORM: Hibernate ==
-== Caching: Infinispan/TreeCache ==
-== Connection pooling: Proxool ==
-== Replication: HA-JDBC ==
-== RDBMS: PostgreSQL ==
+Eucalyptus consists of a collection of '''components''' which are web services implementations of AWS services like EC2, S3, etc.  
 
+== Overview ==
+The services use a common persistence stack for storing data in a replicated RDBMS.  The stack consists of object relation mapping (using Hibernate's JPA implementation), distributed caching (infinispan/TreeCache, depending on version), connection pooling (Proxool), distributed connection management (jgroups), and application level transaction replication (HA-JDBC).  Persistence is done exclusively using JPA -- use of native SQL is disallowed in the services.  
+
+Each service has its own database cluster, cache region, and connection pool.  The system manages the setup and teardown of connections as well as the synchronization of databases when a database host joins or leaves the system.  Use of a database is scoped to the service's own database cluster -- using the database/persistence for communication or data sharing between services is disallowed.
+
+= Persistence Stack =
+The flow of information for storing state:
+# '''JPA''' annotated entities contain metadata defining the object-relational mapping
+# The application begins a '''JPA EntityTransaction''' managed by Hibernate
+# A '''Hibernate EntityManager''' manages the transaction against a hierarchy of caches
+## '''L1-cache''': a local object cache; one cache per session.
+## '''L2-cache/Infinispan''': a replicated object and query cache; one cache region per component.
+# The final execution against the RDBMS happens using a managed JDBC connection:
+## '''Proxool''': managed connection pools; one pool per component.
+## '''HA-JDBC''': JDBC-level transaction replication; wraps multiple JDBC connections and replicates updates, synchronizes databases on join/leave.
+## '''JGroups''': group membership system; used to manage host memebership and triggers JDBC connection activation/deactivation and synchronization.
+# Finally, data is stored in '''Postgres''': two hosts manage pgsql processes.  They configured and managed by the stack.  Their state is monitored.
+
+== ORM: Hibernate ==
+Eucalyptus manages Hibernate EntityManagers for each component.  An EntityManager orchestrate JPA EntityTransactions.  This includes JTA transaction management, JPA object relation mapping based on entity annotations, L1 and L2 cache management, and finally execution of transactions using JDBC. MVCC is used across the persistence layers.
+
+== Caching: Infinispan/TreeCache ==
+Each component has a corresponding object and query cache region.  The cache is configured to be '''TRANSACTIONAL''' per the JPA specification.  The cache is distributed and replicated synchronously among all the java hosts in a Eucalyptus deployment.
+
+== Connection pooling: Proxool ==
+Each component has a corresponding pool of JDBC connections.  The pool has a [[persistence-3.4-spec#proxool|number of parameters]] which determine how it reacts to usage and manages its connections.  Every connection is also health-checked.
+
+== Replication: HA-JDBC ==
+Each pooled JDBC connection is a wrapper of (up to) two underlying JDBC connections and a shared JDBC metadata cache.  There are a [[persistence-3.4-spec#proxool|number of parameters]] determining the behaviour of each connection.  HA-JDBC wrapped connections perform replicated writes and round-robin reads.  When a new database host joins the system there is an ''activation'' of the host which is performed on each of the connections pooled in Proxool.  During activation, the newly added host will perform a full database synchronization from any previously existing database w/in the system.
+
+== Membership: JGroups ==
+When a Eucalyptus host which runs a database joins, leaves, or crashes out of the system two kinds of things happen:
+# Reconfiguration of all the HA-JDBC connections to only reference the DB hosts in the system.
+# Synchronization of data when a DB host re-enters the system based on the state in the databases present before the join occurred.
+A database host joining the system is a stop-the-world event:  Each host will wait until the databases are synchronized before proceeding.  At that point every host has also activated the newly arrived has been activated in all the existing HA-JDBC connections.
+
+== RDBMS: PostgreSQL ==
+Each component has a database cluster.  The configuration of postgresql and management of the server process lifecycle is handled by Eucalyptus.  The process is started as part of bootstrap and monitored during runtime.  The state of the process is reflected in the health and status that is reported in the system (in part through JGroups).  Should a DB host stop running the postgresql process it has effectively parted from the system.
+
+= Current Schema Example =
+* [[persistence-3.4-eucalyptus-sql|pg_dumpall of schemas]]
+
+= Configuration Examples =
+* Hibernate: [[persistence-3.4-setup_persistence-groovy|setup_persistence.groovy]]
+* Proxool: [[persistence-3.4-setup_dbpool-groovy|setup_dbpool.groovy]]
+* JGroups: [[persistence-3.4-setup_membership-groovy|setup_membership.groovy]]
+* Postgres: [[persistence-3.4-setup_db-groovy|setup_db.groovy]], [[persistence-3.4-postgresql-conf|postgresql.conf]]
+* HA-JDBC: [[persistence-3.4-spec#ha-jdbc|ha_jdbc_cloud.xml]]
+
+== Hibernate ==
+```groovy
+default_hiber_config = [
+      'hibernate.archive.autodetection': 'jar, class, hbm',
+      'hibernate.ejb.interceptor.session_scoped': 'com.eucalyptus.entities.DelegatingInterceptor',
+      'hibernate.show_sql': 'false',
+      'hibernate.format_sql': 'false',
+      'hibernate.connection.autocommit': 'false',
+      'hibernate.connection.release_mode': 'after_statement',
+      'hibernate.hbm2ddl.auto': 'update',
+      'hibernate.generate_statistics': 'false',
+      'hibernate.bytecode.use_reflection_optimizer': 'true',
+      'hibernate.cglib.use_reflection_optimizer': 'true',
+    ]
+```
+```groovy
+  [
+        /** jdbc driver **/
+        'hibernate.dialect': Databases.getHibernateDialect( ),
+        /** db pools **/
+        'hibernate.connection.provider_class': 'org.hibernate.connection.ProxoolConnectionProvider',
+        'hibernate.proxool.pool_alias': "eucalyptus_${context_name}",
+        'hibernate.proxool.existing_pool': 'true',
+        /** transactions **/
+        'hibernate.current_session_context_class': 'jta',
+        'hibernate.jndi.class': 'bitronix.tm.jndi.BitronixInitialContextFactory',
+        'hibernate.transaction.flush_before_completion':'false',
+        'hibernate.transaction.auto_close_session':'false',
+        'hibernate.transaction.manager_lookup_class': 'com.eucalyptus.empyrean.EmpyreanTransactionManager',
+        /** l2 cache **/
+        'hibernate.cache.use_second_level_cache': 'true',
+        'hibernate.cache.use_query_cache': 'false',//GRZE: make it false!
+        'hibernate.cache.jbc.query.localonly': 'true',
+        'hibernate.cache.default_cache_concurrency_strategy': 'transactional',
+        'hibernate.cache.region.factory_class': 'com.eucalyptus.bootstrap.CacheRegionFactory',
+        'hibernate.cache.region.jbc2.cfg.shared': 'eucalyptus_jboss_cache.xml',
+        'hibernate.cache.region.jbc2.cfg.multiplexer.stacks': 'eucalyptus_cache_jgroups.xml',
+        'hibernate.cache.jbc.cfg.jgroups.stacks': 'eucalyptus_cache_jgroups.xml',
+        'hibernate.cache.region_prefix': "eucalyptus_${context_name}_cache",
+        'hibernate.cache.use_minimal_puts': 'true',
+        'hibernate.cache.use_structured_entries': 'true',
+      ]
+```
+== Proxool ==
+```groovy
+default_pool_props = [
+      'proxool.simultaneous-build-throttle': '32',
+      'proxool.minimum-connection-count': '8',
+      'proxool.maximum-connection-count': '512',
+      'proxool.prototype-count': '8',
+      'proxool.house-keeping-test-sql': 'SELECT 1=1;',
+      'proxool.house-keeping-sleep-time': '5000',
+      'proxool.test-before-use': 'false',
+      'proxool.test-after-use': 'false',
+      'proxool.trace': 'false',
+      'user': 'eucalyptus',
+      'password': db_pass,
+    ]
+```
+== HA-JDBC ==
+```xml
+<?xml version="1.0"?>
+<ha-jdbc>
+  <sync id="full" class="com.eucalyptus.bootstrap.Databases$FullSynchronizationStrategy">
+    <property name="fetchSize">1000</property>
+    <property name="maxBatchSize">1000</property>
+  </sync>
+  <sync id="passive" class="com.eucalyptus.bootstrap.Databases$PassiveSynchronizationStrategy" />
+  <cluster balancer="simple" default-sync="passive" dialect="postgresql" meta-data-cache="none"
+    transaction-mode="serial" failure-detect-schedule="0/15 * * ? * *" eval-current-date="true" eval-current-time="true"
+    eval-current-timestamp="true" eval-rand="true">
+    <database id="10.111.5.85" local="true">
+      <driver>org.postgresql.Driver</driver>
+      <url>jdbc:postgresql://10.111.5.85:8777/eucalyptus_cloud?ssl=true&amp;sslfactory=com.eucalyptus.postgresql.PostgreSQLSSLSocketFactory
+      </url>
+      <user>eucalyptus</user>
+      <password>73b3d009bb28c7f8d45781c076a949fbb78ef44c5e84f8cd0524422acd923741b0144b2409cc74d5563e95749909130b8bf36d560de74a8fc0539e4b0bde0edaccd066f0572412aa0a85c290f530bbe2b22bc9264efe51532db6bf85a2b6ad13717723e21b4a486ff3f60e2ceafda4b2632e19c7a01f87bb9572bfe8e6f90bf8f6ddd39efedfaea3f964e1e4acbdbaa3728e80bc1136ea84b97d04b9c036567d7417f6efa7e945a033a786d5fccec8f6710acde905ffd1ea010711b9ae0aa71112440b060f1ea57c29f059bb8994d9c2cf4a1fe3cff5dc26282ecf3c0158c211dfdc57392993630795ea3d3446e47390603b2a51be293a3371f145df06d6d40b
+      </password>
+    </database>
+    <database id="10.111.5.84" weight="100">
+      <driver>org.postgresql.Driver</driver>
+      <url>jdbc:postgresql://10.111.5.84:8777/eucalyptus_cloud?ssl=true&amp;sslfactory=com.eucalyptus.postgresql.PostgreSQLSSLSocketFactory
+      </url>
+      <user>eucalyptus</user>
+      <password>73b3d009bb28c7f8d45781c076a949fbb78ef44c5e84f8cd0524422acd923741b0144b2409cc74d5563e95749909130b8bf36d560de74a8fc0539e4b0bde0edaccd066f0572412aa0a85c290f530bbe2b22bc9264efe51532db6bf85a2b6ad13717723e21b4a486ff3f60e2ceafda4b2632e19c7a01f87bb9572bfe8e6f90bf8f6ddd39efedfaea3f964e1e4acbdbaa3728e80bc1136ea84b97d04b9c036567d7417f6efa7e945a033a786d5fccec8f6710acde905ffd1ea010711b9ae0aa71112440b060f1ea57c29f059bb8994d9c2cf4a1fe3cff5dc26282ecf3c0158c211dfdc57392993630795ea3d3446e47390603b2a51be293a3371f145df06d6d40b
+      </password>
+    </database>
+  </cluster>
+</ha-jdbc>
+```
 ----
 [[tag:rls-3.4]]

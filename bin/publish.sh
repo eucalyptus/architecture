@@ -4,8 +4,7 @@ DESTDIR=${BASEDIR}/wiki
 EXCLUDE="TODO|README.wiki|.wiki.log|EUCA-...."
 EXCLUDE_SUFFIX="pdf|zip|wsdl|git|puml|keep|eucawiki"
 EXCLUDE_DIRS="/bin/|/releases/|/lib/|/wiki/|/.git"
-TAGS="rls-2.0 rls-3.2 rls-3.3 rls-3.4 index"
-${BASEDIR}/bin/eucawiki-publish.sh
+TAGS="rls-2.0 rls-3.0 rls-3.1 rls-3.2 rls-3.3 rls-3.4 rls-4.0 rls-4.1 rls-4.2 rls-5.0 index"
 echo > ${BASEDIR}/.wiki.log
 FILELIST=$(cd ${BASEDIR}; 
 find features  -type f  | 
@@ -49,6 +48,6 @@ FEATURETAGS=$(find ${BASEDIR}/features/ -type d -maxdepth 1 2>/dev/null | egrep 
 for f in ${TAGS} ${FEATURETAGS}; do
   touch ${DESTDIR}/tag:${f}.md
 done
-(cd ${DESTDIR};${BASEDIR}//bin/tag-indexer.rb  -m tags)
-(cd ${DESTDIR}; git add ./*; git status -sb; git commit -m 'updated'; git push) 2>&1 | tee ${BASEDIR}/.wiki.log 
+(cd ${DESTDIR};${BASEDIR}//bin/tag-indexer.rb)
+#(cd ${DESTDIR}; git add ./*; git status -sb; git commit -m 'updated'; git push) 2>&1 | tee ${BASEDIR}/.wiki.log 
 #(cd ${BASEDIR}; git add wiki; git commit -a -m 'update wiki'; git push ) 2>&1 | tee ${BASEDIR}/.wiki.log

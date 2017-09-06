@@ -1,3 +1,18 @@
+- Ensure we fix up STATICDYNMAC mode
+- Introduce propagation of information about
+-- addressing (DNS configuration)
+-- elastic ips
+-- l2 isolation
+-- firewall rules
+-- configuration of edge networking
+- Network information document format
+-+ multiple security groups per instances (*CLC and UI tasks*)
+-+ VPC functionality
+--+ subnet control
+--+ private addresses
+--+ ingress/egress rules
+--+ control of gateways
+
 1  Networking  Yes  A Avoid routing traffic through the CC   Traffic_CC  L    edge networking  could be XL                                
 1  Networking  Yes  A future plugins for SDNs, Cisco, Juniper, F5, etc.  Traffic_CC  --    all about design consideration                                  
 1  Networking  Yes (AWS+)  A Being able to specify the default gateway (primarily for the infra admin. well understood. needs investigation)  Traffic_CC  MoreInfo    this is definition of edge                                  
