@@ -40,8 +40,8 @@ Replace Mule with Spring Integration.
 Features in the 4.4/5.0 release that are relevant for this feature.
 
 
-* [[5.0 SQS|5.0-SQS---Architectural-Analysis]] service configuration will need to use new approach, may have messaging requirements
-* [[ELB using SWF|ELB-SWF-ARCHITECTURAL-ANALYSIS]] relies on threading changes for scalable long polling
+* [[5.0 SQS|sqs-5.0-Architectural-Analysis]] service configuration will need to use new approach, may have messaging requirements
+* [[ELB using SWF|elb-4.4-ELB-SWF-ARCHITECTURAL-ANALYSIS]] relies on threading changes for scalable long polling
 
 
 ## Related Issues
@@ -146,7 +146,7 @@ Areas currently identified as risks:
 
 * [Spring Integration Reference Manual (docs.spring.io)](http://docs.spring.io/spring-integration/docs/4.3.1.RELEASE/reference/htmlsingle/)
 * [[Correlation ID in 4.2|Correlation-ID-in-4.2]]
-* [[Architecture: Eucalyptus System Events|Architecture--Eucalyptus-System-Events]]
+* [[Architecture: Eucalyptus System Events|monitoring-4.1-System-Events]]
 * [[Message bus design|Message-Bus-4.4]]
 
 

@@ -29,7 +29,7 @@ As a cloud developer, I want to use workflow services so that higher level servi
 
 # Use Cases
 
-*  **CloudFormation** :certain CloudFormation operations require the support from SWF.[[Cloudformation (ARCH-69/PRD-93/PRD-94)|Cloudformation-(ARCH-69-PRD-93-PRD-94)]].
+*  **CloudFormation** :certain CloudFormation operations require the support from SWF.[[Cloudformation (ARCH-69/PRD-93/PRD-94)|cloudformations-4.1-spec]].
 
 
 *  **ImagingService:** ImagingService performs a series of steps to convert incoming images. These steps are currently coordinated via IS-specific workflows. Certain details of the workflows are irrelevant to the job that IS should carry out. By decoupling workflow's state mgmt problems from actual application logic, the IS can be refactored into much simpler code, and improvements to the IS can be done quicker.

@@ -15,7 +15,7 @@ This feature is about adding support for recent architectural changes to the adm
 
 ### Goals
 
-* Make the cloud setup and maintenance workflows more suitable for use with [[administrative roles|Personas-Specification]]
+* Make the cloud setup and maintenance workflows more suitable for use with [[administrative roles|iam-4.0-Personas-Specification]]
     * [EUCA-9926 JIRA (eucalyptus.atlassian.net)](https://eucalyptus.atlassian.net/browse/EUCA-9926)
     * [EUCA-9927 JIRA (eucalyptus.atlassian.net)](https://eucalyptus.atlassian.net/browse/EUCA-9927)
     * [EUCA-9928 JIRA (eucalyptus.atlassian.net)](https://eucalyptus.atlassian.net/browse/EUCA-9928)

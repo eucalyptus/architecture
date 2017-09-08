@@ -113,7 +113,7 @@ Helper for global info updates
 
 * 4.2 [[feature details|Identity-Federation]]
 * 4.2 [epic](https://eucalyptus.atlassian.net/browse/EUCA-10334)
-* Previous incomplete [[architectural analysis|Region-Federation-(Arch.-Analysis)]] from 4.1
+* Previous incomplete [[architectural analysis|federation-4.1-Region-Federation-Architectural-Analysis]] from 4.1
 * Zach's [[Thoughts on region/identity federation and multi-region support|Thoughts-on-region-identity-federation-and-multi-region-support]]
 
 

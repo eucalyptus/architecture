@@ -18,7 +18,7 @@ Good intro to SWF, Flow framework, and glisten can be found here:[http://netflix
 
 
 # Current status
-SWF design:[[Simple Workflow Service Design|Simple-Workflow-Service-Design]]
+SWF design:[[Simple Workflow Service Design|swf-4.1-design]]
 
 
 * Stateless service in UFS

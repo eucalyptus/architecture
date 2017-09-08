@@ -16,7 +16,7 @@
 
 
 # Description
-This document covers the implementation related to the [[SWF Architectural Analysis (ARCH-71, ARCH-82)|SWF-Architectural-Analysis-(ARCH-71,-ARCH-82)]]
+This document covers the implementation related to the [[SWF Architectural Analysis (ARCH-71, ARCH-82)|swf-4.1-SWF-Architectural-Analysis]]
 
 
 # Model / Persistence

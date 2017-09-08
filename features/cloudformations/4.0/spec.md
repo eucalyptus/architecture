@@ -1,4 +1,4 @@
-[[Architectural Discovery Checklist_ PRD-93 CloudFormations|Architectural-Discovery-Checklist_-PRD-93-CloudFormations]]
+[[Architectural Discovery Checklist_ PRD-93 CloudFormations|cloudformations-4.0-Architectural-Discovery-Checklist-CloudFormations]]
 
 
 

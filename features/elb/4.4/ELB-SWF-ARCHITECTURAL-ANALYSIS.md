@@ -1,6 +1,6 @@
  **Overview** The feature is to refactor Eucalyptus ELB to use SWF as a workflow orchestration service.
 
- **Context & Background** Distributed services often involve complex workflows and [[ELB|4.3-Investigation---In-VM-services-model-and-future]] is one such example. By using a common workflow engine (SWF), implementing the future Eucalyptus services (such as RDS) can be based on a well-known, repeatable pattern and their characteristics can be easily analyzed. When ELB is implemented in SWF, we can expect
+ **Context & Background** Distributed services often involve complex workflows and [[ELB|configuration-4.3-investigation-in-vm-services-model-and-future]] is one such example. By using a common workflow engine (SWF), implementing the future Eucalyptus services (such as RDS) can be based on a well-known, repeatable pattern and their characteristics can be easily analyzed. When ELB is implemented in SWF, we can expect
 
 
 * better scalability because periodic pollings are removed
@@ -26,9 +26,9 @@ All existing ELB functionalities should be supported. The new implementation sho
 ## Performance (Scale)
 The scale of the new ELB service should be the same or better than the currently known scale limit. The ELB's use of SWF should not impact other services relying on SWF (e.g., cloudformation).
 
- **Analysis & Spikes** The investigation of In-VM services of which the ELB is an example can be found [[here|4.3-Investigation---In-VM-services-model-and-future]].
+ **Analysis & Spikes** The investigation of In-VM services of which the ELB is an example can be found [[here|configuration-4.3-investigation-in-vm-services-model-and-future]].
 
-Investigation on SWF hardening is [[here|4.3-investigation---SWF-hardening]].
+Investigation on SWF hardening is [[here|swf-4.3-investigation-swf-hardening]].
 
 
 ## SWF Scale
@@ -52,7 +52,7 @@ Dependencies
 
 
 ## VM Communication
-In old ELB implementation, the VMs used a custom, non-AWS API to retrieve a loadbalancer's specification and put an instance status and cloud-watch metrics. They will be replaced with SWF task polling. IAM::downloadServerCertificate() will remain as the only non-SWF API from the VMs. The [[protocol|ELB-SSL-Specification]] for credential download will not be changed.
+In old ELB implementation, the VMs used a custom, non-AWS API to retrieve a loadbalancer's specification and put an instance status and cloud-watch metrics. They will be replaced with SWF task polling. IAM::downloadServerCertificate() will remain as the only non-SWF API from the VMs. The [[protocol|elb-4.0-SSL-Server-Certificates]] for credential download will not be changed.
 
 SWF WorkersEach ELB service (running on UFS) will run workers for decision tasks and activity tasks. Their client-side (e.g., thread pool size) setup is configurable via the properties.
 
@@ -65,7 +65,7 @@ RedisInside the ELB VMs, Redis is used as a simple interprocess communication be
 Because SWF maintains ELB's service states and coordinates the access from distributed services, loadbalancing-backend (CLC) service can be safely removed. There will be 'loadbalancing' services hosted on UFS.
 
 Security
-* The existing [[protocol|ELB-SSL-Specification]] for credential exchange (to support downloading a user's server certificate) will not change. In summary,
+* The existing [[protocol|elb-4.0-SSL-Server-Certificates]] for credential exchange (to support downloading a user's server certificate) will not change. In summary,
     * A new RSA keypair is generated and passed down to the loadbalancer VM after encryption using NODE's keypair.
     * IAM service signs the keypair to certify that it can be used to download IAM user's server certificate
     * When a HTTPS/SSL listener is created, the loadbalancer VM requests iam:downloadServerCertificate with the public part of the keypair and the signature it generated in the step above
@@ -89,8 +89,8 @@ Security
 References
 
 
-1. [[4.3 investigation - SWF hardening|4.3-investigation---SWF-hardening]]
-1. [[4.3 Investigation - In-VM services model and future|4.3-Investigation---In-VM-services-model-and-future]]
+1. [[4.3 investigation - SWF hardening|swf-4.3-investigation-swf-hardening]]
+1. [[4.3 Investigation - In-VM services model and future|configuration-4.3-investigation-in-vm-services-model-and-future]]
 1. [https://eucalyptus.atlassian.net/browse/EUCA-10517](https://eucalyptus.atlassian.net/browse/EUCA-10517)
 1. [https://github.com/Netflix/glisten](https://github.com/Netflix/glisten)
 1. [EUCA-12689 JIRA (eucalyptus.atlassian.net)](https://eucalyptus.atlassian.net/browse/EUCA-12689)

@@ -57,7 +57,7 @@ The right solution for service VM logs is likely CloudWatch Logs.
 
 ## References
 
-* Proposed 4.1 feature : [[Monitoring Eucalyptus in 4.1 - Feature Requirements|Monitoring-Eucalyptus-in-4.1---Feature-Requirements]]
+* Proposed 4.1 feature : [[Monitoring Eucalyptus in 4.1 - Feature Requirements|monitoring-4.1-Monitoring-Feature-Requirements]]
 * [[Correlation ID in 4.2|Correlation-ID-in-4.2]]
 * [EUCA-6519 : Stacktraces should include root causes](https://eucalyptus.atlassian.net/browse/EUCA-6519)
 * [CloudWatch Logs (docs.aws.amazon.com)](http://docs.aws.amazon.com/AmazonCloudWatch/latest/DeveloperGuide/WhatIsCloudWatchLogs.html)
